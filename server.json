@@ -1,0 +1,318 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "nom": "Ben",
+      "prenom": "Ali",
+      "email": "ali.ben@example.com",
+      "PWD": "password123",
+      "role": "CLIENT",
+      "telephone": "21612345678",
+      "adresse": {
+        "rue": "Rue Habib Bourguiba",
+        "ville": "Tunis",
+        "codePostal": "1000"
+      },
+      "localisation": {
+        "lat": 36.8065,
+        "lng": 10.1815
+      }
+    },
+    {
+      "id": "u2",
+      "nom": "Sami",
+      "prenom": "Mahmoud",
+      "email": "sami.mah@example.com",
+      "PWD": "password123",
+      "role": "CLIENT",
+      "telephone": "21698765432",
+      "adresse": {
+        "rue": "Avenue de France",
+        "ville": "Sousse",
+        "codePostal": "4000"
+      }
+    },
+    {
+      "id": "v1",
+      "nom": "Faten",
+      "prenom": "Hassen",
+      "email": "faten.hassen@example.com",
+      "PWD": "vendeur123",
+      "role": "VENDEUR",
+      "telephone": "21611223344",
+      "adresse": {
+        "rue": "Rue des Bougainvilliers",
+        "ville": "Tunis",
+        "codePostal": "1000"
+      }
+    },
+    {
+      "id": "v2",
+      "nom": "Karim",
+      "prenom": "Saidi",
+      "email": "karim.saidi@example.com",
+      "PWD": "vendeur123",
+      "role": "VENDEUR",
+      "telephone": "21655667788",
+      "adresse": {
+        "rue": "Rue de la Paix",
+        "ville": "Sfax",
+        "codePostal": "3000"
+      }
+    }
+  ],
+  "vendeurs": [
+    {
+      "id": "vd1",
+      "userId": "v1",
+      "boutiques": [
+        "b1",
+        "b2"
+      ]
+    },
+    {
+      "id": "vd2",
+      "userId": "v2",
+      "boutiques": [
+        "b3",
+        "b4"
+      ]
+    }
+  ],
+  "boutiques": [
+    {
+      "id": "b1",
+      "nom": "Faten Market",
+      "adresse": "Rue des Bougainvilliers, Tunis",
+      "localisation": {
+        "lat": 36.807,
+        "lng": 10.182
+      },
+      "categorie": "Epicerie",
+      "telephone": "21611223344",
+      "vendeurId": "vd1",
+      "produits": [
+        "p1",
+        "p2"
+      ]
+    },
+    {
+      "id": "b2",
+      "nom": "Faten Fruits",
+      "adresse": "Rue de la Soukra, Tunis",
+      "localisation": {
+        "lat": 36.821,
+        "lng": 10.177
+      },
+      "categorie": "Fruits & Légumes",
+      "telephone": "21611223344",
+      "vendeurId": "vd1",
+      "produits": [
+        "p3"
+      ]
+    },
+    {
+      "id": "b3",
+      "nom": "Karim Viandes",
+      "adresse": "Rue Sfax Medina, Sfax",
+      "localisation": {
+        "lat": 34.74,
+        "lng": 10.76
+      },
+      "categorie": "Viandes & Poissons",
+      "telephone": "21655667788",
+      "vendeurId": "vd2",
+      "produits": [
+        "p4",
+        "p5"
+      ]
+    },
+    {
+      "id": "b4",
+      "nom": "Karim Laitiers",
+      "adresse": "Rue El Menzah, Sfax",
+      "localisation": {
+        "lat": 34.742,
+        "lng": 10.759
+      },
+      "categorie": "Produits Laitiers",
+      "telephone": "21655667788",
+      "vendeurId": "vd2",
+      "produits": [
+        "p6"
+      ]
+    },
+    {
+      "id": "febe",
+      "nom": "testbt1",
+      "adresse": "ariana batoire",
+      "localisation": {
+        "lat": 36.8065,
+        "lng": 10.1815
+      },
+      "categorie": "Fruits & Légumes",
+      "telephone": "+216 22174185",
+      "vendeurId": "vd1"
+    }
+  ],
+  "produits": [
+    {
+      "id": "p1",
+      "nom": "Riz",
+      "prix": 2.5,
+      "categorie": "Epicerie",
+      "description": "Riz blanc 1kg",
+      "image": "riz.jpg",
+      "quantite": 100,
+      "unite": "KILOGRAMME",
+      "livrable": true,
+      "boutiqueId": "b1"
+    },
+    {
+      "id": "p2",
+      "nom": "Huile",
+      "prix": 5,
+      "categorie": "Epicerie",
+      "description": "Huile d'olive 1L",
+      "image": "huile.jpg",
+      "quantite": 50,
+      "unite": "LITRE",
+      "livrable": true,
+      "boutiqueId": "b1"
+    },
+    {
+      "id": "p3",
+      "nom": "Pommes",
+      "prix": 3,
+      "categorie": "Fruits & Légumes",
+      "description": "Pommes rouges",
+      "image": "pommes.jpg",
+      "quantite": 200,
+      "unite": "KILOGRAMME",
+      "livrable": true,
+      "boutiqueId": "b2"
+    },
+    {
+      "id": "p4",
+      "nom": "Poulet",
+      "prix": 8,
+      "categorie": "Viandes & Poissons",
+      "description": "Poulet fermier",
+      "image": "poulet.jpg",
+      "quantite": 30,
+      "unite": "PIECE",
+      "livrable": true,
+      "boutiqueId": "b3"
+    },
+    {
+      "id": "p5",
+      "nom": "Thon",
+      "prix": 6,
+      "categorie": "Viandes & Poissons",
+      "description": "Thon en conserve",
+      "image": "thon.jpg",
+      "quantite": 80,
+      "unite": "BOITE",
+      "livrable": true,
+      "boutiqueId": "b3"
+    },
+    {
+      "id": "p6",
+      "nom": "Fromage",
+      "prix": 4,
+      "categorie": "Produits Laitiers",
+      "description": "Fromage frais",
+      "image": "fromage.jpg",
+      "quantite": 60,
+      "unite": "KILOGRAMME",
+      "livrable": true,
+      "boutiqueId": "b4"
+    },
+    {
+      "id": "794c",
+      "nom": "p1test",
+      "prix": 1500,
+      "categorie": "fruits-legumes",
+      "description": "p1 test",
+      "image": "product-1760744376277.jpg",
+      "quantite": 25,
+      "unite": "KILOGRAMME",
+      "livrable": true
+    },
+    {
+      "id": "0aea",
+      "nom": "tomate",
+      "prix": 1500,
+      "categorie": "fruits-legumes",
+      "description": "test",
+      "image": "product-1760746284197.jpg",
+      "quantite": 100,
+      "unite": "KILOGRAMME",
+      "livrable": true
+    }
+  ],
+  "commandes": [
+    {
+      "id": "c1",
+      "status": "PENDING",
+      "adresseLivraison": {
+        "rue": "Rue Habib Bourguiba",
+        "ville": "Tunis",
+        "codePostal": "1000"
+      },
+      "totalCommande": 10,
+      "dateCommande": "2025-10-17T12:00:00Z",
+      "clientId": "u1",
+      "boutiqueId": "b1",
+      "produits": [
+        "cp1",
+        "cp2"
+      ]
+    },
+    {
+      "id": "c2",
+      "status": "PROCESSING",
+      "adresseLivraison": {
+        "rue": "Avenue de France",
+        "ville": "Sousse",
+        "codePostal": "4000"
+      },
+      "totalCommande": 9,
+      "dateCommande": "2025-10-17T13:00:00Z",
+      "clientId": "u2",
+      "boutiqueId": "b3",
+      "produits": [
+        "cp3"
+      ]
+    }
+  ],
+  "commande_produits": [
+    {
+      "id": "cp1",
+      "quantite": 2,
+      "prixTotal": 5,
+      "commandeId": "c1",
+      "produitId": "p1",
+      "dateAjout": "2025-10-17T12:00:00Z",
+      "dateModif": "2025-10-17T12:00:00Z"
+    },
+    {
+      "id": "cp2",
+      "quantite": 1,
+      "prixTotal": 5,
+      "commandeId": "c1",
+      "produitId": "p2",
+      "dateAjout": "2025-10-17T12:00:00Z",
+      "dateModif": "2025-10-17T12:00:00Z"
+    },
+    {
+      "id": "cp3",
+      "quantite": 3,
+      "prixTotal": 9,
+      "commandeId": "c2",
+      "produitId": "p5",
+      "dateAjout": "2025-10-17T13:00:00Z",
+      "dateModif": "2025-10-17T13:00:00Z"
+    }
+  ]
+}

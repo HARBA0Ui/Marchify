@@ -1,0 +1,281 @@
+<div class="min-h-screen bg-[#FAFAF5] py-8 px-4">
+  <div class="max-w-md mx-auto">
+ 
+    
+    <!-- Main Form -->
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-8 rounded-lg shadow-lg border border-[#BDBDBD]">
+      <!-- Title -->
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-[#2E3D32]">Ajouter un produit</h2>
+        <p class="text-[#2E3D32] mt-2">Remplissez les informations du produit</p>
+      </div>
+
+      <!-- Nom du produit -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Nom du produit *
+        </label>
+        <input
+          type="text"
+          formControlName="name"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+          placeholder="Nom du produit"
+        />
+        @if (isFieldInvalid('name')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('name') }}
+          </div>
+        }
+      </div>
+
+      <!-- Prix -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Prix (€) *
+        </label>
+        <input
+          type="number"
+          formControlName="price"
+          step="0.01"
+          min="0.01"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+          placeholder="0.00"
+        />
+        @if (isFieldInvalid('price')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('price') }}
+          </div>
+        }
+      </div>
+
+      <!-- Unité de mesure -->
+<div>
+  <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+    Unité de mesure *
+  </label>
+  <select
+    formControlName="unit"
+    class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] appearance-none"
+  >
+    <option value="" class="text-[#BDBDBD]">Sélectionnez une unité</option>
+    <option [value]="UniteMesure.GRAMME" class="text-[#2E3D32]">Gramme (g)</option>
+    <option [value]="UniteMesure.KILOGRAMME" class="text-[#2E3D32]">Kilogramme (kg)</option>
+    <option [value]="UniteMesure.LITRE" class="text-[#2E3D32]">Litre (l)</option>
+    <option [value]="UniteMesure.MILLILITRE" class="text-[#2E3D32]">Millilitre (ml)</option>
+    <option [value]="UniteMesure.PIECE" class="text-[#2E3D32]">Pièce</option>
+    <option [value]="UniteMesure.BOITE" class="text-[#2E3D32]">Boîte</option>
+    <option [value]="UniteMesure.SAC" class="text-[#2E3D32]">Sac</option>
+    <option [value]="UniteMesure.CARTON" class="text-[#2E3D32]">Carton</option>
+    <option [value]="UniteMesure.METRE" class="text-[#2E3D32]">Mètre (m)</option>
+    <option [value]="UniteMesure.CENTIMETRE" class="text-[#2E3D32]">Centimètre (cm)</option>
+    <option [value]="UniteMesure.AUTRE" class="text-[#2E3D32]">Autre</option>
+  </select>
+  @if (isFieldInvalid('unit')) {
+    <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+      <span class="mr-1">⚠</span>
+      {{ getFieldError('unit') }}
+    </div>
+  }
+</div>
+
+      <!-- Catégorie -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Catégorie *
+        </label>
+        <select
+          formControlName="category"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] appearance-none"
+        >
+          <option value="" class="text-[#BDBDBD]">Sélectionnez une catégorie</option>
+          <option value="fruits-legumes" class="text-[#2E3D32]">🍎 Fruits & Légumes</option>
+          <option value="viandes-poissons" class="text-[#2E3D32]">🍖 Viandes & Poissons</option>
+          <option value="produits-laitiers" class="text-[#2E3D32]">🥛 Produits Laitiers</option>
+          <option value="boissons" class="text-[#2E3D32]">🥤 Boissons</option>
+          <option value="epicerie" class="text-[#2E3D32]">🛒 Épicerie</option>
+        </select>
+        @if (isFieldInvalid('category')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('category') }}
+          </div>
+        }
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Description
+        </label>
+        <textarea
+          formControlName="description"
+          rows="3"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD] resize-none"
+          placeholder="Description du produit..."
+        ></textarea>
+      </div>
+
+      <!-- Images du produit -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Images du produit
+        </label>
+        <div class="border-2 border-dashed border-[#BDBDBD] rounded-lg p-4 text-center bg-[#FAFAF5]">
+          <input
+            type="file"
+            (change)="onFileChange($event)"
+            accept="image/*"
+            multiple
+            class="hidden"
+            #fileInput
+          />
+          @if (previewUrls.length === 0) {
+            <div>
+              <p class="text-[#2E3D32] mb-2">Glissez-déposez des images ou cliquez pour sélectionner</p>
+              <button
+                type="button"
+                (click)="fileInput.click()"
+                class="px-4 py-2 bg-[#00BCD4] text-white rounded-lg hover:bg-[#0097A7] focus:outline-none focus:ring-2 focus:ring-[#00BCD4] transition-colors"
+              >
+                Choisir des images
+              </button>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              <div class="grid grid-cols-3 gap-2">
+                @for (previewUrl of previewUrls; track previewUrl; let i = $index) {
+                  <div class="relative">
+                    <img [src]="previewUrl" alt="Preview" class="w-20 h-20 object-cover rounded border border-[#BDBDBD]">
+                    <button
+                      type="button"
+                      (click)="removeImage(i)"
+                      class="absolute -top-2 -right-2 bg-[#FF5252] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-[#691F1F]"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                }
+              </div>
+              <button
+                type="button"
+                (click)="fileInput.click()"
+                class="px-4 py-2 bg-[#00BCD4] text-white rounded-lg hover:bg-[#0097A7] focus:outline-none focus:ring-2 focus:ring-[#00BCD4] transition-colors text-sm"
+              >
+                Ajouter plus d'images
+              </button>
+            </div>
+          }
+        </div>
+        @if (showImageWarning) {
+          <div class="text-[#FFA726] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            Produit créé sans images. Vous pourrez les ajouter plus tard.
+          </div>
+        }
+        <div class="text-[#2E3D32] text-sm mt-2">
+          {{ previewUrls.length }} image(s) sélectionnée(s)
+        </div>
+      </div>
+
+      <!-- Quantité -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Quantité en stock *
+        </label>
+        <input
+          type="number"
+          formControlName="quantity"
+          min="0"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+          placeholder="Quantité disponible"
+        />
+        @if (isFieldInvalid('quantity')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('quantity') }}
+          </div>
+        }
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage) {
+        <div class="p-4 bg-[#FF5252] bg-opacity-10 border border-[#FF5252] border-opacity-30 text-[#691F1F] rounded-lg flex items-start">
+          <span class="mr-2 mt-0.5">⚠</span>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <!-- Success Message -->
+      @if (successMessage) {
+        <div class="p-4 bg-[#4CAF50] bg-opacity-10 border border-[#4CAF50] border-opacity-30 text-[#214721] rounded-lg flex items-start">
+          <span class="mr-2 mt-0.5">✅</span>
+          <span>{{ successMessage }}</span>
+        </div>
+      }
+     
+<!-- Disponibilité de livraison -->
+<div>
+  <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+    Disponibilité de livraison
+  </label>
+
+  <div class="flex items-center space-x-3">
+    <label class="relative inline-flex items-center cursor-pointer">
+      <input
+        type="checkbox"
+        formControlName="livrable"
+        class="sr-only peer"
+      />
+      <div
+        class="w-12 h-6 bg-gray-300 rounded-full peer peer-checked:bg-[#4CAF50] transition-colors duration-300"
+      ></div>
+      <div
+        class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 peer-checked:translate-x-6"
+      ></div>
+    </label>
+    <span class="text-[#2E3D32] font-medium">
+      Produit livrable
+    </span>
+  </div>
+
+  <p class="text-[#757575] text-sm mt-1">
+    Activez cette option si le produit peut être livré.
+  </p>
+</div>
+
+
+
+      <!-- Buttons -->
+      <div class="flex gap-4 pt-4">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="flex-1 py-3 px-6 bg-[#BDBDBD] text-[#2E3D32] font-semibold rounded-lg hover:bg-[#9E9E9E] focus:outline-none focus:ring-2 focus:ring-[#BDBDBD] transition-colors"
+        >
+          Annuler
+        </button>
+        
+        <div class="flex gap-2 flex-1">
+          
+          
+          <button
+            type="submit"
+            [disabled]="productForm.invalid || isLoading"
+            class="flex-1 py-3 px-4 bg-[#4CAF50] text-white font-semibold rounded-lg hover:bg-[#45a049] focus:outline-none focus:ring-2 focus:ring-[#4CAF50] disabled:bg-[#C9C9C9] disabled:cursor-not-allowed transition-colors"
+          >
+            @if (isLoading) {
+              <div class="flex items-center justify-center">
+                <span class="animate-spin mr-2">⏳</span>
+                <span>Ajout...</span>
+              </div>
+            } @else {
+              <span>Ajouter</span>
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

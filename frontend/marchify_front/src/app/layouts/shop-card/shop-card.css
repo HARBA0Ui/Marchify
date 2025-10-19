@@ -1,0 +1,224 @@
+:root {
+  /* Primary Colors */
+  --primary-dark: #212c57;
+  --primary-green: #29875c;
+  --primary-teal: #38cddd;
+  --primary-light-green: #47a275;
+  --primary-cyan: #4bc5ce;
+  --primary-mint: #63bd8f;
+  --primary-light-teal: #91c4c8;
+  --primary-lime: #98e256;
+  --primary-dark-orange: #9d3518;
+  --primary-pink: #a52b4d;
+  --primary-light-cyan: #ace0e4;
+  --primary-brown: #b06129;
+  --primary-purple: #d585e1;
+  --primary-red: #dd5248;
+  --primary-yellow: #e0ab3a;
+  --primary-orange: #ec945a;
+  
+  /* Background Colors */
+  --bg-light: #f9f3d1;
+  --bg-lighter: #f9f1b2;
+  --bg-neutral: #e2dfc3;
+  
+  /* Principle Colors */
+  --principle-primary: #4bc5ce;
+  --principle-secondary: #fec655;
+}
+
+.shop-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(33, 44, 87, 0.1);
+  border: 1px solid var(--bg-neutral);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(33, 44, 87, 0.15);
+}
+
+/* Category Styles */
+.shop-card.fruits-legumes {
+  border-left: 4px solid var(--primary-green);
+}
+
+.shop-card.epicerie {
+  border-left: 4px solid var(--primary-orange);
+}
+
+.shop-card.viandes-poissons {
+  border-left: 4px solid var(--primary-red);
+}
+
+.shop-card.laitiers {
+  border-left: 4px solid var(--primary-light-cyan);
+}
+
+.shop-card.boissons {
+  border-left: 4px solid var(--primary-teal);
+}
+
+.shop-card.other {
+  border-left: 4px solid var(--primary-purple);
+}
+
+/* Header */
+.shop-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg-lighter), var(--bg-light));
+  border-bottom: 1px solid var(--bg-neutral);
+}
+
+.shop-avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--principle-primary), var(--principle-secondary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-dark);
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 15px;
+  box-shadow: 0 2px 8px rgba(75, 197, 206, 0.3);
+}
+
+.shop-info {
+  flex: 1;
+}
+
+.shop-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.shop-category {
+  color: var(--principle-primary);
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shop-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: rgba(75, 197, 206, 0.1);
+}
+
+.delete-btn:hover {
+  background: rgba(221, 82, 72, 0.1);
+}
+
+/* Details */
+.shop-details {
+  padding: 20px;
+  background: var(--bg-light);
+  flex: 1;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border-left: 3px solid var(--principle-primary);
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-icon {
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+.detail-text {
+  color: var(--primary-dark);
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Footer */
+.shop-footer {
+  padding: 16px 20px 20px;
+  background: white;
+  border-top: 1px solid var(--bg-neutral);
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--principle-primary), var(--primary-teal));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, var(--primary-teal), var(--principle-primary));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(75, 197, 206, 0.4);
+}
+
+/* Compact Variant */
+.shop-card.compact {
+  padding: 16px;
+}
+
+.shop-card.compact .shop-header {
+  padding: 0 0 12px 0;
+  background: transparent;
+  border: none;
+}
+
+.shop-card.compact .shop-details {
+  padding: 12px 0;
+  background: transparent;
+}
+
+.shop-card.compact .shop-footer {
+  padding: 12px 0 0 0;
+  border: none;
+}
+
+.shop-card.compact .detail-item {
+  padding: 8px;
+  margin-bottom: 8px;
+}

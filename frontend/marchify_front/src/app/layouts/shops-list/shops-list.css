@@ -1,0 +1,136 @@
+:root {
+  --primary-dark: #212c57;
+  --primary-green: #29875c;
+  --primary-teal: #38cddd;
+  --primary-light-green: #47a275;
+  --primary-cyan: #4bc5ce;
+  --primary-mint: #63bd8f;
+  --primary-light-teal: #91c4c8;
+  --primary-lime: #98e256;
+  --primary-dark-orange: #9d3518;
+  --primary-pink: #a52b4d;
+  --primary-light-cyan: #ace0e4;
+  --primary-brown: #b06129;
+  --primary-purple: #d585e1;
+  --primary-red: #dd5248;
+  --primary-yellow: #e0ab3a;
+  --primary-orange: #ec945a;
+  --bg-light: #f9f3d1;
+  --bg-lighter: #f9f1b2;
+  --bg-neutral: #e2dfc3;
+  --principle-primary: #4bc5ce;
+  --principle-secondary: #fec655;
+}
+
+.min-h-\[50vh\] {
+  min-height: 50vh;
+}
+
+.p-12 {
+  padding: 3rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 0;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--primary-light-cyan);
+  border-top: 4px solid var(--principle-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.px-20 {
+  padding-left: 5rem;
+  padding-right: 5rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
+}
+
+.text-zinc-950 {
+  color: rgb(9 9 11);
+}
+
+.font-extrabold {
+  font-weight: 800;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.text-blue-950 {
+  color: rgb(23 37 84);
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .p-12 {
+    padding: 1.5rem;
+  }
+  
+  .px-20 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .text-6xl {
+    font-size: 2.25rem;
+  }
+  
+  .text-4xl {
+    font-size: 1.875rem;
+  }
+}
