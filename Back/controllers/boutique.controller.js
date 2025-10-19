@@ -3,7 +3,7 @@ import db from "../db/prisma.js";
 // Créer une boutique
 export const createBoutique = async (req, res) => {
   try {
-    const { nom, adresse, localisation, categorie, telephone, vendeurId } = req.body;
+    const { nom, adresse, localisation, categorie, telephone } = req.body;
 
     const boutique = await db.boutique.create({
       data: {
@@ -12,7 +12,7 @@ export const createBoutique = async (req, res) => {
         localisation,
         categorie,
         telephone,
-        vendeurId,
+        // vendeurId,
       },
     });
 
