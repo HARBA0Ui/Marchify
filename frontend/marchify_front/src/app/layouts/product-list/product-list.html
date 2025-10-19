@@ -1,0 +1,80 @@
+<!-- Hero Section -->
+<div class="bg-[#3b8f65] text-white py-10 text-center mb-12">
+  <h1 class="text-3xl md:text-4xl font-semibold mb-2">Nos Produits</h1>
+  <p class="text-sm md:text-base opacity-90">
+    {{ filteredProducts.length }} produit{{ filteredProducts.length !== 1 ? 's' : '' }} disponible{{ filteredProducts.length !== 1 ? 's' : '' }}
+  </p>
+</div>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 max-w-7xl">
+  <!-- Filtres -->
+  <div class="mb-8 flex flex-wrap gap-4 justify-center">
+
+    <!-- Catégorie -->
+    <select 
+      [(ngModel)]="selectedCategory" 
+      (change)="applyFilters()"
+      class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring focus:ring-green-200"
+    >
+      <option value="">Toutes les catégories</option>
+      <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+    </select>
+
+    <!-- Livraison -->
+    <select 
+      [(ngModel)]="deliveryFilter" 
+      (change)="applyFilters()"
+      class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring focus:ring-green-200"
+    >
+      <option value="all">Tous les produits</option>
+      <option value="livrable">Livrables uniquement</option>
+      <option value="non-livrable">Non livrables uniquement</option>
+    </select>
+
+    <!-- Tri -->
+    <select 
+      [(ngModel)]="sortBy" 
+      (change)="applySorting()"
+      class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring focus:ring-green-200"
+    >
+      <option value="name">Nom (A-Z)</option>
+      <option value="price-asc">Prix croissant</option>
+      <option value="price-desc">Prix décroissant</option>
+    </select>
+
+    <!-- Bouton Reset -->
+    <button 
+      (click)="clearFilters()" 
+      class="bg-[#3b8f65] text-white rounded-lg px-4 py-2 text-sm hover:bg-[#2f6f50] transition"
+    >
+      Réinitialiser
+    </button>
+
+  </div>
+
+  <!-- Produits -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    @for (product of filteredProducts; track product.id) {
+      <app-product-card
+        [product]="product"
+        (addToCartEvent)="onAddToCart($event)"
+        (viewDetailsEvent)="onViewDetails($event)"
+      ></app-product-card>
+    }
+  </div>
+
+  <!-- Empty State -->
+  @if (filteredProducts.length === 0 && !isLoading) {
+    <div class="text-center text-gray-500 py-16">
+      Aucun produit trouvé.
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="text-center text-gray-400 py-16 animate-pulse">
+      Chargement des produits...
+    </div>
+  }
+</div>

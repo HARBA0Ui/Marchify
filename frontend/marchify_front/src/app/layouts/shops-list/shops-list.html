@@ -1,17 +1,22 @@
-<div class="min-h-[50vh] p-12 bg-gradient-to-br from-[#f9f3d1] to-[#f9f1b2]">
-  @if(isLoading) {
+<div class="min-h-[50vh] p-12">
+  <h3 class="text-6xl text-[#212c57] font-extrabold text-center mb-8 uppercase">
+    NOS <span class="bg-gradient-to-r from-[#4bc5ce] to-[#38cddd] bg-clip-text text-transparent">Boutiques</span>
+  </h3>
+
+
+  @if (isLoading) {
     <div class="flex justify-center items-center py-20">
       <div class="w-12 h-12 border-4 border-[#ace0e4] border-t-[#4bc5ce] rounded-full animate-spin"></div>
+      <p class="ml-4">Loading shops...</p>
     </div>
-  } @else if(shops.length === 0) {
-    <h1 class="text-4xl font-bold text-center text-[#212c57]">Aucune boutique trouvée!</h1>
+  } @else if (shops.length === 0) {
+    <div class="text-center py-20 text-gray-500">
+      No shops available
+    </div>
   } @else {
     <div class="py-12 px-20">
-      <h3 class="text-6xl text-[#212c57] font-extrabold text-center mb-8 uppercase">
-        Mes <span class="bg-gradient-to-r from-[#4bc5ce] to-[#38cddd] bg-clip-text text-transparent">Boutiques</span>
-      </h3>
       <div class="flex justify-center flex-wrap gap-6">
-        @for(shop of shops; track shop.id) {
+        @for (shop of shops; track shop.id) {
           <app-shop-card [shop]="shop" />
         }
       </div>
