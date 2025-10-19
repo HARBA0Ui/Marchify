@@ -1,0 +1,194 @@
+<div class="min-h-screen bg-[#FAFAF5] py-8 px-4">
+  <div class="max-w-md mx-auto">
+   
+    
+    <!-- Main Form -->
+    <form [formGroup]="shopForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-8 rounded-lg shadow-lg border border-[#BDBDBD]">
+      <!-- Title -->
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-[#2E3D32]">Création d'une boutique</h2>
+        <p class="text-[#2E3D32] mt-2">Remplissez les informations de votre boutique</p>
+      </div>
+
+      <!-- Nom de la boutique -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Nom de la boutique *
+        </label>
+        <input
+          type="text"
+          formControlName="name"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+          placeholder="Entrer le nom de la boutique"
+        />
+        @if (isFieldInvalid('name')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('name') }}
+          </div>
+        }
+      </div>
+
+      <!-- Nom de marché -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Nom de marché
+        </label>
+        <input
+          type="text"
+          formControlName="marketName"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+          placeholder="Entrer le nom du marché"
+        />
+      </div>
+
+      <!-- Adresse avec géolocalisation -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Adresse *
+        </label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            formControlName="address"
+            class="flex-1 px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+            placeholder="Entrer l'adresse de la boutique"
+          />
+          <button
+            type="button"
+            (click)="onGetLocation()"
+            class="px-4 py-3 bg-[#00BCD4] text-white rounded-lg hover:bg-[#0097A7] focus:outline-none focus:ring-2 focus:ring-[#00BCD4] transition-colors"
+            title="Utiliser ma position actuelle"
+            [disabled]="isLoadingLocation"
+          >
+            @if (isLoadingLocation) {
+              <span class="animate-spin">⏳</span>
+            } @else {
+              <span>📍</span>
+            }
+          </button>
+        </div>
+        @if (isFieldInvalid('address')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('address') }}
+          </div>
+        }
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Description
+        </label>
+        <textarea
+          formControlName="description"
+          rows="4"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD] resize-none"
+          placeholder="Entrer la description de la boutique"
+        ></textarea>
+      </div>
+
+      <!-- Catégorie -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Catégorie *
+        </label>
+        <select
+          formControlName="category"
+          class="w-full px-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] appearance-none"
+        >
+          <option value="" class="text-[#BDBDBD]">Select...</option>
+          @for (category of popularCategories; track category) {
+            <option [value]="category" class="text-[#2E3D32]">
+              {{ category }}
+              @if (category === 'Fruits & Légumes') { 🍎 }
+              @if (category === 'Viandes & Poissons') { 🍖 }
+              @if (category === 'Produits Laitiers') { 🥛 }
+              @if (category === 'Boissons') { 🥤 }
+              @if (category === 'Épicerie') { 🛒 }
+              @if (category === 'Boulangerie') { 🥖 }
+              @if (category === 'Électronique') { 📱 }
+              @if (category === 'Vêtements') { 👕 }
+              @if (category === 'Maison & Jardin') { 🏠 }
+              @if (category === 'Santé & Beauté') { 💊 }
+              @if (category === 'Autre') { 📦 }
+            </option>
+          }
+        </select>
+        @if (isFieldInvalid('category')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('category') }}
+          </div>
+        }
+      </div>
+
+      <!-- Téléphone -->
+      <div>
+        <label class="block text-sm font-medium text-[#2E3D32] mb-2">
+          Téléphone *
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-[#2E3D32]">+216</span>
+          </div>
+          <input
+            type="tel"
+            formControlName="phone"
+            class="w-full pl-16 pr-4 py-3 border border-[#BDBDBD] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent bg-white text-[#2E3D32] placeholder-[#BDBDBD]"
+            placeholder="99 999 999"
+          />
+        </div>
+        @if (isFieldInvalid('phone')) {
+          <div class="text-[#FF5252] text-sm mt-1 flex items-center">
+            <span class="mr-1">⚠</span>
+            {{ getFieldError('phone') }}
+          </div>
+        }
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage) {
+        <div class="p-4 bg-[#FF5252] bg-opacity-10 border border-[#FF5252] border-opacity-30 text-[#691F1F] rounded-lg flex items-start">
+          <span class="mr-2 mt-0.5">⚠</span>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <!-- Success Message -->
+      @if (successMessage) {
+        <div class="p-4 bg-[#4CAF50] bg-opacity-10 border border-[#4CAF50] border-opacity-30 text-[#214721] rounded-lg flex items-start">
+          <span class="mr-2 mt-0.5">✅</span>
+          <span>{{ successMessage }}</span>
+        </div>
+      }
+
+      <!-- Buttons -->
+      <div class="flex gap-4 pt-4">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="flex-1 py-3 px-6 bg-[#BDBDBD] text-[#2E3D32] font-semibold rounded-lg hover:bg-[#9E9E9E] focus:outline-none focus:ring-2 focus:ring-[#BDBDBD] transition-colors"
+        >
+          Annuler
+        </button>
+        
+        <button
+          type="submit"
+          [disabled]="shopForm.invalid || isLoading"
+          class="flex-1 py-3 px-6 bg-[#4CAF50] text-white font-semibold rounded-lg hover:bg-[#45a049] focus:outline-none focus:ring-2 focus:ring-[#4CAF50] disabled:bg-[#C9C9C9] disabled:cursor-not-allowed transition-colors"
+        >
+          @if (isLoading) {
+            <div class="flex items-center justify-center">
+              <span class="animate-spin mr-2">⏳</span>
+              <span>Création en cours...</span>
+            </div>
+          } @else {
+            <span>Créer la boutique</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
