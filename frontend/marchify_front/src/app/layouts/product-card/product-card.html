@@ -1,1 +1,73 @@
-<p>product-card works!</p>
+<!-- product-card.component.html -->
+<div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-[#e2dfc3] overflow-hidden group hover:transform hover:scale-[1.02]">
+  <!-- Product Image -->
+  <div class="relative h-48 bg-gradient-to-br from-[#ace0e4] to-[#91c4c8] overflow-hidden">
+    <img 
+      [src]="product.image" 
+      [alt]="product.nom"
+      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+    />
+    
+    <!-- Delivery Badge -->
+    @if (product.livrable) {
+      <div class="absolute top-3 left-3">
+        <span class="bg-gradient-to-r from-[#47a275] to-[#63bd8f] text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
+          🚗 Livraison
+        </span>
+      </div>
+    }
+    
+    <!-- Category Badge -->
+    <div class="absolute top-3 right-3">
+      <span class="bg-gradient-to-r from-[#38cddd] to-[#4bc5ce] text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
+        {{ product.categorie }}
+      </span>
+    </div>
+
+    <!-- Overlay on hover -->
+    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
+  </div>
+
+  <!-- Product Info -->
+  <div class="p-5">
+    <!-- Product Name -->
+    <h3 class="text-lg font-bold text-[#212c57] mb-2 line-clamp-2 group-hover:text-[#29875c] transition-colors">
+      {{ product.nom }}
+    </h3>
+    
+    <!-- Description -->
+    <p class="text-[#212c57]/70 text-sm mb-4 line-clamp-2">
+      {{ product.description }}
+    </p>
+    
+    <!-- Price & Quantity -->
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <span class="text-2xl font-bold bg-gradient-to-r from-[#fcb046] to-[#fec655] bg-clip-text text-transparent">
+          {{ product.prix }}€
+        </span>
+        <span class="text-[#212c57]/60 text-sm ml-2">
+          / {{ product.quantite }} {{ product.unite }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3">
+      <button 
+        class="flex-1 bg-gradient-to-r from-[#fcb046] to-[#fec655] hover:from-[#fec655] hover:to-[#fcb046] text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+        (click)="addToCart()"
+      >
+        <span>🛒</span>
+        <span>Ajouter</span>
+      </button>
+      
+      <button 
+        class="w-12 h-12 flex items-center justify-center border border-[#63bd8f] rounded-xl hover:bg-[#63bd8f] hover:text-white transition-all duration-300 group/icon"
+        (click)="viewDetails()"
+      >
+        <span class="group-hover/icon:scale-110 transition-transform">👁️</span>
+      </button>
+    </div>
+  </div>
+</div>
