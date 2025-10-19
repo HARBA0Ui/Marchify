@@ -68,10 +68,11 @@ model Vendeur {
 }
 
 model Livreur {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   localisation Json?
-  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String @unique @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String     @unique @db.ObjectId
+  Commande     Commande[]
 
   @@map("livreurs")
 }
@@ -125,6 +126,9 @@ model Commande {
   boutique   Boutique?         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
   boutiqueId String?           @db.ObjectId
   produits   CommandeProduit[]
+
+  livreur   Livreur? @relation(fields: [livreurId], references: [id])
+  livreurId String?  @db.ObjectId
 
   @@map("commandes")
 }
