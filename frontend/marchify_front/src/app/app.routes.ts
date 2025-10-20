@@ -5,8 +5,8 @@ import { ShopsList } from './layouts/shops-list/shops-list';
 import { Shop } from './layouts/shop/shop';
 import { PanierList } from './layouts/panier-list/panier-list';
 import { ProductList } from './layouts/product-list/product-list';
-import { Component } from '@angular/core';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
+import { MissionList } from './features/delivery/pages/mission-list/mission-list';
 
 export const routes: Routes = [
   {
@@ -42,6 +42,10 @@ export const routes: Routes = [
     path:"commande-list-vendor",
     title:"Commande List Vendor",
     component: CommandeListVendor
-  },
+  }, {
+    path: 'delivery/missions',
+    title: 'Delivery Missions',
+    component: MissionList,
+  }
 ];
 

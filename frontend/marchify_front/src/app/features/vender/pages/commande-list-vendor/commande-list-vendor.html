@@ -6,7 +6,7 @@
       <p class="text-[#212c57]/70 text-lg">Gérez vos commandes et mettez à jour leur statut</p>
     </div>
 
-    <!-- Status Filter Tabs -->
+    <!-- Status Filter Tabs (Only 3 vendor statuses) -->
     <div class="mb-6 overflow-x-auto pb-2">
       <div class="flex gap-3 min-w-max">
         @for (status of statusList; track status.value) {
@@ -176,9 +176,12 @@
                   ✓ Marquer comme {{ getStatusInfo(getNextStatus(commande.status)!).label }}
                 </button>
               }
-              @if (!getNextStatus(commande.status) && commande.status === 'DELIVERED') {
-                <span class="px-6 py-3 bg-[#29875c] text-white font-bold rounded-xl shadow-lg">
-                  ✓ Commande terminée
+              @if (commande.status === 'READY') {
+                <span class="px-6 py-3 bg-[#29875c] text-white font-bold rounded-xl shadow-lg flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Commande prête pour livraison
                 </span>
               }
             </div>

@@ -21,6 +21,7 @@ export class CommandeListVendor {
   vendeurId: string = 'vd1'; // TODO: Replace with actual auth service
   vendeurBoutiques: string[] = ['b1', 'b2']; // TODO: Fetch from vendeur data
 
+  // ONLY vendor-relevant statuses (PENDING → PROCESSING → READY)
   statusList = [
     {
       value: CmdStatus.PENDING,
@@ -29,33 +30,15 @@ export class CommandeListVendor {
       textColor: 'text-white',
     },
     {
-      value: CmdStatus.CONFIRMED,
-      label: 'Confirmée',
-      bgColor: 'bg-[#38cddd]',
-      textColor: 'text-white',
-    },
-    {
-      value: CmdStatus.PREPARING,
-      label: 'En préparation',
+      value: CmdStatus.PROCESSING,
+      label: 'En traitement',
       bgColor: 'bg-[#fcb046]',
       textColor: 'text-white',
     },
     {
-      value: CmdStatus.SHIPPED,
-      label: 'Expédiée',
-      bgColor: 'bg-[#47a275]',
-      textColor: 'text-white',
-    },
-    {
-      value: CmdStatus.DELIVERED,
-      label: 'Livrée',
+      value: CmdStatus.READY,
+      label: 'Prête',
       bgColor: 'bg-[#29875c]',
-      textColor: 'text-white',
-    },
-    {
-      value: CmdStatus.CANCELLED,
-      label: 'Annulée',
-      bgColor: 'bg-[#a52b4d]',
       textColor: 'text-white',
     },
   ];
@@ -70,9 +53,12 @@ export class CommandeListVendor {
 
     this.commandeService.getAllCommandes().subscribe({
       next: (data) => {
-        // Filter commandes for this vendor's boutiques
+        // Filter commandes for this vendor's boutiques AND only vendor statuses
         this.commandes = data.filter(
-          (cmd) => cmd.boutiqueId && this.isVendeurBoutique(cmd.boutiqueId)
+          (cmd) =>
+            cmd.boutiqueId &&
+            this.isVendeurBoutique(cmd.boutiqueId) &&
+            this.isVendorStatus(cmd.status)
         );
         this.filterByStatus(this.selectedStatus);
         this.loading = false;
@@ -85,7 +71,14 @@ export class CommandeListVendor {
     });
   }
 
-  // Check if boutique belongs to vendor (you'll need to implement this based on your data)
+  // Check if status is vendor-manageable
+  isVendorStatus(status: CmdStatus): boolean {
+    return [CmdStatus.PENDING, CmdStatus.PROCESSING, CmdStatus.READY].includes(
+      status
+    );
+  }
+
+  // Check if boutique belongs to vendor
   isVendeurBoutique(boutiqueId: string): boolean {
     // TODO: Implement proper check from vendeur boutiques list
     return true; // For now, return true for all
@@ -106,6 +99,13 @@ export class CommandeListVendor {
         if (index !== -1) {
           this.commandes[index] = updatedCommande;
         }
+
+        // If status moved to READY, remove from vendor view after update
+        if (newStatus === CmdStatus.READY) {
+          // Keep it visible for a moment, then optionally remove or keep
+          // For now, we keep it so vendor can see completed orders
+        }
+
         this.filterByStatus(this.selectedStatus);
         console.log('✅ Statut mis à jour avec succès');
       },
@@ -116,14 +116,14 @@ export class CommandeListVendor {
     });
   }
 
+  // Vendor workflow: PENDING → PROCESSING → READY (STOP)
   getNextStatus(currentStatus: CmdStatus): CmdStatus | null {
-    const statusFlow: { [key in CmdStatus]?: CmdStatus } = {
-      [CmdStatus.PENDING]: CmdStatus.CONFIRMED,
-      [CmdStatus.CONFIRMED]: CmdStatus.PREPARING,
-      [CmdStatus.PREPARING]: CmdStatus.SHIPPED,
-      [CmdStatus.SHIPPED]: CmdStatus.DELIVERED,
+    const vendorStatusFlow: { [key in CmdStatus]?: CmdStatus } = {
+      [CmdStatus.PENDING]: CmdStatus.PROCESSING,
+      [CmdStatus.PROCESSING]: CmdStatus.READY,
+      // READY is the final status for vendor - no next status
     };
-    return statusFlow[currentStatus] || null;
+    return vendorStatusFlow[currentStatus] || null;
   }
 
   getStatusInfo(status: CmdStatus) {
@@ -150,4 +150,3 @@ export class CommandeListVendor {
     return this.commandes.filter((c) => c.status === status).length;
   }
 }
-  

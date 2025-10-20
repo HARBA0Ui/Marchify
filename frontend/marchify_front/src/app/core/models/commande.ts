@@ -1,11 +1,11 @@
-// commande.model.ts
 export enum CmdStatus {
   PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  PREPARING = 'PREPARING',
+  PROCESSING = 'PROCESSING',
+  READY = 'READY',
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
+  RETURNED = 'RETURNED',
 }
 
 export interface AdresseLivraison {
