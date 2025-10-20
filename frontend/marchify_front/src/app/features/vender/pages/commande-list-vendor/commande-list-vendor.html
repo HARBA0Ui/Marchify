@@ -1,0 +1,190 @@
+<div class="min-h-screen bg-[#f9f3d1] px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-[#212c57] mb-2">Gestion des Commandes</h1>
+      <p class="text-[#212c57]/70 text-lg">Gérez vos commandes et mettez à jour leur statut</p>
+    </div>
+
+    <!-- Status Filter Tabs -->
+    <div class="mb-6 overflow-x-auto pb-2">
+      <div class="flex gap-3 min-w-max">
+        @for (status of statusList; track status.value) {
+          <button
+            (click)="filterByStatus(status.value)"
+            [class]="
+              'px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ' +
+              (selectedStatus === status.value
+                ? status.bgColor + ' ' + status.textColor + ' scale-105'
+                : 'bg-white text-[#212c57] hover:bg-[#e2dfc3]')
+            "
+          >
+            {{ status.label }}
+            <span
+              [class]="
+                'ml-2 px-2.5 py-1 text-xs font-bold rounded-full ' +
+                (selectedStatus === status.value
+                  ? 'bg-white/30 text-white'
+                  : 'bg-[#fcb046] text-white')
+              "
+            >
+              {{ getCommandeCount(status.value) }}
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="text-center py-16">
+        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#fcb046] border-t-transparent"></div>
+        <p class="mt-4 text-[#212c57] text-lg font-medium">Chargement des commandes...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error && !loading) {
+      <div class="bg-[#dd5248]/10 border-2 border-[#dd5248] text-[#dd5248] px-6 py-4 rounded-xl mb-6 font-medium">
+        {{ error }}
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading && filteredCommandes.length === 0) {
+      <div class="text-center py-16 bg-white rounded-2xl shadow-lg">
+        <svg
+          class="mx-auto h-20 w-20 text-[#212c57]/30"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+        <p class="mt-6 text-xl text-[#212c57] font-medium">
+          Aucune commande {{ getStatusInfo(selectedStatus).label.toLowerCase() }}
+        </p>
+      </div>
+    }
+
+    <!-- Commandes List -->
+    @if (!loading && filteredCommandes.length > 0) {
+      <div class="space-y-6">
+        @for (commande of filteredCommandes; track commande.id) {
+          <div
+            class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6 border-l-4"
+            [style.border-left-color]="getStatusInfo(commande.status).bgColor.replace('bg-[', '').replace(']', '')"
+          >
+            <!-- Commande Header -->
+            <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+              <div>
+                <h3 class="text-2xl font-bold text-[#212c57] mb-1">
+                  Commande #{{ commande.id.substring(0, 8).toUpperCase() }}
+                </h3>
+                <p class="text-[#212c57]/60 font-medium">
+                  📅 {{ formatDate(commande.dateCommande) }}
+                </p>
+              </div>
+              <span
+                [class]="
+                  'px-5 py-2 rounded-xl text-sm font-bold shadow-md ' +
+                  getStatusInfo(commande.status).bgColor + ' ' +
+                  getStatusInfo(commande.status).textColor
+                "
+              >
+                {{ getStatusInfo(commande.status).label }}
+              </span>
+            </div>
+
+            <!-- Client Info -->
+            <div class="mb-6 p-5 bg-[#f9f1b2] rounded-xl border border-[#e2dfc3]">
+              <h4 class="text-lg font-bold text-[#212c57] mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Informations Client
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <p class="text-[#212c57] font-medium">
+                  <span class="text-[#212c57]/60">📧 Email:</span>
+                  <span class="ml-2">client@example.com</span>
+                </p>
+                <p class="text-[#212c57] font-medium">
+                  <span class="text-[#212c57]/60">📱 Téléphone:</span>
+                  <span class="ml-2">+216 12 345 678</span>
+                </p>
+              </div>
+              <div class="mt-3">
+                <p class="text-[#212c57] font-medium">
+                  <span class="text-[#212c57]/60">📍 Adresse de livraison:</span>
+                </p>
+                <p class="ml-6 mt-1 text-[#212c57]">
+                  {{ commande.adresseLivraison.rue }}, {{ commande.adresseLivraison.ville }}
+                  {{ commande.adresseLivraison.codePostal }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Products -->
+            <div class="mb-6">
+              <h4 class="text-lg font-bold text-[#212c57] mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Produits ({{ getTotalProduits(commande) }} articles)
+              </h4>
+              <div class="space-y-3">
+                @for (produit of commande.produits; track produit.produitId || $index) {
+                  <div class="flex items-center justify-between p-4 bg-[#e2dfc3] rounded-xl hover:bg-[#d8d5b8] transition-colors">
+                    <div class="flex items-center gap-4 flex-1">
+                      <div class="bg-white p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-[#fcb046]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <p class="font-bold text-[#212c57] text-lg">{{ produit.nom }}</p>
+                        <p class="text-[#212c57]/70 font-medium">
+                          {{ produit.quantite }} {{ produit.unite }} × {{ produit.prixUnitaire }} DT
+                        </p>
+                      </div>
+                    </div>
+                    <p class="font-bold text-[#29875c] text-xl">{{ produit.prixTotal }} DT</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Total and Actions -->
+            <div class="flex flex-wrap justify-between items-center pt-6 border-t-2 border-[#e2dfc3] gap-4">
+              <div>
+                <p class="text-[#212c57]/70 font-medium mb-1">Total de la commande</p>
+                <p class="text-4xl font-bold text-[#29875c]">{{ commande.totalCommande }} DT</p>
+              </div>
+
+              <!-- Action Button -->
+              @if (getNextStatus(commande.status)) {
+                <button
+                  (click)="updateStatus(commande.id, getNextStatus(commande.status)!)"
+                  class="px-8 py-4 bg-[#fcb046] hover:bg-[#fec655] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1"
+                >
+                  ✓ Marquer comme {{ getStatusInfo(getNextStatus(commande.status)!).label }}
+                </button>
+              }
+              @if (!getNextStatus(commande.status) && commande.status === 'DELIVERED') {
+                <span class="px-6 py-3 bg-[#29875c] text-white font-bold rounded-xl shadow-lg">
+                  ✓ Commande terminée
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

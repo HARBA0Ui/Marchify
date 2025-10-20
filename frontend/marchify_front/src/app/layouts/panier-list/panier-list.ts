@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Panier } from '../../core/models/panier';
 import { PanierService } from '../../core/services/panier';
 import { DecimalPipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-panier-list',
@@ -13,8 +14,8 @@ export class PanierList {
   paniers: Panier[] = [];
   loading = true;
   error: string | null = null;
-
-  constructor(private panierService: PanierService) {} // Fixed service name
+  private router = inject(Router);
+  constructor(private panierService: PanierService) {}
 
   ngOnInit() {
     console.log('🔄 Loading paniers...');
@@ -37,58 +38,145 @@ export class PanierList {
 
   confirmerCommande(): void {
     if (this.paniers && this.paniers.length > 0) {
-      this.panierService.confirmerCommande(this.paniers[0]);
-      alert('Commande confirmée ✅');
+      const panier = this.paniers[0];
+
+      // Get client's address from panier or user data
+      const adresseLivraison = {
+        rue: '15 Avenue Habib Bourguiba', // TODO: Get from user profile or form
+        ville: 'Tunis',
+        codePostal: '1000',
+      };
+
+      this.panierService
+        .confirmerCommande(panier.id, adresseLivraison)
+        .subscribe({
+          next: (response) => {
+            console.log('✅ Commande créée:', response);
+            alert('Commande confirmée avec succès ✅');
+
+            // Clear panier after successful order
+            this.viderPanier();
+
+            // Optional: Navigate to orders page
+            // this.router.navigate(['/commandes']);
+          },
+          error: (err) => {
+            console.error('❌ Erreur lors de la confirmation:', err);
+            alert('Erreur lors de la confirmation de la commande');
+          },
+        });
     } else {
       alert('Aucun panier à confirmer');
     }
   }
-  // In your component class
+
   increaseQuantity(product: any): void {
-    product.quantite++;
-    this.updateTotals();
+    if (this.paniers[0]?.id && product.produitId) {
+      product.quantite++;
+
+      // Update on server
+      this.panierService
+        .modifierQuantite(
+          this.paniers[0].id,
+          product.produitId,
+          product.quantite
+        )
+        .subscribe({
+          next: (updatedPanier) => {
+            console.log('✅ Quantité mise à jour');
+            this.updateTotals();
+          },
+          error: (err) => {
+            console.error('❌ Erreur:', err);
+            product.quantite--; // Revert on error
+          },
+        });
+    }
   }
 
   decreaseQuantity(product: any): void {
     if (product.quantite > 1) {
-      product.quantite--;
-      this.updateTotals();
+      if (this.paniers[0]?.id && product.produitId) {
+        product.quantite--;
+
+        // Update on server
+        this.panierService
+          .modifierQuantite(
+            this.paniers[0].id,
+            product.produitId,
+            product.quantite
+          )
+          .subscribe({
+            next: (updatedPanier) => {
+              console.log('✅ Quantité mise à jour');
+              this.updateTotals();
+            },
+            error: (err) => {
+              console.error('❌ Erreur:', err);
+              product.quantite++; // Revert on error
+            },
+          });
+      }
     }
   }
 
   removeProduct(product: any): void {
-    const index = this.paniers[0].produits.indexOf(product);
-    if (index > -1) {
-      this.paniers[0].produits.splice(index, 1);
-      this.updateTotals();
+    if (this.paniers[0]?.id && product.produitId) {
+      if (confirm('Voulez-vous vraiment retirer ce produit ?')) {
+        this.panierService
+          .retirerProduit(this.paniers[0].id, product.produitId)
+          .subscribe({
+            next: () => {
+              console.log('✅ Produit retiré');
+              const index = this.paniers[0].produits.indexOf(product);
+              if (index > -1) {
+                this.paniers[0].produits.splice(index, 1);
+                this.updateTotals();
+              }
+            },
+            error: (err) => {
+              console.error('❌ Erreur:', err);
+              alert('Erreur lors de la suppression du produit');
+            },
+          });
+      }
     }
   }
 
   viderPanier(): void {
-    this.paniers[0].produits = [];
-    this.updateTotals();
+    if (this.paniers[0]?.id) {
+      if (confirm('Voulez-vous vraiment vider le panier ?')) {
+        this.panierService.viderPanier(this.paniers[0].id).subscribe({
+          next: () => {
+            console.log('✅ Panier vidé');
+            this.paniers[0].produits = [];
+            this.updateTotals();
+          },
+          error: (err) => {
+            console.error('❌ Erreur:', err);
+            alert('Erreur lors du vidage du panier');
+          },
+        });
+      }
+    }
   }
 
   continuerAchats(): void {
-    // Navigate back or do something else
-    console.log('Continuing shopping...');
+    this.router.navigate(['/produits']); // Adjust route as needed
   }
 
   updateTotals(): void {
     if (this.paniers[0]?.produits) {
-      // First: Recalculate prixTotal for each product
+      // Recalculate prixTotal for each product
       for (const p of this.paniers[0].produits) {
         p.prixTotal = p.prixUnitaire * p.quantite;
       }
 
-      // Then: Recalculate cart totals
-      const sousTotal = this.paniers[0].produits.reduce(
+      // Recalculate cart total
+      this.paniers[0].total = this.paniers[0].produits.reduce(
         (sum, p) => sum + p.prixTotal,
         0
       );
-      const livraison = sousTotal > 0 ? 3.0 : 0.0; // or however you compute delivery
-
-      this.paniers[0].total = sousTotal + livraison;
     }
   }
 }

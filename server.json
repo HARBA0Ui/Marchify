@@ -65,12 +65,18 @@
     {
       "id": "vd1",
       "userId": "v1",
-      "boutiques": ["b1", "b2"]
+      "boutiques": [
+        "b1",
+        "b2"
+      ]
     },
     {
       "id": "vd2",
       "userId": "v2",
-      "boutiques": ["b3", "b4"]
+      "boutiques": [
+        "b3",
+        "b4"
+      ]
     }
   ],
   "paniers": [
@@ -131,7 +137,10 @@
       "categorie": "Epicerie",
       "telephone": "21611223344",
       "vendeurId": "vd1",
-      "produits": ["p1", "p2"]
+      "produits": [
+        "p1",
+        "p2"
+      ]
     },
     {
       "id": "b2",
@@ -144,7 +153,9 @@
       "categorie": "Fruits & Légumes",
       "telephone": "21611223344",
       "vendeurId": "vd1",
-      "produits": ["p3"]
+      "produits": [
+        "p3"
+      ]
     },
     {
       "id": "b3",
@@ -157,7 +168,10 @@
       "categorie": "Viandes & Poissons",
       "telephone": "21655667788",
       "vendeurId": "vd2",
-      "produits": ["p4", "p5"]
+      "produits": [
+        "p4",
+        "p5"
+      ]
     },
     {
       "id": "b4",
@@ -170,7 +184,9 @@
       "categorie": "Produits Laitiers",
       "telephone": "21655667788",
       "vendeurId": "vd2",
-      "produits": ["p6"]
+      "produits": [
+        "p6"
+      ]
     },
     {
       "id": "febe",
@@ -195,7 +211,7 @@
       "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200&h=200&fit=crop&q=60",
       "quantite": 100,
       "unite": "KILOGRAMME",
-      "livrable": true,
+      "livrable": false,
       "boutiqueId": "b1"
     },
     {
@@ -288,27 +304,143 @@
       "adresseLivraison": {
         "rue": "Rue Habib Bourguiba",
         "ville": "Tunis",
-        "codePostal": "1000"
+        "codePostal": "1000",
+        "pays": "Tunisie"
       },
       "totalCommande": 10,
       "dateCommande": "2025-10-17T12:00:00Z",
       "clientId": "u1",
       "boutiqueId": "b1",
-      "produits": ["cp1", "cp2"]
+      "produits": [
+        {
+          "produitId": "p1",
+          "nom": "Riz",
+          "prixUnitaire": 2.5,
+          "quantite": 2,
+          "prixTotal": 5,
+          "unite": "kg"
+        },
+        {
+          "produitId": "p2",
+          "nom": "Huile d'olive",
+          "prixUnitaire": 5,
+          "quantite": 1,
+          "prixTotal": 5,
+          "unite": "L"
+        }
+      ]
     },
     {
       "id": "c2",
-      "status": "PROCESSING",
+      "status": "CONFIRMED",
       "adresseLivraison": {
         "rue": "Avenue de France",
         "ville": "Sousse",
-        "codePostal": "4000"
+        "codePostal": "4000",
+        "pays": "Tunisie"
       },
       "totalCommande": 9,
       "dateCommande": "2025-10-17T13:00:00Z",
       "clientId": "u2",
       "boutiqueId": "b3",
-      "produits": ["cp3"]
+      "produits": [
+        {
+          "produitId": "p5",
+          "nom": "Thon",
+          "prixUnitaire": 6,
+          "quantite": 3,
+          "prixTotal": 18,
+          "unite": "boîte"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "status": "PREPARING",
+      "adresseLivraison": {
+        "rue": "Rue de la Soukra",
+        "ville": "Tunis",
+        "codePostal": "2036",
+        "pays": "Tunisie"
+      },
+      "totalCommande": 24,
+      "dateCommande": "2025-10-18T09:15:00Z",
+      "clientId": "u1",
+      "boutiqueId": "b2",
+      "produits": [
+        {
+          "produitId": "p3",
+          "nom": "Pommes",
+          "prixUnitaire": 3,
+          "quantite": 5,
+          "prixTotal": 15,
+          "unite": "kg"
+        },
+        {
+          "produitId": "p4",
+          "nom": "Poulet fermier",
+          "prixUnitaire": 8,
+          "quantite": 1,
+          "prixTotal": 8,
+          "unite": "pièce"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "status": "SHIPPED",
+      "adresseLivraison": {
+        "rue": "Rue Sfax Medina",
+        "ville": "Sfax",
+        "codePostal": "3000",
+        "pays": "Tunisie"
+      },
+      "totalCommande": 16,
+      "dateCommande": "2025-10-16T14:30:00Z",
+      "clientId": "u2",
+      "boutiqueId": "b4",
+      "produits": [
+        {
+          "produitId": "p6",
+          "nom": "Fromage",
+          "prixUnitaire": 4,
+          "quantite": 4,
+          "prixTotal": 16,
+          "unite": "kg"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "status": "DELIVERED",
+      "adresseLivraison": {
+        "rue": "Avenue Mohamed V",
+        "ville": "Tunis",
+        "codePostal": "1002",
+        "pays": "Tunisie"
+      },
+      "totalCommande": 32.5,
+      "dateCommande": "2025-10-15T10:00:00Z",
+      "clientId": "u1",
+      "boutiqueId": "b1",
+      "produits": [
+        {
+          "produitId": "p1",
+          "nom": "Riz",
+          "prixUnitaire": 2.5,
+          "quantite": 3,
+          "prixTotal": 7.5,
+          "unite": "kg"
+        },
+        {
+          "produitId": "p2",
+          "nom": "Huile d'olive",
+          "prixUnitaire": 5,
+          "quantite": 5,
+          "prixTotal": 25,
+          "unite": "L"
+        }
+      ]
     }
   ],
   "commande_produits": [
