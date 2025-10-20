@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable } from 'rxjs';
 import { Shop } from '../models/shop';
 import { ShopCreateRequest } from '../models/shop-create-request';
 import { HttpClient } from '@angular/common/http';
@@ -9,11 +9,23 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ShopService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000'; // JSON Server URL
+  private apiUrl = 'http://localhost:3000';
 
-  // Get all shops
-  getShops(): Observable<Shop[]> {
-    return this.http.get<Shop[]>(`${this.apiUrl}/boutiques`);
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed:`, error);
+      return new Observable<T>((subscriber) => {
+        subscriber.next(result as T);
+        subscriber.complete();
+      });
+    };
+  }
+
+  // Get all shops - JSON Server returns array directly
+  getAllShops(): Observable<Shop[]> {
+    return this.http
+      .get<Shop[]>(`${this.apiUrl}/boutiques`)
+      .pipe(catchError(this.handleError<Shop[]>('getAllShops', [])));
   }
 
   // Get shops by vendeur ID

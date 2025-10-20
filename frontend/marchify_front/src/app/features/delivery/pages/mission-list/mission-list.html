@@ -1,0 +1,214 @@
+<div class="min-h-screen bg-[#f9f3d1] px-4 py-8">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-4xl font-bold text-[#212c57] mb-2">Mes Missions de Livraison</h1>
+      <p class="text-[#212c57]/70 text-lg">Gérez vos livraisons en cours</p>
+    </div>
+
+    <!-- Status Filter Tabs -->
+    <div class="mb-6 flex justify-center">
+      <div class="inline-flex gap-3 bg-white p-2 rounded-xl shadow-lg">
+        @for (status of statusList; track status.value) {
+          <button
+            (click)="filterByStatus(status.value)"
+            [class]="
+              'px-6 py-3 rounded-lg font-semibold transition-all duration-200 ' +
+              (selectedStatus === status.value
+                ? status.bgColor + ' ' + status.textColor + ' shadow-md scale-105'
+                : 'bg-[#f9f3d1] text-[#212c57] hover:bg-[#e2dfc3]')
+            "
+          >
+            <span class="mr-2">{{ status.icon }}</span>
+            {{ status.label }}
+            <span
+              [class]="
+                'ml-2 px-2.5 py-1 text-xs font-bold rounded-full ' +
+                (selectedStatus === status.value
+                  ? 'bg-white/30 text-white'
+                  : 'bg-[#fcb046] text-white')
+              "
+            >
+              {{ getMissionCount(status.value) }}
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="text-center py-16">
+        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#fcb046] border-t-transparent"></div>
+        <p class="mt-4 text-[#212c57] text-lg font-medium">Chargement des missions...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error && !loading) {
+      <div class="bg-[#dd5248]/10 border-2 border-[#dd5248] text-[#dd5248] px-6 py-4 rounded-xl mb-6 font-medium">
+        {{ error }}
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading && filteredMissions.length === 0) {
+      <div class="text-center py-16 bg-white rounded-2xl shadow-lg">
+        <svg
+          class="mx-auto h-20 w-20 text-[#212c57]/30"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        <p class="mt-6 text-xl text-[#212c57] font-medium">
+          Aucune mission {{ getStatusInfo(selectedStatus).label.toLowerCase() }}
+        </p>
+        <p class="mt-2 text-[#212c57]/60">
+          Revenez plus tard pour voir les nouvelles missions
+        </p>
+      </div>
+    }
+
+    <!-- Missions List -->
+    @if (!loading && filteredMissions.length > 0) {
+      <div class="space-y-6">
+        @for (mission of filteredMissions; track mission.id) {
+          <div 
+            class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6 border-l-4"
+            [style.border-left-color]="getStatusInfo(mission.status).bgColor.replace('bg-[', '').replace(']', '')"
+          >
+            <!-- Mission Header -->
+            <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-2xl font-bold text-[#212c57]">
+                    Commande #{{ mission.id.substring(0, 8).toUpperCase() }}
+                  </h3>
+                  <span 
+                    [class]="
+                      'px-3 py-1 text-xs font-bold rounded-full ' +
+                      getStatusInfo(mission.status).bgColor + ' ' +
+                      getStatusInfo(mission.status).textColor
+                    "
+                  >
+                    {{ getStatusInfo(mission.status).icon }} {{ getStatusInfo(mission.status).label }}
+                  </span>
+                </div>
+                <p class="text-[#212c57]/60 font-medium">
+                  📅 {{ formatDate(mission.dateCommande) }}
+                </p>
+              </div>
+              <div class="text-right">
+                <p class="text-[#212c57]/60 text-sm">Montant</p>
+                <p class="text-3xl font-bold text-[#29875c]">{{ mission.totalCommande }} DT</p>
+              </div>
+            </div>
+
+            <!-- Delivery Info -->
+            <div class="mb-6 p-5 bg-[#f9f1b2] rounded-xl border border-[#e2dfc3]">
+              <h4 class="text-lg font-bold text-[#212c57] mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-[#fcb046]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Adresse de livraison
+              </h4>
+              <p class="text-[#212c57] font-medium text-lg ml-7">
+                {{ mission.adresseLivraison.rue }}
+              </p>
+              <p class="text-[#212c57]/70 ml-7">
+                {{ mission.adresseLivraison.ville }}, {{ mission.adresseLivraison.codePostal }}
+              </p>
+              @if (mission.adresseLivraison.instructions) {
+                <div class="mt-3 ml-7 p-3 bg-[#fcb046]/10 rounded-lg border border-[#fcb046]/30">
+                  <p class="text-sm text-[#212c57] font-medium">
+                    📝 Instructions: {{ mission.adresseLivraison.instructions }}
+                  </p>
+                </div>
+              }
+              <div class="mt-3 ml-7 flex items-center gap-2 text-[#38cddd]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                
+              </div>
+            </div>
+
+            <!-- Products Summary -->
+            <div class="mb-6">
+              <h4 class="text-lg font-bold text-[#212c57] mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-[#fcb046]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Produits à livrer ({{ getTotalProduits(mission) }} articles)
+              </h4>
+              <div class="space-y-2">
+                @for (produit of mission.produits; track produit.produitId) {
+                  <div class="flex items-center justify-between p-3 bg-[#e2dfc3] rounded-lg">
+                    <div class="flex items-center gap-3">
+                      <div class="bg-white p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-[#fcb046]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="font-bold text-[#212c57]">{{ produit.nom }}</p>
+                        <p class="text-sm text-[#212c57]/70">
+                          {{ produit.quantite }} {{ produit.unite }}
+                        </p>
+                      </div>
+                    </div>
+                    <p class="font-bold text-[#29875c]">{{ produit.prixTotal }} DT</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-6 border-t-2 border-[#e2dfc3]">
+              @if (mission.status === 'READY') {
+                <button
+                  (click)="acceptMission(mission.id)"
+                  class="w-full px-8 py-4 bg-[#38cddd] hover:bg-[#4dd4e4] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Accepter la mission et commencer la livraison
+                </button>
+              }
+              @if (mission.status === 'SHIPPED') {
+                <button
+                  (click)="completeDelivery(mission.id)"
+                  class="w-full px-8 py-4 bg-[#29875c] hover:bg-[#31a06b] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Confirmer la livraison
+                </button>
+              }
+              @if (mission.status === 'DELIVERED') {
+                <div class="text-center py-3 bg-[#29875c]/10 rounded-xl border-2 border-[#29875c]">
+                  <p class="text-[#29875c] font-bold flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ✅ Livraison terminée avec succès
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

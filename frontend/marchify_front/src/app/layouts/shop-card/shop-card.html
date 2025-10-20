@@ -1,45 +1,51 @@
 <a
   [routerLink]="['/shop', shop.id]"
-  class="flex flex-col cursor-pointer h-full w-fit"
+  class="group block w-72 rounded-2xl bg-gradient-to-br from-[#fcb046] to-[#fda428] shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden border-2 border-[#fcb046] hover:border-[#212c57]"
 >
-  <div class="overflow-hidden group relative rounded-xl border border-[#212c57]">
-    <div class="bg-gradient-to-br from-[#f9f1b2] to-[#f9f3d1] group-hover:scale-105 transition-all rounded-xl w-[150px] h-[200px] sm:w-[200px] sm:h-[270px] md:w-[250px] md:h-[350px] lg:w-[360px] lg:h-[490px] flex items-center justify-center">
-      <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-[#4bc5ce] to-[#fec655] flex items-center justify-center text-[#212c57] font-bold text-2xl shadow-lg">
-        {{ getInitials(shop.nom) }}
+  <div class="p-6 relative">
+    <!-- Top Section with Shop Name and Badge -->
+    <div class="flex justify-between items-start mb-4">
+      <div class="flex-1 mr-3">
+        <h2 class="text-xl font-extrabold text-[#212c57] mb-2 line-clamp-2 group-hover:text-white transition-colors duration-300">
+          {{ shop.nom }}
+        </h2>
+        <span class="inline-block text-xs font-bold text-white bg-[#212c57] rounded-full px-3 py-1 shadow-sm">
+          {{ shop.categorie }}
+        </span>
+      </div>
+      
+      <!-- Products Count Badge -->
+      <div class="flex flex-col items-center bg-white rounded-xl px-3 py-2 shadow-md min-w-[60px]">
+        <span class="text-2xl">🏪</span>
+        <span class="text-lg font-extrabold text-[#212c57]">{{ shop.produits?.length || 0 }}</span>
+        <span class="text-[9px] font-semibold text-gray-500 uppercase">produits</span>
       </div>
     </div>
-    <div
-      class="absolute inset-0 bg-[#212c57] brightness-50 opacity-0 group-hover:opacity-30 transition-opacity rounded-xl"
-    ></div>
+
+    <!-- Divider -->
+    <div class="w-full h-0.5 bg-[#212c57]/20 my-4"></div>
+
+    <!-- Contact Information -->
+    <div class="space-y-3">
+      <!-- Address -->
+      <div class="flex items-start gap-2 text-[#212c57] group-hover:text-white transition-colors duration-300">
+        <span class="text-lg mt-0.5 flex-shrink-0">📍</span>
+        <span class="text-sm font-medium line-clamp-2">{{ shop.adresse }}</span>
+      </div>
+      
+      <!-- Phone -->
+      <div class="flex items-center gap-2 text-[#212c57] group-hover:text-white transition-colors duration-300">
+        <span class="text-lg flex-shrink-0">📞</span>
+        <span class="text-sm font-semibold">{{ shop.telephone }}</span>
+      </div>
+    </div>
+
+    <!-- Hover Effect Arrow -->
+    <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+      <span class="text-[#212c57] group-hover:text-white text-xl font-bold">→</span>
+    </div>
   </div>
 
-  <div
-    class="text-left pt-2 text-[#212c57] px-3 flex justify-between items-start w-full"
-  >
-    <div class="flex-1">
-      <h2 class="text-sm md:text-md md:-mb-2 leading-3 md:leading-normal font-semibold">
-        {{ shop.nom }}
-      </h2>
-      <span class="font-bold !text-lg md:text-sm text-[#4bc5ce]">
-        {{ shop.categorie }}
-      </span>
-    </div>
-    <p
-      class="!text-md md:text-sm bg-[#212c57] text-white py-1 px-2 rounded-full flex items-center gap-x-1 ml-2"
-    >
-      <span>🏪</span>
-      {{ shop.produits?.length || 0 }}
-    </p>
-  </div>
-
-  <div class="text-left px-3 mt-2 w-full">
-    <div class="flex items-center text-sm text-[#212c57] mb-1">
-      <span class="mr-2">📍</span>
-      <span class="truncate">{{ shop.adresse }}</span>
-    </div>
-    <div class="flex items-center text-sm text-[#212c57]">
-      <span class="mr-2">📞</span>
-      <span>{{ shop.telephone }}</span>
-    </div>
-  </div>
+  <!-- Bottom Accent Bar -->
+  <div class="h-1 bg-[#212c57] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
 </a>
