@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommandeService } from '../../../../core/services/commande-service';
 import { CmdStatus, Commande } from '../../../../core/models/commande';
+import { LivreurService } from '../../../../core/services/livreur-service';
 
 @Component({
   selector: 'app-mission-list',
@@ -9,37 +10,18 @@ import { CmdStatus, Commande } from '../../../../core/models/commande';
   styleUrl: './mission-list.css',
 })
 export class MissionList {
-  private commandeService = inject(CommandeService);
+  private livreurService = inject(LivreurService);
 
   missions: Commande[] = [];
   filteredMissions: Commande[] = [];
-  selectedStatus: CmdStatus = CmdStatus.READY;
-  loading: boolean = false;
-  error: string = '';
+  selectedStatus: string = 'READY';
+  loading = false;
+  error = '';
 
-  // Delivery person can only see: READY, SHIPPED, DELIVERED
   statusList = [
-    {
-      value: CmdStatus.READY,
-      label: 'Prête',
-      bgColor: 'bg-[#47a275]',
-      textColor: 'text-white',
-      icon: '📦',
-    },
-    {
-      value: CmdStatus.SHIPPED,
-      label: 'En livraison',
-      bgColor: 'bg-[#38cddd]',
-      textColor: 'text-white',
-      icon: '🚚',
-    },
-    {
-      value: CmdStatus.DELIVERED,
-      label: 'Livrée',
-      bgColor: 'bg-[#29875c]',
-      textColor: 'text-white',
-      icon: '✅',
-    },
+    { value: 'READY', label: 'Prête' },
+    { value: 'SHIPPED', label: 'En cours de livraison' },
+    { value: 'DELIVERED', label: 'Livrée' },
   ];
 
   ngOnInit(): void {
@@ -50,87 +32,47 @@ export class MissionList {
     this.loading = true;
     this.error = '';
 
-    // Get all commandes and filter for delivery statuses only
-    this.commandeService.getAllCommandes().subscribe({
-      next: (data) => {
-        // Filter only READY, SHIPPED, and DELIVERED commandes
-        this.missions = data.filter((cmd) => this.isDeliveryStatus(cmd.status));
-        console.log('✅ Missions disponibles:', this.missions);
-        this.filterByStatus(this.selectedStatus);
+    this.livreurService.getMissionsDisponibles().subscribe({
+      next: (data: any) => {
+        // 🔹 Si le backend renvoie { missions: [...] }
+        this.missions = Array.isArray(data) ? data  : data.missions ?? [];
+        this.applyFilter();
         this.loading = false;
       },
       error: (err) => {
+        console.error(err);
         this.error = 'Erreur lors du chargement des missions';
-        console.error('Error loading missions:', err);
         this.loading = false;
       },
     });
   }
 
-  // Check if status is visible to delivery person
-  isDeliveryStatus(status: CmdStatus): boolean {
-    return [CmdStatus.READY, CmdStatus.SHIPPED, CmdStatus.DELIVERED].includes(
-      status
-    );
-  }
-
-  filterByStatus(status: CmdStatus): void {
-    this.selectedStatus = status;
+  applyFilter(): void {
+    if (!Array.isArray(this.missions)) this.missions = [];
     this.filteredMissions = this.missions.filter(
-      (cmd) => cmd.status === status
+      (m) => !this.selectedStatus || m.status === this.selectedStatus
     );
   }
 
-  // Accept mission (READY → SHIPPED)
-  acceptMission(missionId: string): void {
-    this.commandeService
-      .updateCommandeStatus(missionId, CmdStatus.SHIPPED)
-      .subscribe({
-        next: (updatedCommande) => {
-          // Update local data
-          const index = this.missions.findIndex((m) => m.id === missionId);
-          if (index !== -1) {
-            this.missions[index] = updatedCommande;
-          }
-          this.filterByStatus(this.selectedStatus);
-          console.log('✅ Mission acceptée et en livraison');
-        },
-        error: (err) => {
-          console.error("❌ Erreur lors de l'acceptation:", err);
-          alert("Erreur lors de l'acceptation de la mission");
-        },
-      });
+  filterByStatus(status: string) {
+    this.selectedStatus = status;
+    this.applyFilter();
   }
 
-  // Complete delivery (SHIPPED → DELIVERED)
-  completeDelivery(missionId: string): void {
-    this.commandeService
-      .updateCommandeStatus(missionId, CmdStatus.DELIVERED)
-      .subscribe({
-        next: (updatedCommande) => {
-          // Update local data
-          const index = this.missions.findIndex((m) => m.id === missionId);
-          if (index !== -1) {
-            this.missions[index] = updatedCommande;
-          }
-          this.filterByStatus(this.selectedStatus);
-          console.log('✅ Livraison terminée');
-        },
-        error: (err) => {
-          console.error('❌ Erreur lors de la livraison:', err);
-          alert('Erreur lors de la confirmation de livraison');
-        },
-      });
+  getMissionCount(status: string) {
+    return Array.isArray(this.missions)
+      ? this.missions.filter((m) => m.status === status).length
+      : 0;
   }
 
-  getStatusInfo(status: CmdStatus) {
+  getTotalProduits(mission: Commande) {
     return (
-      this.statusList.find((s) => s.value === status) || this.statusList[0]
+      mission.produits?.reduce((sum, p) => sum + (p.quantite ?? 0), 0) ?? 0
     );
   }
 
-  formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+  formatDate(dateStr: string) {
+    return new Date(dateStr).toLocaleString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -139,13 +81,29 @@ export class MissionList {
     });
   }
 
-  getTotalProduits(commande: Commande): number {
-    return commande.produits.reduce((sum, p) => sum + p.quantite, 0);
+  acceptMission(missionId: string) {
+    const livreurId = '68f743532df2f750af13a58d'; // 🔹 ID du livreur connecté
+    this.livreurService.accepterMission(livreurId, missionId).subscribe({
+      next: (updatedMission) => {
+        const index = this.missions.findIndex((m) => m.id === missionId);
+        if (index !== -1) this.missions[index] = updatedMission;
+        this.applyFilter();
+      },
+      error: (err) => console.error('Erreur accepter mission:', err),
+    });
   }
 
- 
-
-  getMissionCount(status: CmdStatus): number {
-    return this.missions.filter((m) => m.status === status).length;
+  completeDelivery(missionId: string) {
+    this.livreurService.livrerCommande(missionId).subscribe({
+      next: (updatedMission) => {
+        const index = this.missions.findIndex((m) => m.id === missionId);
+        if (index !== -1) this.missions[index] = updatedMission;
+        this.applyFilter();
+      },
+      error: (err) => console.error('Erreur livrer mission:', err),
+    });
   }
 }
+
+
+

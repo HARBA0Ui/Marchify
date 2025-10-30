@@ -5,6 +5,6 @@ export interface Panier {
   //client: User;
   clientId: string;
   produits: PanierProduit[];
-  total: number;
+  total?: number; // optional total price (unit * quantity)
   dateMaj?: Date;
 }

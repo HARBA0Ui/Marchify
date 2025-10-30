@@ -9,7 +9,7 @@ import { ProductByshopList } from '../product-byshop-list/product-byshop-list';
   selector: 'app-shop',
   imports: [CommonModule, RouterLink, ProductByshopList],
   templateUrl: './shop.html',
-  styleUrl: './shop.css'
+  styleUrl: './shop.css',
 })
 export class Shop implements OnInit {
   private route = inject(ActivatedRoute);
@@ -20,7 +20,8 @@ export class Shop implements OnInit {
   isLoading: boolean = true;
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
+    // Get shop ID from route params
+    this.route.params.subscribe((params) => {
       this.shopId = params['id'];
       if (this.shopId) {
         this.loadShopDetails();
@@ -36,19 +37,21 @@ export class Shop implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading shop details:', error);
+        console.error('Erreur lors du chargement de la boutique:', error);
         this.isLoading = false;
-      }
+      },
     });
   }
 
+  /** Open Google Maps at shop location */
   openMap() {
     if (this.shop?.localisation) {
-      const url = `https://www.google.com/maps?q=${this.shop.localisation.lat},${this.shop.localisation.lng}`;
-      window.open(url, '_blank');
+      const { lat, lng } = this.shop.localisation;
+      window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
     }
   }
 
+  /** Call shop by phone */
   callShop() {
     if (this.shop?.telephone) {
       window.location.href = `tel:${this.shop.telephone}`;

@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-router.get("/missions/", getMissionsDisponibles);
+router.get("/missions", getMissionsDisponibles);
 
 router.patch("/missions/accepter/:livreurId/:commandeId", accepterMission);
 

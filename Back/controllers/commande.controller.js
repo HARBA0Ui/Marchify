@@ -101,4 +101,29 @@ export const getCommandesBoutique = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+  
 };
+export const updateCommandeStatus = async (req, res) => {
+  try {
+    const { commandeId } = req.params;
+    const { status } = req.body; // New status sent in request body
+
+    // Example using Mongoose/Sequelize
+    const commande = await Commande.findByIdAndUpdate(
+      commandeId,
+      { status },
+      { new: true }
+    );
+
+    if (!commande)
+      return res.status(404).json({ message: "Commande not found" });
+
+    res.json(commande);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour du statut" });
+  }
+};
+

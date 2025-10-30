@@ -4,6 +4,7 @@ import { Product } from '../../core/models/product';
 import { ProductCard } from '../product-card/product-card';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { PanierService } from '../../core/services/panier';
 
 @Component({
   selector: 'app-product-byshop-list',
@@ -12,10 +13,10 @@ import { CommonModule } from '@angular/common';
   styleUrl: './product-byshop-list.css',
 })
 export class ProductByshopList implements OnInit, OnChanges {
-  // ✅ Implement lifecycle hooks
   private productService = inject(ProductService);
+  private panierService = inject(PanierService);
 
-  @Input({ required: true }) boutiqueId!: string; // ✅ Use this Input
+  @Input({ required: true }) boutiqueId!: string;
 
   products: Product[] = [];
   filteredProducts: Product[] = [];
@@ -25,34 +26,32 @@ export class ProductByshopList implements OnInit, OnChanges {
   sortBy: string = 'name';
   searchQuery: string = '';
 
-  // States
   isLoading: boolean = true;
 
   ngOnInit() {
-    if (this.boutiqueId) {
-      this.loadProductsByShop();
-    }
+    this.loadProducts();
   }
 
   ngOnChanges() {
-    // ✅ Reload when boutiqueId changes
-    if (this.boutiqueId) {
-      this.loadProductsByShop();
-    }
+    this.loadProducts();
   }
 
-  loadProductsByShop() {
+  loadProducts() {
+    if (!this.boutiqueId) return;
+
     this.isLoading = true;
-    this.productService.getProductsByBoutiqueId(this.boutiqueId).subscribe({
-      // ✅ Use boutiqueId from @Input
+    this.productService.getProducts().subscribe({
       next: (products) => {
-        this.products = products;
+        // ✅ Filter by boutiqueId on frontend
+        this.products = products.filter(
+          (p) => p.boutiqueId === this.boutiqueId
+        );
         this.filteredProducts = [...this.products];
         this.isLoading = false;
         this.applyFilters();
       },
-      error: (error) => {
-        console.error('Error loading products:', error);
+      error: (err) => {
+        console.error('Error loading products:', err);
         this.isLoading = false;
         this.products = [];
         this.filteredProducts = [];
@@ -65,19 +64,19 @@ export class ProductByshopList implements OnInit, OnChanges {
 
     // Search filter
     if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
+      const q = this.searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (product) =>
-          product.nom.toLowerCase().includes(query) ||
-          product.description?.toLowerCase().includes(query)
+        (p) =>
+          p.nom.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q)
       );
     }
 
     // Delivery filter
     if (this.deliveryFilter === 'livrable') {
-      filtered = filtered.filter((product) => product.livrable);
+      filtered = filtered.filter((p) => p.livrable);
     } else if (this.deliveryFilter === 'non-livrable') {
-      filtered = filtered.filter((product) => !product.livrable);
+      filtered = filtered.filter((p) => !p.livrable);
     }
 
     this.filteredProducts = filtered;
@@ -100,7 +99,6 @@ export class ProductByshopList implements OnInit, OnChanges {
       case 'name':
       default:
         this.filteredProducts.sort((a, b) => a.nom.localeCompare(b.nom));
-        break;
     }
   }
 
@@ -113,8 +111,21 @@ export class ProductByshopList implements OnInit, OnChanges {
   }
 
   onAddToCart(product: Product) {
-    console.log('Product added to cart:', product);
-    alert(`${product.nom} ajouté au panier !`);
+    const clientid = '68f743532df2f750af13a584'; // replace with actual panier ID or get from user session
+    const quantite = 1; // default quantity for now
+
+    this.panierService
+      .ajouterProduit(clientid, product.id, quantite)
+      .subscribe({
+        next: (res) => {
+          console.log('Produit ajouté au panier:', res);
+          alert(`${product.nom} ajouté au panier !`);
+        },
+        error: (err) => {
+          console.error('Erreur ajout produit:', err);
+          alert('Impossible d’ajouter le produit au panier.');
+        },
+      });
   }
 
   onViewDetails(product: Product) {

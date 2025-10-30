@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Panier } from '../models/panier';
 
 @Injectable({
@@ -8,70 +8,50 @@ import { Panier } from '../models/panier';
 })
 export class PanierService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/paniers';
+  private apiUrl = 'http://localhost:3000/api/cart';
 
-  getPanier(): Observable<Panier[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map((paniers) =>
-        paniers.map((panier) => ({
-          ...panier,
-          dateMaj: new Date(panier.dateMaj),
-        }))
-      )
-    );
-  }
-
-  getPanierByClientId(clientId: string): Observable<Panier> {
-    return this.http.get<Panier>(`${this.apiUrl}/client/${clientId}`);
-  }
-
-  // Convert panier to commande
-  confirmerCommande(
-    panierId: string,
-    adresseLivraison: {
-      rue: string;
-      ville: string;
-      codePostal: string;
-    }
-  ): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${panierId}/confirmer`, {
-      adresseLivraison,
-    });
-  }
-
-  // Add product to panier
+  // Add a product to the cart (matches POST /add)
   ajouterProduit(
-    panierId: string,
+    clientId: string,
     produitId: string,
     quantite: number
-  ): Observable<Panier> {
-    return this.http.post<Panier>(`${this.apiUrl}/${panierId}/produits`, {
+  ): Observable<any> {
+    return this.http.post(`${this.apiUrl}/add`, {
+      clientId,
       produitId,
       quantite,
     });
   }
 
-  // Remove product from panier
-  retirerProduit(panierId: string, produitId: string): Observable<Panier> {
-    return this.http.delete<Panier>(
-      `${this.apiUrl}/${panierId}/produits/${produitId}`
-    );
+  // Get the cart for a specific client (matches GET /:clientId)
+  getPanierByClientId(clientId: string): Observable<Panier> {
+    return this.http.get<Panier>(`${this.apiUrl}/${clientId}`);
   }
 
-  // Update product quantity
-  modifierQuantite(
+  // Update quantities (matches PUT /update)
+  modifierQuantites(
     panierId: string,
-    produitId: string,
-    quantite: number
-  ): Observable<Panier> {
-    return this.http.patch<Panier>(
-      `${this.apiUrl}/${panierId}/produits/${produitId}`,
-      { quantite }
-    );
+    produits: { produitId: string; quantite: number }[]
+  ): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update`, {
+      panierId,
+      produits,
+    });
   }
 
-  // Clear panier
-  viderPanier(panierId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${panierId}/clear`);
+  // Recalculate total (matches GET /recalc/:clientId)
+  recalculerTotal(clientId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recalc/${clientId}`);
+  }
+
+  // Confirm the order (matches POST /confirm)
+  confirmerCommande(
+    panierId: string,
+    adresseLivraison: { rue: string; ville: string; codePostal: string }
+  ): Observable<any> {
+    return this.http.post(`${this.apiUrl}/confirm`, {
+      panierId,
+      adresseLivraison,
+    });
   }
 }

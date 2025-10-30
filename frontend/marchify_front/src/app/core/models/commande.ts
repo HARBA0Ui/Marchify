@@ -24,6 +24,12 @@ export interface CommandeProduit {
   prixTotal: number;
   unite: string;
 }
+export interface ClientInfo {
+  id: string;
+  nom: string;
+  email: string;
+  telephone: string;
+}
 
 export interface Commande {
   id: string;
@@ -31,7 +37,8 @@ export interface Commande {
   adresseLivraison: AdresseLivraison;
   totalCommande: number;
   dateCommande: string;
-  clientId: string;
+  clientId: string; 
+  client: ClientInfo;
   boutiqueId?: string;
   produits: CommandeProduit[];
 }

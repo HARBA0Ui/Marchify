@@ -3,6 +3,7 @@
   import { ShopService } from '../../core/services/shop-service';
   import { Shop } from '../../core/models/shop';
   import { ShopCard } from '../shop-card/shop-card';
+import { HttpClient } from '@angular/common/http';
 
   @Component({
     selector: 'app-shops-list',
@@ -12,6 +13,7 @@
   })
   export class ShopsList implements OnInit {
     private shopService = inject(ShopService);
+    private http = inject(HttpClient);
 
     shops: Shop[] = [];
     isLoading = true;

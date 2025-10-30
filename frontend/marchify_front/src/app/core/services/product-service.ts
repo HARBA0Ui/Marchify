@@ -9,54 +9,38 @@ import { ProductCreateRequest } from '../models/product-create-request';
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000'; // JSON Server URL
+  private apiUrl = 'http://localhost:3000/api/produits'; // matches your Express routes
 
-  // Get all products
+  // 🔹 Get all products
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/produits`);
+    return this.http.get<Product[]>(this.apiUrl);
   }
 
-  // Get products by boutique ID
-  getProductsByBoutiqueId(boutiqueId: string): Observable<Product[]> {
-    return this.http.get<Product[]>(
-      `${this.apiUrl}/produits?boutiqueId=${boutiqueId}`
-    );
-  }
-
-  // Get product by ID
+  // 🔹 Get product by ID
   getProductById(id: string): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/produits/${id}`);
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  
-
-  // Create a new product
+  // 🔹 Create a new product
   createProduct(productData: ProductCreateRequest): Observable<Product> {
-    return this.http.post<Product>(`${this.apiUrl}/produits`, productData);
+    return this.http.post<Product>(this.apiUrl, productData);
   }
 
-  // Update product
+  // 🔹 Update product
   updateProduct(
     id: string,
     productData: Partial<Product>
   ): Observable<Product> {
-    return this.http.patch<Product>(
-      `${this.apiUrl}/produits/${id}`,
-      productData
-    );
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
   }
 
-  // Delete product
+  // 🔹 Delete product (if you add backend support later)
   deleteProduct(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/produits/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  // Search products by name or category
+  // 🔹 Optional: search products (if backend supports query)
   searchProducts(searchTerm: string): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/produits?q=${searchTerm}`);
+    return this.http.get<Product[]>(`${this.apiUrl}?q=${searchTerm}`);
   }
-
-
-
-
 }

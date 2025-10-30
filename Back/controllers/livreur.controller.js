@@ -5,7 +5,7 @@ export const getMissionsDisponibles = async (req, res) => {
     const missions = await db.commande.findMany({
       where: {
         status: "READY",
-        livreurId: null 
+        //livreurId: null 
       },
       select: {
         id: true,

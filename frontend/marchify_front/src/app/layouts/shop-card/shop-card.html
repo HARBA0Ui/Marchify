@@ -1,51 +1,44 @@
 <a
   [routerLink]="['/shop', shop.id]"
-  class="group block w-72 rounded-2xl bg-gradient-to-br from-[#fcb046] to-[#fda428] shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden border-2 border-[#fcb046] hover:border-[#212c57]"
+  class="group relative block bg-[#FFF9D9] rounded-xl shadow-md border border-[#386641]/20 hover:border-[#F97A00] hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-0.5"
 >
-  <div class="p-6 relative">
-    <!-- Top Section with Shop Name and Badge -->
-    <div class="flex justify-between items-start mb-4">
-      <div class="flex-1 mr-3">
-        <h2 class="text-xl font-extrabold text-[#212c57] mb-2 line-clamp-2 group-hover:text-white transition-colors duration-300">
-          {{ shop.nom }}
-        </h2>
-        <span class="inline-block text-xs font-bold text-white bg-[#212c57] rounded-full px-3 py-1 shadow-sm">
-          {{ shop.categorie }}
-        </span>
-      </div>
-      
-      <!-- Products Count Badge -->
-      <div class="flex flex-col items-center bg-white rounded-xl px-3 py-2 shadow-md min-w-[60px]">
-        <span class="text-2xl">🏪</span>
-        <span class="text-lg font-extrabold text-[#212c57]">{{ shop.produits?.length || 0 }}</span>
-        <span class="text-[9px] font-semibold text-gray-500 uppercase">produits</span>
-      </div>
+  <div
+    class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#386641] to-[#F97A00] group-hover:from-[#F97A00] group-hover:to-[#FED16A] transition-all duration-500"
+  ></div>
+
+  <div class="p-5 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h2
+        class="text-lg font-bold uppercase tracking-wide text-[#386641] group-hover:text-[#F97A00] transition-colors duration-300"
+      >
+        {{ shop.nom }}
+      </h2>
+      <span
+        class="text-xs font-medium bg-[#386641]/10 text-[#F97A00] px-2 py-0.5 rounded-full uppercase"
+        >{{ shop.categorie }}</span
+      >
     </div>
 
-    <!-- Divider -->
-    <div class="w-full h-0.5 bg-[#212c57]/20 my-4"></div>
-
-    <!-- Contact Information -->
-    <div class="space-y-3">
-      <!-- Address -->
-      <div class="flex items-start gap-2 text-[#212c57] group-hover:text-white transition-colors duration-300">
-        <span class="text-lg mt-0.5 flex-shrink-0">📍</span>
-        <span class="text-sm font-medium line-clamp-2">{{ shop.adresse }}</span>
+    <div class="flex flex-col gap-3 text-sm text-black">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-location-dot text-[#386641] w-5 text-center"></i>
+        <p class="truncate">{{ shop.adresse }}</p>
       </div>
-      
-      <!-- Phone -->
-      <div class="flex items-center gap-2 text-[#212c57] group-hover:text-white transition-colors duration-300">
-        <span class="text-lg flex-shrink-0">📞</span>
-        <span class="text-sm font-semibold">{{ shop.telephone }}</span>
-      </div>
-    </div>
 
-    <!-- Hover Effect Arrow -->
-    <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-      <span class="text-[#212c57] group-hover:text-white text-xl font-bold">→</span>
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-phone text-[#F97A00] w-5 text-center"></i>
+        <p>{{ shop.telephone }}</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-box text-[#386641] w-5 text-center"></i>
+        <p>
+        {{ shop.produits?.length ?? 0 }}
+produit{{ (shop.produits?.length ?? 0) !== 1 ? 's' : '' }}
+
+
+        </p>
+      </div>
     </div>
   </div>
-
-  <!-- Bottom Accent Bar -->
-  <div class="h-1 bg-[#212c57] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
 </a>

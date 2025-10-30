@@ -1,4 +1,4 @@
-import db from "../db/prisma.js"
+  import db from "../db/prisma.js"
 
 async function main() {
   console.log("🚀 Starting database seeding...");

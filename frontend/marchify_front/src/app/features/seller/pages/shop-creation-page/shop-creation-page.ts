@@ -20,7 +20,6 @@ export class ShopCreationPage implements OnInit {
   private shopService = inject(ShopService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  private actroute = inject(ActivatedRoute);
   private locationService = inject(LocationAdrs);
 
   shopForm: FormGroup;
@@ -29,7 +28,6 @@ export class ShopCreationPage implements OnInit {
   errorMessage = '';
   successMessage = '';
 
-  // Popular categories for suggestions
   popularCategories = [
     'Fruits & Légumes',
     'Viandes & Poissons',
@@ -45,87 +43,74 @@ export class ShopCreationPage implements OnInit {
   ];
 
   constructor() {
-    this.shopForm = this.fb.group({
-      
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      marketName: [''],
-      address: ['', [Validators.required, Validators.minLength(5)]],
-      description: [''],
-      category: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9\s]{8,}$/)]],
-    });
+   this.shopForm = this.fb.group({
+     name: ['', [Validators.required, Validators.minLength(2)]],
+     marketName: [''], // <-- Ajouté pour résoudre l'erreur
+     address: ['', [Validators.required, Validators.minLength(5)]],
+     category: ['', Validators.required],
+     phone: ['', [Validators.required, Validators.pattern(/^[0-9\s]{8,}$/)]],
+     description: [''],
+   });
+
   }
 
   ngOnInit(): void {
-    console.log('ShopCreationPageComponent initialized');
+    console.log('ShopCreationPage initialized');
   }
 
   async onGetLocation(): Promise<void> {
     this.isLoadingLocation = true;
     try {
       const { address, lat, lon } = await this.locationService.getAddress();
-
       this.shopForm.patchValue({ address });
-
-      // store coordinates if needed
       console.log(`Detected location: ${address} (${lat}, ${lon})`);
-
       this.successMessage = 'Localisation détectée avec succès !';
     } catch (error) {
       console.error('Erreur de géolocalisation:', error);
-      this.errorMessage =
-        'Impossible de détecter la localisation. Veuillez entrer manuellement.';
+      this.errorMessage = 'Impossible de détecter la localisation.';
     } finally {
       this.isLoadingLocation = false;
     }
   }
 
   onSubmit(): void {
-    if (this.shopForm.valid) {
-      this.createShop();
-    } else {
+    if (!this.shopForm.valid) {
       this.markAllFieldsAsTouched();
+      return;
     }
+    this.createShop();
   }
-
 
   private createShop(): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Get current vendeur ID (in real app, from auth service)
-    const currentVendeurId = 'vd1'; // Example vendeur ID
+    const currentVendeurId = '68f743532df2f750af13a589'; // TODO: replace by real vendeur ID (auth later)
 
-    // Prepare the shop creation request
     const shopRequest: ShopCreateRequest = {
       nom: this.shopForm.get('name')?.value,
       adresse: this.shopForm.get('address')?.value,
-      localisation: { lat: 36.8065, lng: 10.1815 }, // Default Tunis coordinates
+      localisation: { lat: 36.8065, lng: 10.1815 },
       categorie: this.shopForm.get('category')?.value,
       telephone: `+216 ${this.shopForm.get('phone')?.value}`,
       vendeurId: currentVendeurId,
     };
 
-    console.log('Creating shop with data:', shopRequest);
+    console.log('Creating shop:', shopRequest);
 
-    // Use the ShopService to create the shop
     this.shopService.createShop(shopRequest).subscribe({
       next: (createdShop) => {
         this.isLoading = false;
         this.successMessage = 'Boutique créée avec succès!';
-        console.log('Shop created successfully:', createdShop);
+        console.log('Created shop:', createdShop);
 
-        // Redirect to seller dashboard after success
-        setTimeout(() => {
-          this.router.navigate(['/seller/dashboard']);
-        }, 2000);
+        setTimeout(() => this.router.navigate(['/seller/dashboard']), 1500);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage =
-          'Erreur lors de la création de la boutique. Veuillez réessayer.';
-        console.error('Shop creation error:', error);
+        this.errorMessage = 'Erreur lors de la création.';
+        console.error(error);
       },
     });
   }
@@ -134,9 +119,6 @@ export class ShopCreationPage implements OnInit {
     this.router.navigate(['/seller/dashboard']);
   }
 
-  // -----------------------
-  // helper methods
-  // -----------------------
   private markAllFieldsAsTouched(): void {
     Object.keys(this.shopForm.controls).forEach((key) => {
       const control = this.shopForm.get(key);
@@ -151,17 +133,10 @@ export class ShopCreationPage implements OnInit {
 
   getFieldError(fieldName: string): string {
     const field = this.shopForm.get(fieldName);
-
-    if (!field || !field.errors) return 'Invalid field';
-
+    if (!field || !field.errors) return '';
     if (field.errors['required']) return 'Ce champ est obligatoire';
-    if (field.errors['minlength']) {
-      const requiredLength = field.errors['minlength'].requiredLength;
-      return `Doit contenir au moins ${requiredLength} caractères`;
-    }
-    if (field.errors['pattern'] && fieldName === 'phone')
-      return 'Numéro de téléphone invalide';
-
+    if (field.errors['minlength']) return 'Trop court';
+    if (field.errors['pattern']) return 'Format invalide';
     return 'Champ invalide';
   }
 }

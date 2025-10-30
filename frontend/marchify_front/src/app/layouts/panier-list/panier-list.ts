@@ -15,168 +15,111 @@ export class PanierList {
   loading = true;
   error: string | null = null;
   private router = inject(Router);
+
   constructor(private panierService: PanierService) {}
 
   ngOnInit() {
-    console.log('🔄 Loading paniers...');
+    const clientId = '68f743532df2f750af13a584'; // TODO: mettre l'ID client connecté
+    this.loadPanier(clientId);
+  }
 
-    this.panierService.getPanier().subscribe({
+  loadPanier(clientId: string) {
+    this.panierService.getPanierByClientId(clientId).subscribe({
       next: (data: any) => {
-        console.log('✅ Data received:', data);
-        this.paniers = data;
+        if (!data || !data.produits) {
+          this.paniers = [];
+        } else {
+          this.paniers = [
+            {
+              id: data.id,
+              clientId: data.clientId,
+              produits: data.produits.map((p: any) => {
+                const produit = p.produit || p.produitId;
+                return {
+                  produitId: produit._id || produit.id || p.produitId,
+                  nom: produit.nom,
+                  prixUnitaire: produit.prix,
+                  quantite: p.quantite,
+                  prixTotal: p.prixTotal || produit.prix * p.quantite,
+                };
+              }),
+              total: data.produits.reduce(
+                (sum: number, p: any) =>
+                  sum +
+                  (p.prixTotal ||
+                    (p.produit?.prix || p.produitId?.prix) * p.quantite),
+                0
+              ),
+            },
+          ];
+        }
         this.loading = false;
-        this.error = null;
       },
-      error: (err: any) => {
-        console.error('❌ Error loading panier:', err);
-        this.error = 'Erreur lors du chargement du panier';
+      error: (err) => {
+        console.error(err);
         this.loading = false;
-        this.paniers = [];
       },
     });
   }
 
-  confirmerCommande(): void {
-    if (this.paniers && this.paniers.length > 0) {
-      const panier = this.paniers[0];
-
-      // Get client's address from panier or user data
-      const adresseLivraison = {
-        rue: '15 Avenue Habib Bourguiba', // TODO: Get from user profile or form
-        ville: 'Tunis',
-        codePostal: '1000',
-      };
-
-      this.panierService
-        .confirmerCommande(panier.id, adresseLivraison)
-        .subscribe({
-          next: (response) => {
-            console.log('✅ Commande créée:', response);
-            alert('Commande confirmée avec succès ✅');
-
-            // Clear panier after successful order
-            this.viderPanier();
-
-            // Optional: Navigate to orders page
-            // this.router.navigate(['/commandes']);
-          },
-          error: (err) => {
-            console.error('❌ Erreur lors de la confirmation:', err);
-            alert('Erreur lors de la confirmation de la commande');
-          },
-        });
-    } else {
-      alert('Aucun panier à confirmer');
-    }
+  increaseQuantity(p: any) {
+    p.quantite++;
+    this.updateTotals();
+    this.saveQuantities();
   }
 
-  increaseQuantity(product: any): void {
-    if (this.paniers[0]?.id && product.produitId) {
-      product.quantite++;
-
-      // Update on server
-      this.panierService
-        .modifierQuantite(
-          this.paniers[0].id,
-          product.produitId,
-          product.quantite
-        )
-        .subscribe({
-          next: (updatedPanier) => {
-            console.log('✅ Quantité mise à jour');
-            this.updateTotals();
-          },
-          error: (err) => {
-            console.error('❌ Erreur:', err);
-            product.quantite--; // Revert on error
-          },
-        });
-    }
+  decreaseQuantity(p: any) {
+    if (p.quantite <= 1) return;
+    p.quantite--;
+    this.updateTotals();
+    this.saveQuantities();
   }
 
-  decreaseQuantity(product: any): void {
-    if (product.quantite > 1) {
-      if (this.paniers[0]?.id && product.produitId) {
-        product.quantite--;
-
-        // Update on server
-        this.panierService
-          .modifierQuantite(
-            this.paniers[0].id,
-            product.produitId,
-            product.quantite
-          )
-          .subscribe({
-            next: (updatedPanier) => {
-              console.log('✅ Quantité mise à jour');
-              this.updateTotals();
-            },
-            error: (err) => {
-              console.error('❌ Erreur:', err);
-              product.quantite++; // Revert on error
-            },
-          });
-      }
+  private updateTotals() {
+    if (!this.paniers[0]?.produits) return;
+    for (const p of this.paniers[0].produits) {
+      p.prixTotal = p.prixUnitaire * p.quantite;
     }
+    this.paniers[0].total = this.paniers[0].produits.reduce(
+      (sum, p) => sum + p.prixTotal,
+      0
+    );
   }
 
-  removeProduct(product: any): void {
-    if (this.paniers[0]?.id && product.produitId) {
-      if (confirm('Voulez-vous vraiment retirer ce produit ?')) {
-        this.panierService
-          .retirerProduit(this.paniers[0].id, product.produitId)
-          .subscribe({
-            next: () => {
-              console.log('✅ Produit retiré');
-              const index = this.paniers[0].produits.indexOf(product);
-              if (index > -1) {
-                this.paniers[0].produits.splice(index, 1);
-                this.updateTotals();
-              }
-            },
-            error: (err) => {
-              console.error('❌ Erreur:', err);
-              alert('Erreur lors de la suppression du produit');
-            },
-          });
-      }
-    }
+  private saveQuantities() {
+    const panier = this.paniers[0];
+    const updates = panier.produits.map((p) => ({
+      produitId: p.produitId,
+      quantite: p.quantite,
+    }));
+    this.panierService.modifierQuantites(panier.id, updates).subscribe({
+      next: () => console.log('Quantités mises à jour'),
+      error: (err) => console.error(err),
+    });
   }
 
-  viderPanier(): void {
-    if (this.paniers[0]?.id) {
-      if (confirm('Voulez-vous vraiment vider le panier ?')) {
-        this.panierService.viderPanier(this.paniers[0].id).subscribe({
-          next: () => {
-            console.log('✅ Panier vidé');
-            this.paniers[0].produits = [];
-            this.updateTotals();
-          },
-          error: (err) => {
-            console.error('❌ Erreur:', err);
-            alert('Erreur lors du vidage du panier');
-          },
-        });
-      }
-    }
+  continuerAchats() {
+    this.router.navigate(['/produits']);
   }
 
-  continuerAchats(): void {
-    this.router.navigate(['/produits']); // Adjust route as needed
-  }
-
-  updateTotals(): void {
-    if (this.paniers[0]?.produits) {
-      // Recalculate prixTotal for each product
-      for (const p of this.paniers[0].produits) {
-        p.prixTotal = p.prixUnitaire * p.quantite;
-      }
-
-      // Recalculate cart total
-      this.paniers[0].total = this.paniers[0].produits.reduce(
-        (sum, p) => sum + p.prixTotal,
-        0
-      );
-    }
+  confirmerCommande() {
+    const panier = this.paniers[0];
+    const adresseLivraison = {
+      rue: '15 Avenue Habib Bourguiba',
+      ville: 'Tunis',
+      codePostal: '1000',
+    };
+    this.panierService
+      .confirmerCommande(panier.id, adresseLivraison)
+      .subscribe({
+        next: (res) => {
+          alert('Commande confirmée ✅');
+          this.loadPanier(panier.clientId); // recharge panier
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Erreur lors de la confirmation');
+        },
+      });
   }
 }
