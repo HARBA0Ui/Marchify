@@ -1,0 +1,127 @@
+<div class="min-h-screen bg-[#f5f0d4] p-4 md:p-6">
+  <div class="text-center mb-10">
+    <h1 class="text-4xl md:text-5xl font-bold text-[#386641] tracking-tight flex items-center justify-center gap-2">
+      <i class="fas fa-shopping-cart"></i> Mon Panier
+    </h1>
+    @if (paniers.length > 0 && paniers[0].produits.length) {
+      <p class="text-gray-600 mt-2 text-lg">
+        {{ paniers[0].produits.length }} article(s)
+      </p>
+    }
+  </div>
+
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row gap-6">
+
+      <div class="md:w-2/3">
+        <div class="bg-white rounded-2xl shadow-sm border-2 border-[#FED16A] overflow-hidden">
+          @if (loading) {
+            <div class="py-12 text-center">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-[#386641] border-t-transparent"></div>
+              <p class="mt-4 text-gray-600 font-medium">Chargement de votre panier...</p>
+            </div>
+          } @else if (!paniers || paniers.length === 0 || !paniers[0].produits || paniers[0].produits.length === 0) {
+            <div class="py-12 text-center px-6">
+              <div class="mx-auto bg-[#FED16A] w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-box-open text-[#F97A00] text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-[#386641] mb-2">Votre panier est vide</h3>
+              <p class="text-gray-600 mb-5 max-w-md mx-auto">
+                Il semble que vous n’ayez pas encore ajouté d’articles.
+              </p>
+              <button 
+                class="bg-[#386641] hover:bg-[#2E3D32] text-white font-medium px-6 py-2.5 rounded-lg transition duration-200 shadow-sm flex items-center gap-2"
+                (click)="continuerAchats()">
+                <i class="fas fa-search"></i> Explorer les produits
+              </button>
+            </div>
+          } @else {
+            <div class="divide-y divide-[#FED16A]">
+              @for (p of paniers[0].produits; track p.produitId) {
+                <div class="flex items-center gap-4 p-5 hover:bg-[#FED16A]/20 transition-colors">
+
+                  <div class="bg-[#386641]/10 w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#386641]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-[#386641] truncate">{{ p.nom }}</h3>
+                    <p class="text-[#386641] font-medium text-sm">{{ p.prixUnitaire | number: '1.2-2' }} €</p>
+                    <span class="text-xs text-[#F97A00] font-medium">Livraison gratuite</span>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <button 
+                      class="w-9 h-9 bg-white border border-[#FED16A] text-[#386641] rounded-lg flex items-center justify-center hover:bg-[#FED16A]/20 transition shadow-sm"
+                      (click)="decreaseQuantity(p)">
+                      −
+                    </button>
+                    <span class="w-9 text-center font-medium text-[#386641]">{{ p.quantite }}</span>
+                    <button 
+                      class="w-9 h-9 bg-white border border-[#FED16A] text-[#386641] rounded-lg flex items-center justify-center hover:bg-[#FED16A]/20 transition shadow-sm"
+                      (click)="increaseQuantity(p)">
+                      +
+                    </button>
+                  </div>
+
+                  <div class="text-right min-w-[70px]">
+                    <div class="font-bold text-[#F97A00] text-sm">
+                      {{ p.prixTotal | number: '1.2-2' }} €
+                    </div>
+                  </div>
+
+                  
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (paniers.length > 0 && paniers[0].produits.length) {
+    <div class="md:w-1/3">
+          <div class="bg-white rounded-2xl shadow-sm border-2 border-[#FED16A] p-6 sticky top-6">
+            <h3 class="text-lg font-semibold text-[#386641] mb-4 flex items-center gap-2">
+              <i class="fas fa-receipt"></i> Récapitulatif
+            </h3>
+            
+            <div class="space-y-2.5 mb-5">
+              <div class="flex justify-between text-gray-600">
+                <span>Sous-total</span>
+                <span>{{ (paniers[0].total) | number: '1.2-2' }} €</span>
+              </div>
+              <div class="flex justify-between text-[#386641] font-medium">
+                <span>Livraison</span>
+                <span>Gratuite</span>
+              </div>
+             
+              <div class="pt-2 border-t border-[#FED16A]">
+                <div class="flex justify-between text-lg font-bold text-[#386641]">
+                  <span>Total</span>
+                  <span class="text-[#F97A00]">{{ (paniers[0].total) | number: '1.2-2' }} €</span>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              class="w-full bg-[#386641] hover:bg-[#2E3D32] text-white font-semibold py-3.5 rounded-xl transition duration-200 shadow-md hover:shadow-lg mb-4"
+              (click)="confirmerCommande()">
+               Commander
+            </button>
+
+            <div class="flex gap-3">
+              <button 
+                class="flex-1 py-2.5 text-sm rounded-xl border-2 border-[#F97A00] text-[#F97A00] font-medium hover:bg-[#FFF4A4] transition"
+                (click)="continuerAchats()">
+                ← Continuer
+              </button>
+             
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+Running seed command `node seeds/seed.js` ...
+🚀 Starting full database seeding...
+✅ Old data cleared.
+🎉 Seeding terminé avec succès !
+🎉 Seeding terminé avec succès !
+📌 Clients :
+Client 1: 68f743532df2f750af13a584
+Client 2: 68f743532df2f750af13a586
+📌 Paniers :
+Panier 1: 68f743532df2f750af13a585
+Panier 2: 68f743532df2f750af13a587
+📌 Vendeurs :
+Vendeur 1: 68f743532df2f750af13a589 | User ID: 68f743532df2f750af13a588
+Vendeur 2: 68f743532df2f750af13a58b | User ID: 68f743532df2f750af13a58a
+📌 Boutiques :
+Boutique 1: 68f743532df2f750af13a590
+Boutique 2: 68f743532df2f750af13a591
+📌 Livreurs :
+Livreur 1: 68f743532df2f750af13a58d | User ID: 68f743532df2f750af13a58c
+Livreur 2: 68f743532df2f750af13a58f | User ID: 68f743532df2f750af13a58e
+📌 Produits :
+Produit 1: 68f743532df2f750af13a592
+Produit 2: 68f743532df2f750af13a593
+Produit 3: 68f743532df2f750af13a594
+📌 Commandes :
+Commande 1: 68f743532df2f750af13a598
+comnde

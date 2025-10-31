@@ -1,0 +1,13 @@
+export enum UniteMesure {
+  GRAMME = 'GRAMME',
+  KILOGRAMME = 'KILOGRAMME',
+  LITRE = 'LITRE',
+  MILLILITRE = 'MILLILITRE',
+  PIECE = 'PIECE',
+  BOITE = 'BOITE',
+  SAC = 'SAC',
+  CARTON = 'CARTON',
+  METRE = 'METRE',
+  CENTIMETRE = 'CENTIMETRE',
+  AUTRE = 'AUTRE',
+}
