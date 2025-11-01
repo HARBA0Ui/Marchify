@@ -1,0 +1,105 @@
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f9f3d1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #fcb046;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #fec655;
+}
+
+/* Smooth animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bg-white {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Button ripple effect */
+button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Pulse animation for pending status */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.bg-\[\#e0ab3a\] {
+  animation: pulse 2.5s infinite;
+}
+
+/* Hover effects */
+.hover\:shadow-xl:hover {
+  box-shadow: 0 20px 25px -5px rgba(33, 44, 87, 0.1), 
+              0 10px 10px -5px rgba(33, 44, 87, 0.04);
+}
+
+/* Card border animation */
+@keyframes borderGlow {
+  0%, 100% {
+    border-left-width: 4px;
+  }
+  50% {
+    border-left-width: 6px;
+  }
+}
+
+.border-l-4:hover {
+  animation: borderGlow 1.5s ease-in-out infinite;
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

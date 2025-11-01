@@ -1,0 +1,113 @@
+<div class="register-bg min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFF4A4] via-[#FED16A] to-[#F97A00]">
+  <!-- Form Container -->
+  <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-6 w-full max-w-sm text-[#386641] shadow-[0_0_20px_#F97A00]/70">
+
+      <h1 class="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-[#386641] to-[#F97A00] bg-clip-text text-transparent">
+      Créer un compte
+    </h1>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-1">
+      <!-- Nom -->
+     <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Nom</label>
+        <input
+          type="text"
+          formControlName="nom"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+          placeholder="Votre nom"
+        />
+      </div>
+
+      <!-- Prénom -->
+      <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Prénom</label>
+        <input
+          type="text"
+          formControlName="prenom"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+          placeholder="Votre prénom"
+        />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+          placeholder="Votre email"
+        />
+      </div>
+
+      <!-- Mot de passe -->
+      <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Mot de passe</label>
+        <input
+          type="password"
+          formControlName="PWD"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <!-- Téléphone -->
+      <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Téléphone</label>
+        <input
+          type="text"
+          formControlName="telephone"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+          placeholder="+216 ..."
+        />
+      </div>
+
+      <!-- Adresse -->
+      <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Adresse</label>
+        <textarea
+          formControlName="adresse"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+          placeholder="Votre adresse"
+          rows="2"
+        ></textarea>
+      </div>
+
+      <!-- Rôle -->
+      <div>
+        <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Rôle</label>
+        <select
+          formControlName="role"
+          class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-[#386641] placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+        >
+          <option class="text-[#386641]" value="CLIENT">Client</option>
+          <option class="text-[#386641]" value="VENDEUR">Vendeur</option>
+          <option class="text-[#386641]" value="LIVREUR">Livreur</option>
+        </select>
+      </div>
+
+      <!-- Bouton -->
+      <button
+        type="submit"
+        class="w-full bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white font-bold py-2 text-sm rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+      >
+        S’inscrire
+      </button>
+    </form>
+
+    <!-- Messages -->
+    @if(successMessage)
+    {
+      <div class="mt-4 p-2 text-sm bg-green-100/70 text-[#386641] rounded-lg border-l-4 border-[#386641]">
+        {{ successMessage }}
+      </div>
+    }
+
+    @if(errorMessage)
+    {
+      <div class="mt-4 p-2 text-sm bg-red-100/70 text-[#F97A00] rounded-lg border-l-4 border-[#F97A00]">
+        {{ errorMessage }}
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<a
+  [routerLink]="['/shop', shop.id]"
+  class="group relative block bg-[#FFF9D9] rounded-xl shadow-md border border-[#386641]/20 hover:border-[#F97A00] hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-0.5"
+>
+  <div
+    class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#386641] to-[#F97A00] group-hover:from-[#F97A00] group-hover:to-[#FED16A] transition-all duration-500"
+  ></div>
+
+  <div class="p-5 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h2
+        class="text-lg font-bold uppercase tracking-wide text-[#386641] group-hover:text-[#F97A00] transition-colors duration-300"
+      >
+        {{ shop.nom }}
+      </h2>
+      <span
+        class="text-xs font-medium bg-[#386641]/10 text-[#F97A00] px-2 py-0.5 rounded-full uppercase"
+        >{{ shop.categorie }}</span
+      >
+    </div>
+
+    <div class="flex flex-col gap-3 text-sm text-black">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-location-dot text-[#386641] w-5 text-center"></i>
+        <p class="truncate">{{ shop.adresse }}</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-phone text-[#F97A00] w-5 text-center"></i>
+        <p>{{ shop.telephone }}</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-box text-[#386641] w-5 text-center"></i>
+        <p>
+        {{ shop.produits?.length ?? 0 }}
+produit{{ (shop.produits?.length ?? 0) !== 1 ? 's' : '' }}
+
+
+        </p>
+      </div>
+    </div>
+  </div>
+</a>

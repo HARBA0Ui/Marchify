@@ -1,0 +1,51 @@
+<div class="min-h-screen bg-[#faf2b8] py-20">
+    <div class="container mx-auto px-6 max-w-7xl">
+      <div class="text-center mb-14">
+        <h1
+          class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block"
+        >
+          <span class="text-[#386641]">Nos</span>
+          <span
+            class="text-[#F97A00] relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#FED16A]"
+            >Boutiques</span
+          >
+        </h1>
+        <p class="text-base text-[#386641] max-w-2xl mx-auto">
+          Découvrez nos boutiques partenaires et explorez leurs univers uniques.
+        </p>
+      </div>
+
+      @if (isLoading) {
+        <div class="flex flex-col items-center justify-center py-24">
+          <div
+            class="w-14 h-14 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mb-4"
+          ></div>
+          <p class="text-[#386641] font-medium text-base">
+            Chargement des boutiques...
+          </p>
+        </div>
+      }
+
+      @else if (shops.length === 0) {
+        <div class="text-center py-20">
+          <i class="fa-solid fa-store text-5xl text-[#F97A00] mb-3"></i>
+          <h3 class="text-xl font-semibold text-[#386641] mb-1">
+            Aucune boutique disponible
+          </h3>
+          <p class="text-[#386641] text-sm">
+            Les boutiques apparaîtront ici prochainement.
+          </p>
+        </div>
+      }
+
+      @else {
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          @for (shop of shops; track shop.id) {
+            <app-shop-card [shop]="shop" />
+          }
+        </div>
+      }
+    </div>
+  </div>
