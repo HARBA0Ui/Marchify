@@ -1,29 +1,18 @@
 import db from "../db/prisma.js";
-
 export const getMissionsDisponibles = async (req, res) => {
   try {
-    const missions = await db.commande.findMany({
-      where: {
-        status: "READY",
-        //livreurId: null 
-      },
-      select: {
-        id: true,
-        status: true,
-        adresseLivraison: true,
-        totalCommande: true,
-        dateCommande: true,
-        clientId: true,
-        boutiqueId: true,
-        produits: {
-          select: {
-            produitId: true,
-            quantite: true,
-            prixTotal: true
+    const missions = await db.bonDeLivraison.findMany({
+      where: { status: "PENDING_PICKUP" },
+      include: {
+        commande: {
+          include: {
+            client: true,
+            boutique: true,
+            produits: { include: { produit: true } }
           }
         }
       },
-      orderBy: { dateCommande: "asc" }
+      orderBy: { dateCreation: "asc" }
     });
 
     res.json({ missions });
@@ -32,66 +21,86 @@ export const getMissionsDisponibles = async (req, res) => {
   }
 };
 
-
 export const accepterMission = async (req, res) => {
   try {
-    const { commandeId, livreurId } = req.params;
+    const { bonId, livreurId } = req.params;
 
-    const commande = await db.commande.findUnique({ where: { id: commandeId } });
-    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
-
-    if (commande.status !== "READY") 
-      return res.status(400).json({ message: "Commande non disponible pour livraison" });
-
-    if (commande.livreurId) 
-      return res.status(400).json({ message: "Mission déjà prise par un autre livreur" });
-
-    const updated = await db.commande.update({
-      where: { id: commandeId },
-      data: { livreurId, status: "PROCESSING" }
+    const bon = await db.bonDeLivraison.findUnique({
+      where: { id: bonId },
+      include: { commande: true }
     });
 
-    res.json({ message: "Mission acceptée", mission: updated });
+    if (!bon) return res.status(404).json({ message: "Bon de livraison introuvable" });
+    if (bon.status !== "PENDING_PICKUP") return res.status(400).json({ message: "Mission non disponible" });
+    if (bon.livreurId) return res.status(400).json({ message: "Mission déjà prise" });
+
+    const updatedBon = await db.bonDeLivraison.update({
+      where: { id: bonId },
+      data: {
+        livreurId,
+        status: "IN_TRANSIT",
+        commande: { update: { status: "PROCESSING" } }
+      },
+      include: { commande: true }
+    });
+
+    res.json({ message: "Mission acceptée", bonDeLivraison: updatedBon });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const livrerCommande = async (req, res) => {
   try {
-    const { commandeId } = req.params;
+    const { bonId } = req.params;
 
-    const commande = await db.commande.findUnique({ where: { id: commandeId } });
-    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
-
-    if (commande.status !== "PROCESSING") 
-      return res.status(400).json({ message: "Commande non en cours de livraison" });
-
-    const updated = await db.commande.update({
-      where: { id: commandeId },
-      data: { status: "DELIVERED" }
+    const bon = await db.bonDeLivraison.findUnique({
+      where: { id: bonId },
+      include: { commande: true }
     });
 
-    res.json({ message: "Commande livrée", commande: updated });
+    if (!bon) return res.status(404).json({ message: "Bon de livraison introuvable" });
+    if (bon.status !== "IN_TRANSIT") return res.status(400).json({ message: "Livraison non en cours" });
+
+    const updatedBon = await db.bonDeLivraison.update({
+      where: { id: bonId },
+      data: {
+        status: "DELIVERED",
+        commande: { update: { status: "DELIVERED" } }
+      },
+      include: { commande: true }
+    });
+
+    res.json({ message: "Commande livrée", bonDeLivraison: updatedBon });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
 export const refuserMission = async (req, res) => {
   try {
-    const { commandeId } = req.params;
+    const { bonId } = req.params;
 
-    const commande = await db.commande.findUnique({ where: { id: commandeId } });
-    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
+    const bon = await db.bonDeLivraison.findUnique({
+      where: { id: bonId }
+    });
 
-    if (commande.status !== "READY") 
-      return res.status(400).json({ message: "Commande non disponible pour livraison" });
+    if (!bon) return res.status(404).json({ message: "Bon de livraison introuvable" });
+    if (bon.status !== "PENDING_PICKUP" && bon.status !== "IN_TRANSIT") 
+      return res.status(400).json({ message: "Mission non disponible pour refus" });
 
-    
-    res.json({ message: "Mission refusée, elle reste disponible pour un autre livreur" });
+    const updatedBon = await db.bonDeLivraison.update({
+      where: { id: bonId },
+      data: {
+        livreurId: null,     
+        status: "PENDING_PICKUP" 
+      }
+    });
+
+    res.json({ 
+      message: "Mission refusée, disponible pour un autre livreur", 
+      bonDeLivraison: updatedBon 
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
