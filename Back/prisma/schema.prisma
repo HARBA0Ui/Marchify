@@ -38,6 +38,13 @@ enum UniteMesure {
   AUTRE
 }
 
+enum DeliveryStatus {
+  PENDING_PICKUP
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   nom          String
@@ -67,16 +74,6 @@ model Vendeur {
   @@map("vendeurs")
 }
 
-model Livreur {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  localisation Json?
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String     @unique @db.ObjectId
-  Commande     Commande[]
-
-  @@map("livreurs")
-}
-
 model Boutique {
   id           String @id @default(auto()) @map("_id") @db.ObjectId
   nom          String
@@ -92,6 +89,49 @@ model Boutique {
   CommandeProduit CommandeProduit[]
 
   @@map("boutiques")
+}
+
+model BonDeLivraison {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  dateCreation DateTime @default(now())
+
+  commande   Commande @relation(fields: [commandeId], references: [id], onDelete: Cascade)
+  commandeId String   @unique @db.ObjectId
+
+  status DeliveryStatus @default(PENDING_PICKUP)
+
+  livreur   Livreur @relation(fields: [livreurId], references: [id], onDelete: Cascade)
+  livreurId String  @db.ObjectId
+
+  @@map("bon_de_livraison")
+}
+
+model Commande {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  status           CmdStatus @default(PENDING)
+  adresseLivraison Json
+  totalCommande    Float
+  dateCommande     DateTime  @default(now())
+
+  client     User              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId   String            @db.ObjectId
+  boutique   Boutique?         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+  boutiqueId String?           @db.ObjectId
+  produits   CommandeProduit[]
+
+  bonDeLivraison BonDeLivraison?
+
+  @@map("commandes")
+}
+
+model Livreur {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  localisation   Json?
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String           @unique @db.ObjectId
+  BonDeLivraison BonDeLivraison[]
+
+  @@map("livreurs")
 }
 
 model Produit {
@@ -112,25 +152,6 @@ model Produit {
   PanierProduit PanierProduit[]
 
   @@map("produits")
-}
-
-model Commande {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  status           CmdStatus @default(PENDING)
-  adresseLivraison Json
-  totalCommande    Float
-  dateCommande     DateTime  @default(now())
-
-  client     User              @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  clientId   String            @db.ObjectId
-  boutique   Boutique?         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
-  boutiqueId String?           @db.ObjectId
-  produits   CommandeProduit[]
-
-  livreur   Livreur? @relation(fields: [livreurId], references: [id])
-  livreurId String?  @db.ObjectId
-
-  @@map("commandes")
 }
 
 model CommandeProduit {
