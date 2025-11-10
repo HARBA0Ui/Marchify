@@ -8,6 +8,10 @@ import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
 <<<<<<< HEAD
+import { UploadPredict } from './features/ai-search/upload-predict/upload-predict';
+import { PredictResults } from './features/ai-search/predict-results/predict-results';
+=======
+<<<<<<< HEAD
 import { AuthComponent } from './features/auth/auth.component';
 import { ShopsListSellerComponent } from './features/seller/pages/shops-list-seller/shops-list-seller.component';
 import { ShopProductsSellerComponent } from './features/seller/pages/shop-products-seller/shop-products-seller.component';
@@ -24,6 +28,7 @@ export const routes: Routes = [
 
 =======
 import { MapComponent } from './map/map';
+>>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
 
 export const routes: Routes = [
   {
@@ -56,6 +61,28 @@ export const routes: Routes = [
     path: 'product-list',
     title: 'Product List',
     component: ProductList,
+<<<<<<< HEAD
+  },
+  {
+    path: 'commande-list-vendor',
+    title: 'Commande List Vendor',
+    component: CommandeListVendor,
+  },
+  {
+    path: 'delivery/missions',
+    title: 'Delivery Missions',
+    component: MissionList,
+  },
+  {
+    path: 'ai-search/upload-predict',
+    title: 'AI Search - Upload & Predict',
+    component: UploadPredict,
+  },
+  {
+    path: 'predict-results',
+    title: 'Prediction Results',
+    component: PredictResults,
+=======
   }, {
 <<<<<<< HEAD
     path:"commande-list-vendor",
@@ -72,6 +99,7 @@ export const routes: Routes = [
 <<<<<<< HEAD
   },{
     path:'login',title:'login' ,component:AuthComponent
+>>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
   }
 
 =======

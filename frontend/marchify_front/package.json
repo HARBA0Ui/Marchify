@@ -30,12 +30,14 @@
     "@tailwindcss/postcss": "^4.1.14",
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+=======
     "leaflet": "^1.9.4",
     "maplibre-gl": "^5.12.0",
 >>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
     "postcss": "^8.5.6",
+>>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
     "rxjs": "~7.8.0",
-    "tailwindcss": "^4.1.14",
     "tslib": "^2.3.0",
     "zone.js": "^0.15.1"
   },
@@ -45,15 +47,21 @@
     "@angular/compiler-cli": "^20.3.6",
     "@types/jasmine": "~5.1.0",
 <<<<<<< HEAD
+    "autoprefixer": "^10.4.21",
+=======
+<<<<<<< HEAD
 =======
     "@types/leaflet": "^1.9.21",
 >>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
+>>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
     "typescript": "~5.8.2"
   }
 }

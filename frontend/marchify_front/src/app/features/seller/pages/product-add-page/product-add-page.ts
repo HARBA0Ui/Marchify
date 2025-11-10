@@ -150,17 +150,38 @@ export class ProductAddPage implements OnInit {
     if (this.productForm.valid) this.createProduct();
     else this.markAllFieldsAsTouched();
   }
-
   private createProduct(skipImage = false): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
-    const imageUrl =
-      !skipImage && this.previewUrls.length > 0
-        ? `product-${Date.now()}.jpg` // later: integrate real upload
-        : 'default-product.jpg';
+    const formData = new FormData();
+    formData.append('nom', this.productForm.get('name')?.value);
+    formData.append('prix', this.productForm.get('price')?.value);
+    formData.append('categorie', this.productForm.get('category')?.value);
+    formData.append(
+      'description',
+      this.productForm.get('description')?.value || ''
+    );
+    formData.append('quantite', this.productForm.get('quantity')?.value);
+    formData.append('unite', this.productForm.get('unit')?.value);
+    formData.append('livrable', this.productForm.get('livrable')?.value);
+    formData.append(
+      'boutiqueId',
+      this.userShops.length > 0 ? this.userShops[0].id : ''
+    );
 
+<<<<<<< HEAD
+    if (!skipImage && this.selectedFiles.length > 0) {
+      this.selectedFiles.forEach((file, index) => {
+        formData.append('imageFile', file, file.name);
+      });
+    } else {
+      // optional: append a default image or skip
+    }
+
+    this.productService.createProduct(formData).subscribe({
+=======
     const productRequest: ProductCreateRequest = {
       nom: this.productForm.get('name')?.value,
       prix: parseFloat(this.productForm.get('price')?.value),
@@ -179,6 +200,7 @@ export class ProductAddPage implements OnInit {
     };
 
     this.productService.createProduct(productRequest).subscribe({
+>>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
       next: () => {
         this.isLoading = false;
         this.successMessage = 'Produit ajouté avec succès!';
