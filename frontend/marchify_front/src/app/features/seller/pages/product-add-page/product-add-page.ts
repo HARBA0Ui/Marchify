@@ -18,20 +18,12 @@ export class ProductAddPage implements OnInit {
   private shopService = inject(ShopService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-<<<<<<< HEAD
-  private route = inject(ActivatedRoute);  
-=======
 
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   productForm: FormGroup;
   selectedFiles: File[] = [];
   previewUrls: string[] = [];
   showImageWarning = false;
   userShops: any[] = [];
-<<<<<<< HEAD
-  shopId: string | null = null;  
-=======
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 
   isLoading = false;
   errorMessage = '';
@@ -66,28 +58,6 @@ export class ProductAddPage implements OnInit {
   }
 
   ngOnInit(): void {
-<<<<<<< HEAD
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.role !== 'VENDEUR') {
-      this.router.navigate(['/login']);
-      return;
-    }
-    this.shopId = this.route.snapshot.paramMap.get('shopId'); 
-    if (!this.shopId) {
-      this.errorMessage = 'Boutique non spécifiée.';
-      return;
-    }
-    this.loadUserShops(user.id); 
-    this.initializeFormData();
-    this.productForm
-      .get('unit')
-      ?.valueChanges.subscribe((unit:any) => this.toggleCustomUnitField(unit));
-  }
-
-  private loadUserShops(vendeurId: string): void {
-    this.shopService.getShopsByVendeurId(vendeurId).subscribe({
-      next: (shops:any) => (this.userShops = shops),
-=======
     this.loadUserShops();
     this.initializeFormData();
     this.productForm
@@ -100,7 +70,6 @@ export class ProductAddPage implements OnInit {
     // replace with real auth ID
     this.shopService.getShopsByVendeurId(currentVendeurId).subscribe({
       next: (shops) => (this.userShops = shops),
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
       error: () =>
         (this.errorMessage = 'Erreur lors du chargement des boutiques'),
     });
@@ -150,38 +119,17 @@ export class ProductAddPage implements OnInit {
     if (this.productForm.valid) this.createProduct();
     else this.markAllFieldsAsTouched();
   }
+
   private createProduct(skipImage = false): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
-    const formData = new FormData();
-    formData.append('nom', this.productForm.get('name')?.value);
-    formData.append('prix', this.productForm.get('price')?.value);
-    formData.append('categorie', this.productForm.get('category')?.value);
-    formData.append(
-      'description',
-      this.productForm.get('description')?.value || ''
-    );
-    formData.append('quantite', this.productForm.get('quantity')?.value);
-    formData.append('unite', this.productForm.get('unit')?.value);
-    formData.append('livrable', this.productForm.get('livrable')?.value);
-    formData.append(
-      'boutiqueId',
-      this.userShops.length > 0 ? this.userShops[0].id : ''
-    );
+    const imageUrl =
+      !skipImage && this.previewUrls.length > 0
+        ? `product-${Date.now()}.jpg` // later: integrate real upload
+        : 'default-product.jpg';
 
-<<<<<<< HEAD
-    if (!skipImage && this.selectedFiles.length > 0) {
-      this.selectedFiles.forEach((file, index) => {
-        formData.append('imageFile', file, file.name);
-      });
-    } else {
-      // optional: append a default image or skip
-    }
-
-    this.productService.createProduct(formData).subscribe({
-=======
     const productRequest: ProductCreateRequest = {
       nom: this.productForm.get('name')?.value,
       prix: parseFloat(this.productForm.get('price')?.value),
@@ -191,24 +139,15 @@ export class ProductAddPage implements OnInit {
       quantite: parseInt(this.productForm.get('quantity')?.value),
       unite: this.productForm.get('unit')?.value,
       livrable: this.productForm.get('livrable')?.value,
-<<<<<<< HEAD
-      boutiqueId: this.shopId || '',  // ✅ Utilisation de shopId dynamique au lieu du code dur
-=======
-      boutiqueId: '68f743532df2f750af13a590',
+      boutiqueId: '6910e1f5ae7a23b03295a328',
 
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
     };
 
     this.productService.createProduct(productRequest).subscribe({
->>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
       next: () => {
         this.isLoading = false;
         this.successMessage = 'Produit ajouté avec succès!';
-<<<<<<< HEAD
-        setTimeout(() => this.router.navigate(['/seller/shop-products', this.shopId]), 1500);  // ✅ Redirection vers la liste des produits de la boutique
-=======
         setTimeout(() => this.router.navigate(['/seller/products']), 1500);
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
       },
       error: () => {
         this.isLoading = false;
@@ -221,11 +160,7 @@ export class ProductAddPage implements OnInit {
   }
 
   onCancel(): void {
-<<<<<<< HEAD
-    this.router.navigate(['/seller/shops']);  // ✅ Redirection vers la liste des boutiques au lieu de /seller/dashboard
-=======
     this.router.navigate(['/seller/dashboard']);
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   }
 
   private markAllFieldsAsTouched(): void {
@@ -272,9 +207,5 @@ export class ProductAddPage implements OnInit {
     };
     return labels[unit] || unit;
   }
-<<<<<<< HEAD
-}
-=======
 }
 
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21

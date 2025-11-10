@@ -1,31 +1,5 @@
 import db from "../db/prisma.js";
-<<<<<<< HEAD
 
-export const getMissionsDisponibles = async (req, res) => {
-  try {
-    const missions = await db.commande.findMany({
-      where: {
-        status: "READY",
-        //livreurId: null 
-      },
-      select: {
-        id: true,
-        status: true,
-        adresseLivraison: true,
-        totalCommande: true,
-        dateCommande: true,
-        clientId: true,
-        boutiqueId: true,
-        produits: {
-          select: {
-            produitId: true,
-            quantite: true,
-            prixTotal: true
-          }
-        }
-      },
-      orderBy: { dateCommande: "asc" }
-=======
 export const getMissionsDisponibles = async (req, res) => {
   try {
     const missions = await db.bonDeLivraison.findMany({
@@ -40,7 +14,6 @@ export const getMissionsDisponibles = async (req, res) => {
         }
       },
       orderBy: { dateCreation: "asc" }
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
     });
 
     res.json({ missions });
@@ -49,28 +22,6 @@ export const getMissionsDisponibles = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-
-export const accepterMission = async (req, res) => {
-  try {
-    const { commandeId, livreurId } = req.params;
-
-    const commande = await db.commande.findUnique({ where: { id: commandeId } });
-    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
-
-    if (commande.status !== "READY") 
-      return res.status(400).json({ message: "Commande non disponible pour livraison" });
-
-    if (commande.livreurId) 
-      return res.status(400).json({ message: "Mission déjà prise par un autre livreur" });
-
-    const updated = await db.commande.update({
-      where: { id: commandeId },
-      data: { livreurId, status: "PROCESSING" }
-    });
-
-    res.json({ message: "Mission acceptée", mission: updated });
-=======
 export const getMissionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -124,31 +75,12 @@ export const accepterMission = async (req, res) => {
     });
 
     res.json({ message: "Mission acceptée", bonDeLivraison: updatedBon });
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-<<<<<<< HEAD
 
-export const livrerCommande = async (req, res) => {
-  try {
-    const { commandeId } = req.params;
-
-    const commande = await db.commande.findUnique({ where: { id: commandeId } });
-    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
-
-    if (commande.status !== "PROCESSING") 
-      return res.status(400).json({ message: "Commande non en cours de livraison" });
-
-    const updated = await db.commande.update({
-      where: { id: commandeId },
-      data: { status: "DELIVERED" }
-    });
-
-    res.json({ message: "Commande livrée", commande: updated });
-=======
 export const livrerCommande = async (req, res) => {
   try {
     const { bonId } = req.params;
@@ -171,27 +103,12 @@ export const livrerCommande = async (req, res) => {
     });
 
     res.json({ message: "Commande livrée", bonDeLivraison: updatedBon });
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-<<<<<<< HEAD
 
-export const refuserMission = async (req, res) => {
-  try {
-    const { commandeId } = req.params;
-
-    const commande = await db.commande.findUnique({ where: { id: commandeId } });
-    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
-
-    if (commande.status !== "READY") 
-      return res.status(400).json({ message: "Commande non disponible pour livraison" });
-
-    
-    res.json({ message: "Mission refusée, elle reste disponible pour un autre livreur" });
-=======
 export const refuserMission = async (req, res) => {
   try {
     const { bonId } = req.params;
@@ -216,7 +133,6 @@ export const refuserMission = async (req, res) => {
       message: "Mission refusée, disponible pour un autre livreur", 
       bonDeLivraison: updatedBon 
     });
->>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
