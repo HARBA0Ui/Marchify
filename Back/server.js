@@ -5,14 +5,11 @@ import cors from "cors";
 import cartRoutes from "./routes/cart.routes.js";
 import boutiqueRoutes from "./routes/boutique.routes.js";
 import produitRoutes from "./routes/produit.routes.js";
-import userRoutes from "./routes/user.routes.js"
 import commandesRoutes from "./routes/commande.routes.js"
 import livreurRoutes from "./routes/livreur.routes.js"
 import bonDelivraison from "./routes/bonDeLivraison.routes.js"
-import userRoutes from "./routes/user.routes.js";
-import commandesRoutes from "./routes/commande.routes.js";
-import livreurRoutes from "./routes/livreur.routes.js";
 import predictRoutes from "./routes/predict.routes.js"
+import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
 const app = express();
