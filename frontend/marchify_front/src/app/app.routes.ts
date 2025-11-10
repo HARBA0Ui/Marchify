@@ -7,6 +7,7 @@ import { PanierList } from './layouts/panier-list/panier-list';
 import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
+import { MapComponent } from './map/map';
 
 export const routes: Routes = [
   {
@@ -39,13 +40,18 @@ export const routes: Routes = [
     title: 'Product List',
     component: ProductList,
   }, {
-    path:"commande-list-vendor",
-    title:"Commande List Vendor",
+    path: "commande-list-vendor",
+    title: "Commande List Vendor",
     component: CommandeListVendor
   }, {
     path: 'delivery/missions',
     title: 'Delivery Missions',
     component: MissionList,
+  },
+  {
+    path: 'delivery/map',
+    title: 'Delivery Map',
+    component: MapComponent,
   }
 ];
 

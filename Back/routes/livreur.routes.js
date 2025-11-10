@@ -3,12 +3,15 @@ import {
   getMissionsDisponibles,
   accepterMission,
   livrerCommande,
-  refuserMission
+  refuserMission,
+  getMissionById
 } from "../controllers/livreur.controller.js"
 
 const router = express.Router();
 
 router.get("/missions", getMissionsDisponibles);
+
+router.get('/missions/:id', getMissionById);
 
 router.patch("/missions/accepter/:livreurId/:commandeId", accepterMission);
 
