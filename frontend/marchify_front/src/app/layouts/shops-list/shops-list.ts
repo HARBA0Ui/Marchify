@@ -4,10 +4,11 @@
   import { Shop } from '../../core/models/shop';
   import { ShopCard } from '../shop-card/shop-card';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 
   @Component({
     selector: 'app-shops-list',
-    imports: [CommonModule, ShopCard],
+    imports: [CommonModule, ShopCard,RouterLink],
     templateUrl: './shops-list.html',
     styleUrl: './shops-list.css',
   })

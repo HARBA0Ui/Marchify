@@ -10,11 +10,14 @@ import produitRoutes from "./routes/produit.routes.js";
 import userRoutes from "./routes/user.routes.js"
 import commandesRoutes from "./routes/commande.routes.js"
 import livreurRoutes from "./routes/livreur.routes.js"
-
+import predictRoutes from "./routes/predict.routes.js"
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+
+
 app.use(
   cors({
     origin: "http://localhost:4200",
@@ -26,6 +29,7 @@ app.use(
 // Routes
 app.use("/api/boutiques", boutiqueRoutes);
 app.use("/api/produits", produitRoutes);
+app.use("/api/predict", predictRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/commandes", commandesRoutes);

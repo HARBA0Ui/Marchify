@@ -5,10 +5,13 @@ import {
   getProduitById,
   updateProduit,
 } from "../controllers/produit.controller.js";
+import upload from "../utils/multer.js"; // import multer config
 
 const router = express.Router();
 
-router.post("/", createProduit);
+// add upload.array('imageFile', 5) to handle multiple images
+router.post("/", upload.array("imageFile", 5), createProduit);
+
 router.get("/", getProduits);
 router.get("/:id", getProduitById);
 router.put("/:id", updateProduit);

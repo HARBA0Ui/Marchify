@@ -119,31 +119,36 @@ export class ProductAddPage implements OnInit {
     if (this.productForm.valid) this.createProduct();
     else this.markAllFieldsAsTouched();
   }
-
   private createProduct(skipImage = false): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
-    const imageUrl =
-      !skipImage && this.previewUrls.length > 0
-        ? `product-${Date.now()}.jpg` // later: integrate real upload
-        : 'default-product.jpg';
+    const formData = new FormData();
+    formData.append('nom', this.productForm.get('name')?.value);
+    formData.append('prix', this.productForm.get('price')?.value);
+    formData.append('categorie', this.productForm.get('category')?.value);
+    formData.append(
+      'description',
+      this.productForm.get('description')?.value || ''
+    );
+    formData.append('quantite', this.productForm.get('quantity')?.value);
+    formData.append('unite', this.productForm.get('unit')?.value);
+    formData.append('livrable', this.productForm.get('livrable')?.value);
+    formData.append(
+      'boutiqueId',
+      this.userShops.length > 0 ? this.userShops[0].id : ''
+    );
 
-    const productRequest: ProductCreateRequest = {
-      nom: this.productForm.get('name')?.value,
-      prix: parseFloat(this.productForm.get('price')?.value),
-      categorie: this.productForm.get('category')?.value,
-      description: this.productForm.get('description')?.value || '',
-      image: imageUrl,
-      quantite: parseInt(this.productForm.get('quantity')?.value),
-      unite: this.productForm.get('unit')?.value,
-      livrable: this.productForm.get('livrable')?.value,
-      boutiqueId: '68f743532df2f750af13a590',
+    if (!skipImage && this.selectedFiles.length > 0) {
+      this.selectedFiles.forEach((file, index) => {
+        formData.append('imageFile', file, file.name);
+      });
+    } else {
+      // optional: append a default image or skip
+    }
 
-    };
-
-    this.productService.createProduct(productRequest).subscribe({
+    this.productService.createProduct(formData).subscribe({
       next: () => {
         this.isLoading = false;
         this.successMessage = 'Produit ajouté avec succès!';

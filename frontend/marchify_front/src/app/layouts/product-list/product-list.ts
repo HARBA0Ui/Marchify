@@ -5,10 +5,11 @@ import { ProductCard } from '../product-card/product-card';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PanierService } from '../../core/services/panier';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
-  imports: [ProductCard, FormsModule, CommonModule],
+  imports: [ProductCard, FormsModule, CommonModule,RouterLink],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
 })

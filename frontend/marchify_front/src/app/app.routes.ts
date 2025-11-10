@@ -7,6 +7,8 @@ import { PanierList } from './layouts/panier-list/panier-list';
 import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
+import { UploadPredict } from './features/ai-search/upload-predict/upload-predict';
+import { PredictResults } from './features/ai-search/predict-results/predict-results';
 
 export const routes: Routes = [
   {
@@ -38,14 +40,26 @@ export const routes: Routes = [
     path: 'product-list',
     title: 'Product List',
     component: ProductList,
-  }, {
-    path:"commande-list-vendor",
-    title:"Commande List Vendor",
-    component: CommandeListVendor
-  }, {
+  },
+  {
+    path: 'commande-list-vendor',
+    title: 'Commande List Vendor',
+    component: CommandeListVendor,
+  },
+  {
     path: 'delivery/missions',
     title: 'Delivery Missions',
     component: MissionList,
+  },
+  {
+    path: 'ai-search/upload-predict',
+    title: 'AI Search - Upload & Predict',
+    component: UploadPredict,
+  },
+  {
+    path: 'predict-results',
+    title: 'Prediction Results',
+    component: PredictResults,
   }
 ];
 

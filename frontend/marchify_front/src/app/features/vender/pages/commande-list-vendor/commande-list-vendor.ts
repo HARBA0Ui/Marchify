@@ -4,6 +4,7 @@ import { CommandeService } from '../../../../core/services/commande-service';
 
 @Component({
   selector: 'app-commande-list-vendor',
+  
   templateUrl: './commande-list-vendor.html',
   styleUrls: ['./commande-list-vendor.css'],
 })
