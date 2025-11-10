@@ -1,4 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+<<<<<<< HEAD
+@import "tailwindcss";
+=======
 @import "tailwindcss";
 
 @import 'leaflet/dist/leaflet.css';
@@ -11,3 +14,4 @@
 .leaflet-marker-icon {
     background-image: url('leaflet/dist/images/marker-icon.png');
 }
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21

@@ -49,6 +49,18 @@ export const preparerCommande = async (req, res) => {
 
     const commande = await db.commande.findUnique({
       where: { id: commandeId },
+<<<<<<< HEAD
+      include: { produits: { include: { produit: true } } }
+    });
+
+    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
+
+    const indisponibles = commande.produits.filter(p => p.produit.quantite < p.quantite);
+    if (indisponibles.length > 0) {
+      return res.status(400).json({
+        message: "Certains produits sont indisponibles",
+        produits: indisponibles.map(p => ({ nom: p.produit.nom, disponible: p.produit.quantite }))
+=======
       include: {
         produits: { include: { produit: true } },
         boutique: {
@@ -78,18 +90,29 @@ export const preparerCommande = async (req, res) => {
           nom: p.produit.nom,
           disponible: p.produit.quantite,
         })),
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
       });
     }
 
     for (const p of commande.produits) {
       await db.produit.update({
         where: { id: p.produitId },
+<<<<<<< HEAD
+        data: { quantite: p.produit.quantite - p.quantite }
+=======
         data: { quantite: p.produit.quantite - p.quantite },
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
       });
     }
 
     const commandePrep = await db.commande.update({
       where: { id: commandeId },
+<<<<<<< HEAD
+      data: { status: "READY" }
+    });
+
+    res.json({ message: "Commande prête pour livraison", commande: commandePrep });
+=======
       data: { status: "READY" },
       include: { boutique: true, client: true },
     });
@@ -109,13 +132,17 @@ export const preparerCommande = async (req, res) => {
       commande: commandePrep,
       bonDeLivraison: bon,
     });
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 export const getCommandesBoutique = async (req, res) => {
   try {
     const { boutiqueId } = req.params;
@@ -136,7 +163,11 @@ export const getCommandesBoutique = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+<<<<<<< HEAD
+  
+=======
 
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 };
 export const updateCommandeStatus = async (req, res) => {
   try {

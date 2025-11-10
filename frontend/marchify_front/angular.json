@@ -21,19 +21,28 @@
                 "input": "public"
               }
             ],
+<<<<<<< HEAD
+            "styles": ["src/styles.css","node_modules/@fortawesome/fontawesome-free/css/all.min.css"]
+=======
             "styles": [
               "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/maplibre-gl/dist/maplibre-gl.css"
             ]
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
+<<<<<<< HEAD
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+=======
                   "maximumWarning": "2mb",
                   "maximumError": "3mb"
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
                 },
                 {
                   "type": "anyComponentStyle",
@@ -76,12 +85,20 @@
                 "input": "public"
               }
             ],
+<<<<<<< HEAD
+            "styles": ["src/styles.css"]
+=======
             "styles": [
               "src/styles.css"
             ]
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
           }
         }
       }
     }
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
