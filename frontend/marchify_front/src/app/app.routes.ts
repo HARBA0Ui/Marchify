@@ -7,6 +7,7 @@ import { PanierList } from './layouts/panier-list/panier-list';
 import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
+<<<<<<< HEAD
 import { AuthComponent } from './features/auth/auth.component';
 import { ShopsListSellerComponent } from './features/seller/pages/shops-list-seller/shops-list-seller.component';
 import { ShopProductsSellerComponent } from './features/seller/pages/shop-products-seller/shop-products-seller.component';
@@ -21,6 +22,21 @@ export const routes: Routes = [
   { path: 'seller/shop-products/:id', title: 'Produits de la Boutique', component: ShopProductsSellerComponent },
   { path: 'seller/product-edit/:id', title: 'Modifier Produit', component: ProductEditSellerComponent },
 
+=======
+import { MapComponent } from './map/map';
+
+export const routes: Routes = [
+  {
+    path: 'seller/shop-creation',
+    title: 'Shop Creation',
+    component: ShopCreationPage,
+  },
+  {
+    path: 'seller/product-add',
+    title: 'add product',
+    component: ProductAddPage,
+  },
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
   {
     path: 'shop-list',
     title: 'Shops List',
@@ -41,16 +57,30 @@ export const routes: Routes = [
     title: 'Product List',
     component: ProductList,
   }, {
+<<<<<<< HEAD
     path:"commande-list-vendor",
     title:"Commande List Vendor",
+=======
+    path: "commande-list-vendor",
+    title: "Commande List Vendor",
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
     component: CommandeListVendor
   }, {
     path: 'delivery/missions',
     title: 'Delivery Missions',
     component: MissionList,
+<<<<<<< HEAD
   },{
     path:'login',title:'login' ,component:AuthComponent
   }
 
+=======
+  },
+  {
+    path: 'delivery/map',
+    title: 'Delivery Map',
+    component: MapComponent,
+  }
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 ];
 
