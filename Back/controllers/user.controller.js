@@ -1,13 +1,12 @@
-import db from "../db/prisma.js"
+import db from "../db/prisma.js";
 
 export const createUser = async (req, res) => {
   try {
     const { nom, prenom, email, PWD, telephone, adresse, role } = req.body;
 
-
     const existing = await db.user.findUnique({ where: { email } });
-    if (existing) return res.status(400).json({ message: "Email déjà utilisé" });
-
+    if (existing)
+      return res.status(400).json({ message: "Email déjà utilisé" });
 
     const user = await db.user.create({
       data: {
@@ -21,7 +20,6 @@ export const createUser = async (req, res) => {
       },
     });
 
-
     if (role === "VENDEUR") {
       await db.vendeur.create({
         data: {
@@ -30,7 +28,6 @@ export const createUser = async (req, res) => {
       });
     }
 
-
     if (role === "LIVREUR") {
       await db.livreur.create({
         data: {
@@ -38,7 +35,6 @@ export const createUser = async (req, res) => {
         },
       });
     }
-
 
     if (role === "CLIENT") {
       await db.panier.create({
@@ -60,6 +56,30 @@ export const getAllUsers = async (req, res) => {
     const users = await db.user.findMany();
     res.json(users);
   } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+export const loginUser = async (req, res) => {
+  try {
+    const { email, PWD } = req.body;
+
+    const user = await db.user.findUnique({ where: { email } });
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "Email ou mot de passe incorrect" });
+
+    
+    if (user.PWD !== PWD)
+      return res
+        .status(400)
+        .json({ message: "Email ou mot de passe incorrect" });
+
+    
+
+    res.status(200).json({ message: "Connexion réussie", user /*, token */ });
+  } catch (error) {
+    console.error("Erreur login utilisateur :", error);
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };

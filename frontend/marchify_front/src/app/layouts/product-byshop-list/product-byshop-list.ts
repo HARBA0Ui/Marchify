@@ -5,10 +5,11 @@ import { ProductCard } from '../product-card/product-card';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PanierService } from '../../core/services/panier';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-product-byshop-list',
-  imports: [ProductCard, FormsModule, CommonModule], // ✅ Remove duplicate ProductCard
+  imports: [ProductCard, FormsModule, CommonModule,RouterLink], // ✅ Remove duplicate ProductCard
   templateUrl: './product-byshop-list.html',
   styleUrl: './product-byshop-list.css',
 })

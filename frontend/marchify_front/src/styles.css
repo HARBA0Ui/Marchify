@@ -1,2 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+@import 'leaflet/dist/leaflet.css';
+
+.leaflet-tile-pane {
+    -webkit-filter: none !important;
+    filter: none !important;
+}
+
+.leaflet-marker-icon {
+    background-image: url('leaflet/dist/images/marker-icon.png');
+}

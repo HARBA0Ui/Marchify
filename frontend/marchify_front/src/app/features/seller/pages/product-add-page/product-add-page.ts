@@ -139,7 +139,7 @@ export class ProductAddPage implements OnInit {
       quantite: parseInt(this.productForm.get('quantity')?.value),
       unite: this.productForm.get('unit')?.value,
       livrable: this.productForm.get('livrable')?.value,
-      boutiqueId: '68f743532df2f750af13a590',
+      boutiqueId: '6910e1f5ae7a23b03295a328',
 
     };
 

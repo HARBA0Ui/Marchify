@@ -1,0 +1,210 @@
+<div class="min-h-screen bg-gradient-to-br from-[#faf2b8] via-[#e9f5db] to-[#cfe1b9] py-12 px-4">
+  <div class="container mx-auto max-w-5xl">
+    
+    <!-- Header with animated gradient text -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-[#386641] to-[#F97A00] rounded-2xl flex items-center justify-center rotate-12 animate-pulse">
+          <i class="fas fa-robot text-white text-2xl -rotate-12"></i>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-black">
+          <span class="bg-gradient-to-r from-[#386641] via-[#6a994e] to-[#F97A00] bg-clip-text text-transparent">
+            AI Search
+          </span>
+        </h1>
+        <div class="w-12 h-12 bg-gradient-to-br from-[#F97A00] to-[#386641] rounded-2xl flex items-center justify-center -rotate-12 animate-pulse delay-75">
+          <i class="fas fa-wand-magic-sparkles text-white text-2xl rotate-12"></i>
+        </div>
+      </div>
+      <p class="text-[#386641] text-lg font-medium max-w-2xl mx-auto">
+        Capturez, analysez, découvrez ! Notre IA identifie vos produits instantanément
+      </p>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border-4 border-white">
+      
+      <!-- Camera/Upload Section -->
+      @if (!imageBase64) {
+        <div class="flex flex-col items-center justify-center py-12">
+          
+          <!-- Animated Background Elements -->
+          <div class="relative">
+            <!-- Outer glow rings -->
+            <div class="absolute inset-0 -m-8 rounded-full bg-gradient-to-r from-[#386641]/10 to-[#F97A00]/10 animate-ping"></div>
+            <div class="absolute inset-0 -m-4 rounded-full bg-gradient-to-r from-[#F97A00]/5 to-[#386641]/5 animate-pulse"></div>
+            
+            <!-- Main Camera Button -->
+            <div
+              class="relative w-48 h-48 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-[#386641] via-[#6a994e] to-[#F97A00] flex flex-col items-center justify-center shadow-2xl cursor-pointer hover:scale-105 transition-all duration-500 group"
+              (click)="onCapture()"
+            >
+              <!-- Inner glow -->
+              <div class="absolute inset-4 rounded-full bg-white/20 backdrop-blur-sm"></div>
+              
+              <!-- Icon Container -->
+              <div class="relative z-10 flex flex-col items-center gap-3">
+                <!-- AI Scan Icon with Camera Badge -->
+                <div class="relative">
+                  <!-- Main scanning effect -->
+                  <div class="relative">
+                    <i class="fas fa-robot text-white text-7xl md:text-8xl group-hover:scale-110 transition-transform duration-300"></i>
+                    <!-- Scanning line animation -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="w-16 h-1 bg-white/60 animate-pulse"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Camera Badge -->
+                  <div class="absolute -bottom-3 -right-3 w-14 h-14 bg-gradient-to-br from-[#F97A00] to-[#ff6b00] rounded-2xl flex items-center justify-center border-4 border-white shadow-2xl group-hover:rotate-12 transition-all duration-300 group-hover:scale-110">
+                    <i class="fas fa-camera-retro text-white text-2xl"></i>
+                  </div>
+                  
+                  <!-- AI Indicator Dot -->
+                  <div class="absolute -top-2 -left-2 w-6 h-6 bg-green-400 rounded-full border-3 border-white shadow-lg animate-pulse"></div>
+                </div>
+                
+                <span class="text-white font-bold text-xl mt-2 group-hover:scale-105 transition-transform drop-shadow-lg">
+                  Capturer Image
+                </span>
+              </div>
+              
+              <!-- Floating Sparkles -->
+              <div class="absolute top-8 right-12 text-yellow-300 animate-bounce">
+                <i class="fas fa-sparkles text-2xl"></i>
+              </div>
+              <div class="absolute bottom-12 left-8 text-yellow-300 animate-bounce delay-150">
+                <i class="fas fa-sparkles text-xl"></i>
+              </div>
+              <div class="absolute top-16 left-16 text-yellow-300 animate-bounce delay-300">
+                <i class="fas fa-star text-lg"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instruction Text -->
+          <div class="mt-12 text-center">
+            <p class="text-[#386641] font-semibold text-xl mb-2">
+              Prêt à découvrir ?
+            </p>
+            <p class="text-gray-600 text-sm max-w-md">
+              Prenez une photo ou sélectionnez une image pour commencer la recherche intelligente de produits avec notre IA avancée.
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- Preview & Analyze Section -->
+      @if (imageBase64) {
+        <div class="space-y-6">
+          
+          <!-- Image Preview with Enhanced Design -->
+          <div class="relative group">
+            <!-- Animated border glow -->
+            <div class="absolute -inset-1 bg-gradient-to-r from-[#386641] via-[#F97A00] to-[#6a994e] rounded-3xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+            
+            <div class="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-4">
+              <img 
+                [src]="imageBase64" 
+                alt="Preview" 
+                class="w-full max-h-[28rem] object-contain rounded-2xl"
+              />
+              
+              <!-- Delete button with improved style -->
+              <button
+                (click)="imageBase64 = null"
+                class="absolute top-6 right-6 w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110 group/btn"
+              >
+                <i class="fas fa-times text-xl group-hover/btn:rotate-90 transition-transform duration-300"></i>
+              </button>
+              
+              <!-- Image badge -->
+              <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border-2 border-[#386641]/20">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-image text-[#386641]"></i>
+                  <span class="text-[#386641] font-semibold text-sm">Image capturée</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons with Improved Layout -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Analyze Button - More Prominent -->
+            <button
+              (click)="onPredict()"
+              [disabled]="loading"
+              class="sm:col-span-2 bg-gradient-to-r from-[#386641] via-[#6a994e] to-[#F97A00] text-white px-8 py-5 rounded-2xl font-bold text-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group relative overflow-hidden"
+            >
+              <!-- Animated background -->
+              <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              
+              @if (loading) {
+                <i class="fas fa-spinner fa-spin text-2xl relative z-10"></i>
+                <span class="relative z-10">Analyse en cours...</span>
+              } @else {
+                <i class="fas fa-brain text-2xl group-hover:scale-110 transition-transform relative z-10"></i>
+                <span class="relative z-10">Analyser avec l'IA</span>
+                <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform relative z-10"></i>
+              }
+            </button>
+
+            <!-- Change Photo Button -->
+            <button
+              (click)="onCapture()"
+              [disabled]="loading"
+              class="sm:col-span-2 px-6 py-4 bg-white border-3 border-[#386641] text-[#386641] rounded-2xl font-semibold hover:bg-[#386641] hover:text-white transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group"
+            >
+              <i class="fas fa-camera text-lg group-hover:rotate-12 transition-transform"></i>
+              <span>Changer la photo</span>
+            </button>
+          </div>
+
+          <!-- Loading Animation - Enhanced -->
+          @if (loading) {
+            <div class="relative overflow-hidden">
+              <!-- Animated gradient border -->
+              <div class="absolute inset-0 bg-gradient-to-r from-[#386641] via-[#F97A00] to-[#386641] rounded-2xl animate-pulse"></div>
+              
+              <div class="relative m-1 bg-gradient-to-br from-[#faf2b8] to-[#e9f5db] rounded-2xl p-6">
+                <div class="flex items-start gap-4">
+                  <!-- Animated Brain Icon -->
+                  <div class="relative">
+                    <div class="w-16 h-16 bg-gradient-to-br from-[#386641] to-[#F97A00] rounded-2xl flex items-center justify-center">
+                      <i class="fas fa-brain text-3xl text-white animate-pulse"></i>
+                    </div>
+                    <div class="absolute -top-1 -right-1">
+                      <i class="fas fa-sparkles text-[#F97A00] text-lg animate-ping"></i>
+                    </div>
+                  </div>
+                  
+                  <!-- Loading Text -->
+                  <div class="flex-1">
+                    <p class="font-bold text-[#386641] text-xl mb-1">
+                      Intelligence Artificielle en action
+                    </p>
+                    <p class="text-[#6a994e] text-sm mb-4">
+                      Recherche des meilleurs produits pour vous...
+                    </p>
+                    
+                    <!-- Progress bar -->
+                    <div class="w-full bg-white/60 rounded-full h-3 overflow-hidden shadow-inner">
+                      <div class="h-full bg-gradient-to-r from-[#386641] via-[#F97A00] to-[#6a994e] rounded-full animate-pulse shadow-lg"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+    </div>
+
+   
+
+  <!-- Hidden file input -->
+  <input type="file" hidden accept="image/*" (change)="onFileSelected($event)" #fileInput />
+</div>

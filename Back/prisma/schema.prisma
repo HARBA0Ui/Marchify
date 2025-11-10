@@ -146,8 +146,8 @@ model Produit {
   unitePersonnalisee String?
   livrable           Boolean     @default(true)
 
-  boutique      Boutique          @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
-  boutiqueId    String            @db.ObjectId
+  boutique      Boutique?         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+  boutiqueId    String?           @db.ObjectId
   commandes     CommandeProduit[]
   PanierProduit PanierProduit[]
 

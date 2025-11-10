@@ -1,4 +1,5 @@
 import db from "../db/prisma.js";
+
 export const getMissionsDisponibles = async (req, res) => {
   try {
     const missions = await db.bonDeLivraison.findMany({
@@ -20,6 +21,35 @@ export const getMissionsDisponibles = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getMissionById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const mission = await db.bonDeLivraison.findUnique({
+      where: { id },
+      include: {
+        commande: {
+          include: {
+            client: true,
+            boutique: { include: { vendeur: { include: { user: true } } } },
+          },
+        },
+        livreur: { include: { user: true } },
+      },
+    });
+
+    if (!mission) {
+      return res.status(404).json({ message: 'Mission introuvable' });
+    }
+
+    res.json({ mission });
+  } catch (error) {
+    console.error('Erreur lors de la récupération de la mission:', error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+};
+
 
 export const accepterMission = async (req, res) => {
   try {
@@ -49,6 +79,7 @@ export const accepterMission = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 export const refuserMission = async (req, res) => {

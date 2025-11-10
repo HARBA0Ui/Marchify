@@ -2,11 +2,11 @@ import { Component, inject } from '@angular/core';
 import { Panier } from '../../core/models/panier';
 import { PanierService } from '../../core/services/panier';
 import { DecimalPipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-panier-list',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe,RouterLink],
   templateUrl: './panier-list.html',
   styleUrl: './panier-list.css',
 })

@@ -22,8 +22,8 @@ export class ProductService {
   }
 
   // 🔹 Create a new product
-  createProduct(productData: ProductCreateRequest): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, productData);
+  createProduct(product: ProductCreateRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, product); // no FormData
   }
 
   // 🔹 Update product

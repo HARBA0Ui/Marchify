@@ -49,71 +49,36 @@ export const preparerCommande = async (req, res) => {
 
     const commande = await db.commande.findUnique({
       where: { id: commandeId },
-      include: {
-        produits: { include: { produit: true } },
-        boutique: {
-          include: {
-            vendeur: {
-              include: {
-                user: true,
-              },
-            },
-          },
-        },
-        client: true,
-      },
+      include: { produits: { include: { produit: true } } }
     });
 
-    if (!commande) {
-      return res.status(404).json({ message: "Commande introuvable" });
-    }
+    if (!commande) return res.status(404).json({ message: "Commande introuvable" });
 
-    const indisponibles = commande.produits.filter(
-      (p) => p.produit.quantite < p.quantite
-    );
+    const indisponibles = commande.produits.filter(p => p.produit.quantite < p.quantite);
     if (indisponibles.length > 0) {
       return res.status(400).json({
         message: "Certains produits sont indisponibles",
-        produits: indisponibles.map((p) => ({
-          nom: p.produit.nom,
-          disponible: p.produit.quantite,
-        })),
+        produits: indisponibles.map(p => ({ nom: p.produit.nom, disponible: p.produit.quantite }))
       });
     }
 
     for (const p of commande.produits) {
       await db.produit.update({
         where: { id: p.produitId },
-        data: { quantite: p.produit.quantite - p.quantite },
+        data: { quantite: p.produit.quantite - p.quantite }
       });
     }
 
     const commandePrep = await db.commande.update({
       where: { id: commandeId },
-      data: { status: "READY" },
-      include: { boutique: true, client: true },
+      data: { status: "READY" }
     });
 
-    const bon = await db.bonDeLivraison.create({
-      data: {
-        commandeId: commandePrep.id,
-        livreurId: null,
-        status: "PENDING_PICKUP",
-        adresseVendeur: commande.boutique?.localisation || {},
-        adresseAcheteur: commande.client?.adresse || {},
-      },
-    });
-
-    res.json({
-      message: "Commande prête pour livraison, bon de livraison créé",
-      commande: commandePrep,
-      bonDeLivraison: bon,
-    });
+    res.json({ message: "Commande prête pour livraison", commande: commandePrep });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 
 export const getCommandesBoutique = async (req, res) => {
@@ -136,7 +101,7 @@ export const getCommandesBoutique = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-
+  
 };
 export const updateCommandeStatus = async (req, res) => {
   try {
