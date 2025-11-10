@@ -18,12 +18,13 @@ export class ProductAddPage implements OnInit {
   private shopService = inject(ShopService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-
+  private route = inject(ActivatedRoute);  
   productForm: FormGroup;
   selectedFiles: File[] = [];
   previewUrls: string[] = [];
   showImageWarning = false;
   userShops: any[] = [];
+  shopId: string | null = null;  
 
   isLoading = false;
   errorMessage = '';
@@ -58,18 +59,26 @@ export class ProductAddPage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadUserShops();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.role !== 'VENDEUR') {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.shopId = this.route.snapshot.paramMap.get('shopId'); 
+    if (!this.shopId) {
+      this.errorMessage = 'Boutique non spécifiée.';
+      return;
+    }
+    this.loadUserShops(user.id); 
     this.initializeFormData();
     this.productForm
       .get('unit')
-      ?.valueChanges.subscribe((unit) => this.toggleCustomUnitField(unit));
+      ?.valueChanges.subscribe((unit:any) => this.toggleCustomUnitField(unit));
   }
 
-  private loadUserShops(): void {
-    const currentVendeurId = '68f743532df2f750af13a589';
-    // replace with real auth ID
-    this.shopService.getShopsByVendeurId(currentVendeurId).subscribe({
-      next: (shops) => (this.userShops = shops),
+  private loadUserShops(vendeurId: string): void {
+    this.shopService.getShopsByVendeurId(vendeurId).subscribe({
+      next: (shops:any) => (this.userShops = shops),
       error: () =>
         (this.errorMessage = 'Erreur lors du chargement des boutiques'),
     });
@@ -139,15 +148,14 @@ export class ProductAddPage implements OnInit {
       quantite: parseInt(this.productForm.get('quantity')?.value),
       unite: this.productForm.get('unit')?.value,
       livrable: this.productForm.get('livrable')?.value,
-      boutiqueId: '68f743532df2f750af13a590',
-
+      boutiqueId: this.shopId || '',  // ✅ Utilisation de shopId dynamique au lieu du code dur
     };
 
     this.productService.createProduct(productRequest).subscribe({
       next: () => {
         this.isLoading = false;
         this.successMessage = 'Produit ajouté avec succès!';
-        setTimeout(() => this.router.navigate(['/seller/products']), 1500);
+        setTimeout(() => this.router.navigate(['/seller/shop-products', this.shopId]), 1500);  // ✅ Redirection vers la liste des produits de la boutique
       },
       error: () => {
         this.isLoading = false;
@@ -160,7 +168,7 @@ export class ProductAddPage implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/seller/dashboard']);
+    this.router.navigate(['/seller/shops']);  // ✅ Redirection vers la liste des boutiques au lieu de /seller/dashboard
   }
 
   private markAllFieldsAsTouched(): void {
@@ -208,4 +216,3 @@ export class ProductAddPage implements OnInit {
     return labels[unit] || unit;
   }
 }
-

@@ -8,18 +8,19 @@ import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
 import { AuthComponent } from './features/auth/auth.component';
+import { ShopsListSellerComponent } from './features/seller/pages/shops-list-seller/shops-list-seller.component';
+import { ShopProductsSellerComponent } from './features/seller/pages/shop-products-seller/shop-products-seller.component';
+import { ProductEditSellerComponent } from './features/seller/pages/product-edit-seller/product-edit-seller.component';
 
 export const routes: Routes = [
-  {
-    path: 'seller/shop-creation',
-    title: 'Shop Creation',
-    component: ShopCreationPage,
-  },
-  {
-    path: 'seller/product-add',
-    title: 'add product',
-    component: ProductAddPage,
-  },
+  //3ami el vendeur 
+  {path: 'seller/shop-creation',title: 'Shop Creation',component: ShopCreationPage,},
+  {path: 'seller/product-add',title: 'add product',component: ProductAddPage,},
+  { path: 'seller/product-add/:shopId', title: 'Ajouter un produit', component: ProductAddPage },
+  { path: 'seller/shops', title: 'Mes Boutiques', component: ShopsListSellerComponent },
+  { path: 'seller/shop-products/:id', title: 'Produits de la Boutique', component: ShopProductsSellerComponent },
+  { path: 'seller/product-edit/:id', title: 'Modifier Produit', component: ProductEditSellerComponent },
+
   {
     path: 'shop-list',
     title: 'Shops List',
@@ -48,7 +49,7 @@ export const routes: Routes = [
     title: 'Delivery Missions',
     component: MissionList,
   },{
-    path:'login',title:'connexion d utilisatuer' ,component:AuthComponent
+    path:'login',title:'login' ,component:AuthComponent
   }
 
 ];

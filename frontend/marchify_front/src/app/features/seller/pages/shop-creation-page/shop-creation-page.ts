@@ -45,7 +45,7 @@ export class ShopCreationPage implements OnInit {
   constructor() {
    this.shopForm = this.fb.group({
      name: ['', [Validators.required, Validators.minLength(2)]],
-     marketName: [''], // <-- Ajouté pour résoudre l'erreur
+     marketName: [''], 
      address: ['', [Validators.required, Validators.minLength(5)]],
      category: ['', Validators.required],
      phone: ['', [Validators.required, Validators.pattern(/^[0-9\s]{8,}$/)]],
@@ -86,7 +86,7 @@ export class ShopCreationPage implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const currentVendeurId = '68f743532df2f750af13a589'; // TODO: replace by real vendeur ID (auth later)
+    const currentVendeurId = '68f743532df2f750af13a589'; 
 
     const shopRequest: ShopCreateRequest = {
       nom: this.shopForm.get('name')?.value,

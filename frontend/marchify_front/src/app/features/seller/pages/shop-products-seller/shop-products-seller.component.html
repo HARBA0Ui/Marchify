@@ -1,0 +1,99 @@
+<div class="min-h-screen bg-gradient-to-br from-[#faf2b8] to-[#faf2b0] py-20">
+    <div class="container mx-auto px-6 max-w-7xl">
+        @if (shop && shop.nom) {
+        <div class="text-center mb-14">
+            <h1 class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block">
+                Produits de la boutique :
+                <span
+                    class="text-[#F97A00] relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#F97A00]">
+                    {{ shop.nom }}
+                </span>
+            </h1>
+            <p class="text-base text-[#386641] max-w-2xl mx-auto mt-4">
+                Gérez vos produits : modifiez ou supprimez rapidement vos articles.
+            </p>
+            <button
+                class="mt-6 bg-gradient-to-r from-[#F97A00] to-[#FED16A] text-white px-6 py-3 rounded-xl hover:from-[#F97A00] hover:to-[#FF8C00] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold flex items-center gap-2 mx-auto"
+                (click)="addProduct()">
+                <i class="fa-solid fa-plus"></i>
+                Ajouter un produit
+            </button>
+        </div>
+        }
+
+        @if (products.length === 0) {
+        <div class="text-center py-20">
+            <div
+                class="w-24 h-24 bg-gradient-to-br from-[#FFF9D9] to-[#FED16A] rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-box text-3xl text-[#F97A00]"></i>
+            </div>
+            <h3 class="text-2xl font-semibold text-[#386641] mb-2">Aucun produit disponible</h3>
+            <p class="text-[#386641] text-lg">Les produits apparaîtront ici prochainement.</p>
+        </div>
+        } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            @for (product of products; track product.id) {
+            <div
+                class="group relative bg-[#FFF9D9] rounded-2xl shadow-lg border border-[#386641]/20 hover:border-[#F97A00] hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2">
+                <!-- Bandeau gradient en haut avec couleurs d'origine -->
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#386641] to-[#F97A00] group-hover:from-[#F97A00] group-hover:to-[#FED16A] transition-all duration-500">
+                </div>
+
+                <!-- Image du produit -->
+                <div class="p-4">
+                    <div class="relative overflow-hidden rounded-xl mb-4">
+                        <img [src]="product.image" alt="{{ product.nom }}"
+                            class="w-full h-48 object-cover rounded-xl transition-transform duration-500 group-hover:scale-105" />
+                        <div
+                            class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300 rounded-xl">
+                        </div>
+                    </div>
+
+                    <!-- Informations du produit -->
+                    <div class="space-y-3">
+                        <h2
+                            class="text-lg font-bold text-[#386641] line-clamp-1 group-hover:text-[#F97A00] transition-colors">
+                            {{ product.nom }}
+                        </h2>
+                        <p class="text-sm text-gray-700 line-clamp-2 leading-relaxed">
+                            {{ product.description }}
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-lg font-bold text-[#F97A00] bg-[#FFF4A4] px-3 py-1 rounded-full">
+                                {{ product.prix }} DT
+                            </span>
+                            <span class="text-xs font-medium bg-[#386641]/10 text-[#386641] px-2 py-1 rounded-full">
+                                {{ product.categorie }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Actions avec couleurs d'origine -->
+                    <div class="flex gap-3 mt-6 pt-4 border-t border-[#386641]/20">
+                        <button
+                            class="flex-1 bg-gradient-to-r from-[#F97A00] to-[#FF8C00] text-white px-4 py-2.5 rounded-xl hover:from-[#FF8C00] hover:to-[#F97A00] transition-all duration-300 shadow hover:shadow-md font-medium flex items-center justify-center gap-2 group/btn"
+                            (click)="editProduct(product.id)">
+                            <i
+                                class="fa-solid fa-pen-to-square text-sm group-hover/btn:scale-110 transition-transform"></i>
+                            Modifier
+                        </button>
+                        <button
+                            class="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2.5 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow hover:shadow-md font-medium flex items-center justify-center gap-2 group/btn"
+                            (click)="deleteProduct(product.id)">
+                            <i class="fa-solid fa-trash text-sm group-hover/btn:scale-110 transition-transform"></i>
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Effet de survol -->
+                <div
+                    class="absolute inset-0 border-2 border-transparent group-hover:border-[#F97A00]/30 rounded-2xl pointer-events-none transition-all duration-500">
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
