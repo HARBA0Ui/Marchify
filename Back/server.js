@@ -10,7 +10,7 @@ import produitRoutes from "./routes/produit.routes.js";
 import userRoutes from "./routes/user.routes.js"
 import commandesRoutes from "./routes/commande.routes.js"
 import livreurRoutes from "./routes/livreur.routes.js"
-
+import bonDelivraison from "./routes/bonDeLivraison.routes.js"
 
 dotenv.config();
 const app = express();
@@ -30,7 +30,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/commandes", commandesRoutes);
 app.use("/api/livreur", livreurRoutes);
-
+app.use("/api/bonDeLivraison", bonDelivraison);
 
 // Start server
 const PORT = process.env.PORT || 3000;
