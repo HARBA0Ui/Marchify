@@ -81,33 +81,6 @@ export const accepterMission = async (req, res) => {
 };
 
 
-export const livrerCommande = async (req, res) => {
-  try {
-    const { bonId } = req.params;
-
-    const bon = await db.bonDeLivraison.findUnique({
-      where: { id: bonId },
-      include: { commande: true }
-    });
-
-    if (!bon) return res.status(404).json({ message: "Bon de livraison introuvable" });
-    if (bon.status !== "IN_TRANSIT") return res.status(400).json({ message: "Livraison non en cours" });
-
-    const updatedBon = await db.bonDeLivraison.update({
-      where: { id: bonId },
-      data: {
-        status: "DELIVERED",
-        commande: { update: { status: "DELIVERED" } }
-      },
-      include: { commande: true }
-    });
-
-    res.json({ message: "Commande livrée", bonDeLivraison: updatedBon });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 
 export const refuserMission = async (req, res) => {
   try {
@@ -137,3 +110,5 @@ export const refuserMission = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+

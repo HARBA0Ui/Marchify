@@ -15,6 +15,7 @@ async function main() {
   await db.user.deleteMany();
   await db.panierProduit.deleteMany();
   await db.panier.deleteMany();
+  await db.bonDeLivraison.deleteMany();
   console.log("✅ Old data cleared.");
 
   // -----------------------
@@ -225,9 +226,28 @@ async function main() {
       totalCommande: 9,
       clientId: client1.id,
       boutiqueId: boutique1.id,
-      livreurId: livreur1.id,
     },
   });
+
+  const commande2 = await db.commande.create({
+  data: {
+    status: "PENDING",
+    adresseLivraison: { rue: "Rue B", ville: "Sfax" },
+    totalCommande: 120,
+    clientId: client2.id,
+    boutiqueId: boutique2.id,
+  },
+});
+
+const commande3 = await db.commande.create({
+  data: {
+    status: "PENDING",
+    adresseLivraison: { rue: "Rue A", ville: "Tunis" },
+    totalCommande: 5.5,
+    clientId: client1.id,
+    boutiqueId: boutique1.id,
+  },
+});
 
   await db.commandeProduit.createMany({
     data: [
@@ -247,6 +267,65 @@ async function main() {
       },
     ],
   });
+
+  await db.commandeProduit.createMany({
+  data: [
+    {
+      commandeId: commande2.id,
+      produitId: produit2.id,
+      quantite: 1,
+      prixTotal: 120,
+      boutiqueId: boutique2.id,
+    },
+  ],
+});
+
+await db.commandeProduit.createMany({
+  data: [
+    {
+      commandeId: commande3.id,
+      produitId: produit3.id,
+      quantite: 2,
+      prixTotal: 4,
+      boutiqueId: boutique1.id,
+    },
+    {
+      commandeId: commande3.id,
+      produitId: produit1.id,
+      quantite: 0.5,
+      prixTotal: 1.5,
+      boutiqueId: boutique1.id,
+    },
+  ],
+});
+
+
+  const bon1=await db.bonDeLivraison.create({
+   data:{
+     commandeId:commande1.id,
+    livreurId:livreur1.id,
+    status:"IN_TRANSIT",
+    dateCreation:new Date(),
+   }
+  })
+
+  const bon2 = await db.bonDeLivraison.create({
+  data: {
+    commandeId: commande2.id,
+    livreurId: livreur1.id,
+    status: "IN_TRANSIT",
+    dateCreation: new Date(),
+  },
+});
+
+const bon3 = await db.bonDeLivraison.create({
+  data: {
+    commandeId: commande3.id,
+    livreurId: livreur1.id,
+    status: "IN_TRANSIT",
+    dateCreation: new Date(),
+  },
+});
 
     console.log("🎉 Seeding terminé avec succès !");
     console.log("🎉 Seeding terminé avec succès !");
@@ -281,6 +360,14 @@ async function main() {
     console.log("Commande 1:", commande1.id);
     console.log("comnde")
 
+
+    console.log("📌 Commandes supplémentaires :");
+console.log("Commande 2:", commande2.id);
+console.log("Commande 3:", commande3.id);
+
+console.log("📌 Bons de livraison supplémentaires :");
+console.log("Bon 2:", bon2.id);
+console.log("Bon 3:", bon3.id);
 }
 
 main()

@@ -39,6 +39,6 @@ export interface Commande {
   dateCommande: string;
   clientId: string; 
   client: ClientInfo;
-  boutiqueId?: string;
+  boutiqueId: string;
   produits: CommandeProduit[];
 }
