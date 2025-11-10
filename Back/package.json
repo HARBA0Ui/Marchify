@@ -8,6 +8,13 @@
   },
   "prisma": {
     "seed": "node seeds/seed.js"
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+  
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
+>>>>>>> 92b29753a0da1a57e47e0dfbc5dfa925306739de
   },
   "keywords": [],
   "author": "",

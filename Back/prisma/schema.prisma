@@ -38,6 +38,16 @@ enum UniteMesure {
   AUTRE
 }
 
+<<<<<<< HEAD
+=======
+enum DeliveryStatus {
+  PENDING_PICKUP
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   nom          String
@@ -67,6 +77,7 @@ model Vendeur {
   @@map("vendeurs")
 }
 
+<<<<<<< HEAD
 model Livreur {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   localisation Json?
@@ -77,6 +88,8 @@ model Livreur {
   @@map("livreurs")
 }
 
+=======
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 model Boutique {
   id           String @id @default(auto()) @map("_id") @db.ObjectId
   nom          String
@@ -94,6 +107,52 @@ model Boutique {
   @@map("boutiques")
 }
 
+<<<<<<< HEAD
+=======
+model BonDeLivraison {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  dateCreation DateTime @default(now())
+
+  commande   Commande @relation(fields: [commandeId], references: [id], onDelete: Cascade)
+  commandeId String   @unique @db.ObjectId
+
+  status DeliveryStatus @default(PENDING_PICKUP)
+
+  livreur   Livreur @relation(fields: [livreurId], references: [id], onDelete: Cascade)
+  livreurId String  @db.ObjectId
+
+  @@map("bon_de_livraison")
+}
+
+model Commande {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  status           CmdStatus @default(PENDING)
+  adresseLivraison Json
+  totalCommande    Float
+  dateCommande     DateTime  @default(now())
+
+  client     User              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId   String            @db.ObjectId
+  boutique   Boutique?         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+  boutiqueId String?           @db.ObjectId
+  produits   CommandeProduit[]
+
+  bonDeLivraison BonDeLivraison?
+
+  @@map("commandes")
+}
+
+model Livreur {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  localisation   Json?
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String           @unique @db.ObjectId
+  BonDeLivraison BonDeLivraison[]
+
+  @@map("livreurs")
+}
+
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 model Produit {
   id                 String      @id @default(auto()) @map("_id") @db.ObjectId
   nom                String
@@ -114,6 +173,7 @@ model Produit {
   @@map("produits")
 }
 
+<<<<<<< HEAD
 model Commande {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
   status           CmdStatus @default(PENDING)
@@ -133,6 +193,8 @@ model Commande {
   @@map("commandes")
 }
 
+=======
+>>>>>>> bd5a0f9fe8c737f8c867724af0f33f1e30ceee21
 model CommandeProduit {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   quantite  Int      @default(1)
