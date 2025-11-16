@@ -13,6 +13,7 @@ import { PredictResults } from './features/ai-search/predict-results/predict-res
 import { MapComponent } from './map/map';
 import { AuthComponent } from './features/auth/auth.component';
 import { ProductEditSellerComponent } from './features/seller/pages/product-edit-seller/product-edit-seller.component';
+import { RegisterComponent } from './features/register-component/register-component';
 
 export const routes: Routes = [
   {
@@ -82,8 +83,13 @@ export const routes: Routes = [
     path: 'bondelivraison',
     title: 'bondelivraison List',
     component: ConfirmerLivraison,
-  },{
-    path:'login',title:'login' ,component:AuthComponent
+  }, {
+    path: 'login', title: 'login', component: AuthComponent
+  },
+  {
+    path: 'register',
+    title: 'Inscription',
+    component: RegisterComponent,
   },
   {
     path: 'delivery/map',

@@ -120,7 +120,6 @@ export class ProductByshopList implements OnInit, OnChanges {
       .subscribe({
         next: (res) => {
           console.log('Produit ajouté au panier:', res);
-          alert(`${product.nom} ajouté au panier !`);
         },
         error: (err) => {
           console.error('Erreur ajout produit:', err);

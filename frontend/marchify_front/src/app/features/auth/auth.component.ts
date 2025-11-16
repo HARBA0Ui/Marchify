@@ -1,24 +1,34 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { User } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule, RouterLink],
 })
 export class AuthComponent {
   email = '';
   password = '';
   errorMessage = '';
+  isLoading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin() {
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
     this.authService.login(this.email, this.password).subscribe({
       next: (response: any) => {
         console.log('Réponse complète:', response);
@@ -27,21 +37,30 @@ export class AuthComponent {
         console.log('Utilisateur:', user);
         
         localStorage.setItem('user', JSON.stringify(user));
+        this.isLoading = false;
 
+        // Redirect based on role
         if (user.role === 'LIVREUR') {
-          console.log('Redirection vers /delivery/missions pour LIVREUR');
           this.router.navigate(['/delivery/missions']);
         } else if (user.role === 'VENDEUR') {
-          console.log('Redirection vers /seller/shops pour VENDEUR');
-          this.router.navigate(['/seller/shops']);
+          this.router.navigate(['/seller/shop-creation']);
+        } else if (user.role === 'CLIENT') {
+          this.router.navigate(['/product-list']);
         } else {
-          console.log('Redirection vers / pour autres rôles');
           this.router.navigate(['/']);
         }
       },
       error: (err: any) => {
         console.error('Erreur de connexion :', err);
-        this.errorMessage = 'Email ou mot de passe incorrect.';
+        this.isLoading = false;
+        
+        if (err.status === 401) {
+          this.errorMessage = 'Email ou mot de passe incorrect.';
+        } else if (err.status === 0) {
+          this.errorMessage = 'Impossible de se connecter au serveur.';
+        } else {
+          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+        }
       },
     });
   }

@@ -5,10 +5,14 @@
     cursor: url('./assets/cursor.png') 2 0, auto;
 }
 
-button:hover, a:hover, input:hover, label:hover{
+button:hover, a:hover, input:hover, label:hover, .shop-card:hover, .shop-card a:hover, .shop-card div:hover, li a{
     cursor: url('./assets/cursor_hover.png') 2 0, auto !important;
 }
 
-button span, button i, label > span, button div{
+button span, button i, label > span, button div, a span, a i, .shop-card h2, .shop-card span, .shop-card h2 p{
     pointer-events: none;
+}
+
+input::placeholder{
+    opacity: .5;
 }

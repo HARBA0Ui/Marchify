@@ -10,7 +10,6 @@
   }
 }
 
-/* Form animation */
 form {
   animation: fadeIn 0.5s ease-out;
 }
@@ -20,9 +19,9 @@ input:focus {
   transform: translateY(-1px);
 }
 
-/* Button hover effect */
+/* Button effects */
 button:not(:disabled):hover {
-  transform: translateY(-2px);  
+  transform: translateY(-2px);
 }
 
 button:not(:disabled):active {
@@ -37,4 +36,9 @@ button:not(:disabled):active {
 
 .fa-spin {
   animation: spin 1s linear infinite;
+}
+
+/* Role selection animation */
+label:hover {
+  transform: translateY(-2px);
 }
