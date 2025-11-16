@@ -91,3 +91,13 @@ export const updateProduit = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getProduitsByIds =async (req, res) =>{
+  try {
+    const { ids } = req.body;
+    const produits = await db.produit.findMany({ where: { id: { in: ids } } });
+    res.json(produits);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}

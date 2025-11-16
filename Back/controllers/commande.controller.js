@@ -1,5 +1,23 @@
 import db from "../db/prisma.js";
 
+export const getCommadesByAcheteur= async (req, res) => {
+  try{
+    const { clientId } = req.params;
+
+    const commandes = await db.commande.findMany({
+      where: { clientId },
+      include: {
+        produits: { include: { produit: true } },
+        client: true
+      },
+      orderBy: { dateCommande: "desc" }
+    });
+
+    res.json({ commandes });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 export const getCommandesVendeur = async (req, res) => {
   try {
     const { vendeurId } = req.params;
@@ -126,4 +144,3 @@ export const updateCommandeStatus = async (req, res) => {
       .json({ message: "Erreur lors de la mise à jour du statut" });
   }
 };
-

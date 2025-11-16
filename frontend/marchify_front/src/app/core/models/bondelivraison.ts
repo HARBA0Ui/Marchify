@@ -1,38 +1,48 @@
-import { Commande } from "./commande"
-
 export interface BonDeLivraison {
-    id:string
-    dateCreation:Date
-    commandeId:string
-    status:DeliveryStatus
-    livreurId:string
-    commande:{
-        id:string
-        client:
-        {
-          nom:string
-          prenom:string
-          telephone:string
-        }
-        boutique:{
-          nom:string
-          telephone:string
-        }
-        produits:Array<{
-          quantite:number
-          prixTotal:number
-          produit:{
-            nom:string
-            prix:number
-          }
-        }> 
-    }
-    livreur:{
-      user:{
-        nom:string  
-        prenom:string
-      }
-    }
+  id: string;
+  dateCreation: string;
+  commandeId: string;
+  status: DeliveryStatus;
+  livreurId: string;
+
+  commande: {
+    id: string;
+    status: string;
+    adresseLivraison: {
+      rue: string;
+      ville: string;
+    };
+    totalCommande: number;
+    dateCommande: string;
+
+    client: {
+      nom: string;
+      prenom: string;
+      telephone: string;
+    };
+
+    boutique: {
+      nom: string;
+      telephone: string;
+      adresse: string;
+    };
+
+    produits: Array<{
+      quantite: number;
+      prixTotal: number;
+      produit: {
+        nom: string;
+        prix: number;
+      };
+    }>;
+  };
+
+  livreur: {
+    user: {
+      nom: string;
+      prenom: string;
+    };
+  };
 }
 
 export enum DeliveryStatus {

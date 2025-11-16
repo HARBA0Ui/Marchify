@@ -17,12 +17,12 @@ export interface AdresseLivraison {
 }
 
 export interface CommandeProduit {
+  id:string;
   produitId: string;
   nom: string;
-  prixUnitaire: number;
   quantite: number;
+  prixUnitaire: number;
   prixTotal: number;
-  unite: string;
 }
 export interface ClientInfo {
   id: string;
