@@ -6,7 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-panier-list',
-  imports: [DecimalPipe,RouterLink],
+  imports: [DecimalPipe, RouterLink],
   templateUrl: './panier-list.html',
   styleUrl: './panier-list.css',
 })
@@ -19,7 +19,7 @@ export class PanierList {
   constructor(private panierService: PanierService) {}
 
   ngOnInit() {
-    const clientId = '68f743532df2f750af13a584'; // TODO: mettre l'ID client connecté
+    const clientId = '68f743532df2f750af13a584';
     this.loadPanier(clientId);
   }
 
@@ -75,6 +75,18 @@ export class PanierList {
     this.saveQuantities();
   }
 
+  removeProduct(p: any) {
+    if (confirm(`Voulez-vous vraiment supprimer "${p.nom}" du panier ?`)) {
+      const panier = this.paniers[0];
+      panier.produits = panier.produits.filter(
+        (prod) => prod.produitId !== p.produitId
+      );
+      this.updateTotals();
+      // TODO: Call API to remove product from cart
+      console.log('Product removed:', p.produitId);
+    }
+  }
+
   private updateTotals() {
     if (!this.paniers[0]?.produits) return;
     for (const p of this.paniers[0].produits) {
@@ -99,7 +111,7 @@ export class PanierList {
   }
 
   continuerAchats() {
-    this.router.navigate(['/produits']);
+    this.router.navigate(['/product-list']);
   }
 
   confirmerCommande() {
@@ -114,12 +126,21 @@ export class PanierList {
       .subscribe({
         next: (res) => {
           alert('Commande confirmée ✅');
-          this.loadPanier(panier.clientId); // recharge panier
+          this.loadPanier(panier.clientId);
         },
         error: (err) => {
           console.error(err);
           alert('Erreur lors de la confirmation');
         },
       });
+  }
+
+  // Helper method to safely get total
+  getTotalWithTax(): number {
+    return this.paniers[0]?.total ? this.paniers[0].total * 1.19 : 0;
+  }
+
+  getTax(): number {
+    return this.paniers[0]?.total ? this.paniers[0].total * 0.19 : 0;
   }
 }

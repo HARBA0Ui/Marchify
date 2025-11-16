@@ -1,2 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+* {
+    cursor: url('./assets/cursor.png') 2 0, auto;
+}
+
+button:hover, a:hover, input:hover, label:hover{
+    cursor: url('./assets/cursor_hover.png') 2 0, auto !important;
+}
+
+button span, button i, label > span, button div{
+    pointer-events: none;
+}

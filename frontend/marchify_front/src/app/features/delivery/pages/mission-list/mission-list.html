@@ -80,7 +80,7 @@
                 @for (produit of mission.produits; track produit.produitId || $index) {
                   <div class="flex justify-between text-sm text-black">
                     <span>{{ produit.nom }} ({{ produit.quantite }} × {{ produit.prixUnitaire }} DT)</span>
-                    <span class="font-medium text-[#F97A00]">{{ produit.prixTotal }} DT</span>
+                    <span class="font-medium text-zinc-900">{{ produit.prixTotal }} DT</span>
                   </div>
                 }
               </div>

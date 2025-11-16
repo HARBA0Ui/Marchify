@@ -20,7 +20,6 @@ export class Shop implements OnInit {
   isLoading: boolean = true;
 
   ngOnInit() {
-    // Get shop ID from route params
     this.route.params.subscribe((params) => {
       this.shopId = params['id'];
       if (this.shopId) {
@@ -43,7 +42,16 @@ export class Shop implements OnInit {
     });
   }
 
-  /** Open Google Maps at shop location */
+  getInitials(name: string): string {
+    if (!name) return '??';
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
   openMap() {
     if (this.shop?.localisation) {
       const { lat, lng } = this.shop.localisation;
@@ -51,7 +59,6 @@ export class Shop implements OnInit {
     }
   }
 
-  /** Call shop by phone */
   callShop() {
     if (this.shop?.telephone) {
       window.location.href = `tel:${this.shop.telephone}`;
