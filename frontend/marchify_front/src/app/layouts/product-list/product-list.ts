@@ -5,7 +5,8 @@ import { ProductCard } from '../product-card/product-card';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PanierService } from '../../core/services/panier';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
@@ -16,6 +17,8 @@ import { RouterLink } from '@angular/router';
 export class ProductList implements OnInit {
   private productService = inject(ProductService);
   private panierService = inject(PanierService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   products: Product[] = [];
   filteredProducts: Product[] = [];
@@ -29,6 +32,7 @@ export class ProductList implements OnInit {
 
   ngOnInit() {
     this.loadProducts();
+    this.loadCartCount(); // Load initial cart count
   }
 
   loadProducts() {
@@ -45,6 +49,29 @@ export class ProductList implements OnInit {
         console.error('Erreur lors du chargement des produits:', error);
         this.isLoading = false;
       },
+    });
+  }
+
+  // 🔹 Load cart count from database on init
+  loadCartCount() {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) return;
+
+    this.panierService.getPanierByClientId(currentUser.id).subscribe({
+      next: (panier: any) => {
+        if (panier && panier.produits) {
+          const count = panier.produits.reduce(
+            (sum: number, p: any) => sum + p.quantite,
+            0
+          );
+          this.panierService.setCartCount(count);
+        } else {
+          this.panierService.setCartCount(0);
+        }
+      },
+      error: () => {
+        this.panierService.setCartCount(0);
+      }
     });
   }
 
@@ -91,29 +118,47 @@ export class ProductList implements OnInit {
     this.applySorting();
   }
 
-  // ✅ Handle events emitted from ProductCard
+  // ✅ Handle add to cart with dynamic clientId
   onAddToCart(product: Product) {
-    const clientid = '68f743532df2f750af13a584'; // replace with actual panier ID or get from user session
-    const quantite = 1; // default quantity for now
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser) {
+      alert('Vous devez être connecté pour ajouter au panier');
+      this.router.navigate(['/login']);
+      return;
+    }
 
-    this.panierService
-      .ajouterProduit(clientid, product.id, quantite)
-      .subscribe({
-        next: (res) => {
-          console.log('Produit ajouté au panier:', res);
-        },
-        error: (err) => {
-          console.error('Erreur ajout produit:', err);
-          alert('Impossible d’ajouter le produit au panier.');
-        },
-      });
+    const clientId = currentUser.id;
+    const quantite = 1;
+
+    this.panierService.ajouterProduit(clientId, product.id, quantite).subscribe({
+      next: (res) => {
+        console.log('Produit ajouté au panier:', res);
+        
+        // 🔹 Reload cart count from database to ensure accuracy
+        // The ProductCard already did optimistic update (+1)
+        // But let's sync with actual DB count to be safe
+        this.loadCartCount();
+      },
+      error: (err) => {
+        console.error('Erreur ajout produit:', err);
+        
+        if (err.status === 400 && err.error?.message) {
+          alert(err.error.message);
+        } else {
+          alert("Impossible d'ajouter le produit au panier.");
+        }
+        
+        // 🔹 Reload cart from DB on error to fix any mismatch
+        this.loadCartCount();
+      },
+    });
   }
 
   onViewDetails(product: Product) {
     console.log('View product details:', product);
   }
 
- 
   trackById(index: number, product: Product) {
     return product.id;
   }
