@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { NotificationService } from '../../core/services/notification-service';
 
 interface NavItem {
   label: string;
@@ -14,13 +15,18 @@ interface NavItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar-component.html',
-  styleUrl: './navbar-component.css',  
+  styleUrl: './navbar-component.css',
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   private router = inject(Router);
-  
+  private notificationService = inject(NotificationService);
+
   isMobileMenuOpen = false;
   activeDropdown: string | null = null;
+
+  get unreadCount(): number {
+    return this.notificationService.unreadCount();
+  }
 
   navItems: NavItem[] = [
     {
@@ -62,6 +68,17 @@ export class NavbarComponent {
     },
   ];
 
+  ngOnInit() {
+    // Load notifications when component initializes
+    this.loadNotifications();
+  }
+
+  loadNotifications(): void {
+    // Replace with actual user ID from your auth service
+    const userId = '691a32b256ab8476dc908dc3';
+    this.notificationService.getNotifications(userId).subscribe();
+  }
+
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
@@ -76,6 +93,10 @@ export class NavbarComponent {
 
   navigateToCart() {
     this.router.navigate(['/panier-list']);
+  }
+
+  navigateToNotifications() {
+    this.router.navigate(['/notifications']);
   }
 
   navigateToLogin() {

@@ -14,6 +14,7 @@ import { MapComponent } from './map/map';
 import { AuthComponent } from './features/auth/auth.component';
 import { ProductEditSellerComponent } from './features/seller/pages/product-edit-seller/product-edit-seller.component';
 import { RegisterComponent } from './features/register-component/register-component';
+import { NotificationsList } from './layouts/notifications-list/notifications-list';
 
 export const routes: Routes = [
   {
@@ -95,6 +96,10 @@ export const routes: Routes = [
     path: 'delivery/map',
     title: 'Delivery Map',
     component: MapComponent,
+  }, {
+    path: 'notifications',
+    title: 'Notifications',
+    component: NotificationsList,
   }
 ];
 
