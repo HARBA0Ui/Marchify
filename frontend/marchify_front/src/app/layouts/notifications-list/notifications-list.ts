@@ -1,26 +1,50 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification-service';
 import { catchError, finalize, of } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-notifications-list',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './notifications-list.html',
   styleUrl: './notifications-list.css',
 })
 export class NotificationsList implements OnInit {
-  private readonly userId = '691259fd5e08abebfcab3400';
-
+  private authService = inject(AuthService);
   notificationService = inject(NotificationService);
+  
+  userId: string | null = null; // 🔹 Initialize as null
   isLoading = signal(false);
   error = signal<string | null>(null);
   currentFilter = signal<'all' | 'unread'>('all');
 
   ngOnInit() {
+    // 🔹 Get the current user and extract the ID
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser || !currentUser.id) {
+      console.error('No user logged in');
+      this.error.set('Vous devez être connecté pour voir les notifications');
+      return;
+    }
+
+    // 🔹 Assign the user ID
+    this.userId = currentUser.id;
+    console.log('User ID:', this.userId);
+
+    // 🔹 Load notifications
     this.loadNotifications();
   }
 
   loadNotifications(): void {
+    // 🔹 Check if userId exists before making the call
+    if (!this.userId) {
+      this.error.set('ID utilisateur non disponible');
+      return;
+    }
+
     this.isLoading.set(true);
     this.error.set(null);
 
@@ -40,6 +64,8 @@ export class NotificationsList implements OnInit {
   }
 
   markAsRead(notificationId: string): void {
+    if (!this.userId) return;
+
     this.notificationService
       .markAsRead(this.userId, notificationId)
       .pipe(
@@ -53,7 +79,7 @@ export class NotificationsList implements OnInit {
   }
 
   markAllAsRead(): void {
-    if (this.notificationService.unreadCount() === 0) return;
+    if (!this.userId || this.notificationService.unreadCount() === 0) return;
 
     this.notificationService
       .markAllAsRead(this.userId)
@@ -68,6 +94,8 @@ export class NotificationsList implements OnInit {
   }
 
   deleteNotification(notificationId: string): void {
+    if (!this.userId) return;
+
     if (confirm('Êtes-vous sûr de vouloir supprimer cette notification ?')) {
       this.notificationService
         .deleteNotification(this.userId, notificationId)

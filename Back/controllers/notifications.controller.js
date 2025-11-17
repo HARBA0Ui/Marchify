@@ -10,6 +10,7 @@ import {
 export async function getNotifications(req, res) {
   try {
     const { userId } = req.params;
+    console.log("userId: ", userId)
     const { limit, unreadOnly } = req.query;
 
     const notifications = await getUserNotifications(userId, {
