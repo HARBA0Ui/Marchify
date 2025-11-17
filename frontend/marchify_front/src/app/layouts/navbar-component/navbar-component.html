@@ -3,8 +3,8 @@
     <!-- Logo -->
     <div class="navbar-brand">
       <a routerLink="/product-list" class="logo">
-        <i class="fas fa-shopping-bag"></i>
-        <span>Marchify</span>
+   <img src="logo-marchify.png" alt="Marchify Logo" class="logo-img" />       
+    <span class="brand-name" >Marchify</span>
       </a>
     </div>
 
@@ -51,8 +51,18 @@
       </ul>
     </div>
 
-    <!-- Right side actions -->
+  <!-- Right side actions -->
     <div class="navbar-actions">
+      <!-- Notification button -->
+      <button class="icon-btn notification-btn" (click)="navigateToNotifications()">
+        <i class="fas fa-bell"></i>
+        @if (unreadCount > 0) {
+          <span class="badge">
+            {{ unreadCount }}
+          </span>
+        }
+      </button>
+
       <!-- Cart button -->
       <button class="icon-btn cart-btn" (click)="navigateToCart()">
         <i class="fas fa-shopping-cart"></i>
