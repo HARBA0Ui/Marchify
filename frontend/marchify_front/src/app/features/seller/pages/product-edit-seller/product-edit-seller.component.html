@@ -1,172 +1,233 @@
-<div class="min-h-screen bg-[#f5f0d4] py-8 px-4">
-    <div class="max-w-md mx-auto">
-        <form [formGroup]="productForm" (ngSubmit)="onSubmit()"
-            class="space-y-5 bg-white p-6 rounded-xl shadow-lg border-2 border-[#FED16A]">
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+  <div class="max-w-md w-full">
 
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-extrabold text-[#386641]">Modifier le produit</h2>
-                <p class="text-[#386641] mt-1 text-sm">Modifiez les informations du produit</p>
-            </div>
+    <!-- Product Edit Form -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-gradient-to-br from-[#386641] to-[#6a994e] rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-box text-white text-2xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Modifier le produit</h2>
+        <p class="text-gray-600 mt-2 text-sm">Modifiez les informations du produit</p>
+      </div>
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-tag mr-1"></i> Nom du produit *
-                </label>
-                <input type="text" formControlName="nom" placeholder="Nom du produit"
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] placeholder-[#FED16A] focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent shadow-sm transition-all" />
-                @if (isFieldInvalid('nom')) {
-                <div class="text-zinc-900 text-sm mt-1 flex items-center gap-1">
-                    <i class="fas fa-exclamation-circle"></i> {{ getFieldError('nom') }}
-                </div>
-                }
-            </div>
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-5">
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-euro-sign mr-1"></i> Prix (DT) *
-                </label>
-                <input type="number" formControlName="prix" step="0.01" min="0.01" placeholder="0.00"
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] placeholder-[#FED16A] focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent shadow-sm transition-all" />
-                @if (isFieldInvalid('prix')) {
-                <div class="text-zinc-900 text-sm mt-1 flex items-center gap-1">
-                    <i class="fas fa-exclamation-circle"></i> {{ getFieldError('prix') }}
-                </div>
-                }
-            </div>
+        <!-- Product Name -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-tag text-[#386641] mr-2"></i>
+            Nom du produit *
+          </label>
+          <input 
+            type="text" 
+            formControlName="nom" 
+            placeholder="Nom du produit"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 placeholder-gray-400" />
+          @if (isFieldInvalid('nom')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('nom') }}</span>
+          </div>
+          }
+        </div>
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-list-alt mr-1"></i> Catégorie *
-                </label>
-                <select formControlName="categorie"
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent appearance-none shadow-sm transition-all">
-                    <option value="" class="text-[#FED16A]">Sélectionnez une catégorie</option>
-                    <option value="Fruits & Légumes" class="text-[#386641]">Fruits & Légumes</option>
-                    <option value="Viandes & Poissons" class="text-[#386641]">Viandes & Poissons</option>
-                    <option value="Produits Laitiers" class="text-[#386641]">Produits Laitiers</option>
-                    <option value="Boissons" class="text-[#386641]">Boissons</option>
-                    <option value="Épicerie" class="text-[#386641]">Épicerie</option>
-                    <option value="Boulangerie" class="text-[#386641]">Boulangerie</option>
-                    <option value="Électronique" class="text-[#386641]">Électronique</option>
-                    <option value="Vêtements" class="text-[#386641]">Vêtements</option>
-                    <option value="Maison & Jardin" class="text-[#386641]">Maison & Jardin</option>
-                    <option value="Santé & Beauté" class="text-[#386641]">Santé & Beauté</option>
-                    <option value="Autre" class="text-[#386641]">Autre</option>
-                </select>
-                @if (isFieldInvalid('categorie')) {
-                <div class="text-zinc-900 text-sm mt-1 flex items-center gap-1">
-                    <i class="fas fa-exclamation-circle"></i> {{ getFieldError('categorie') }}
-                </div>
-                }
-            </div>
+        <!-- Price -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-euro-sign text-[#386641] mr-2"></i>
+            Prix (DT) *
+          </label>
+          <input 
+            type="number" 
+            formControlName="prix" 
+            step="0.01" 
+            min="0.01" 
+            placeholder="0.00"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 placeholder-gray-400" />
+          @if (isFieldInvalid('prix')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('prix') }}</span>
+          </div>
+          }
+        </div>
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-align-left mr-1"></i> Description
-                </label>
-                <textarea formControlName="description" rows="3" placeholder="Description du produit..."
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] placeholder-[#FED16A] resize-none focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent shadow-sm transition-all"></textarea>
-            </div>
+        <!-- Category -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-list-alt text-[#386641] mr-2"></i>
+            Catégorie *
+          </label>
+          <select 
+            formControlName="categorie"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 appearance-none bg-white cursor-pointer">
+            <option value="">Sélectionnez une catégorie</option>
+            <option value="Fruits & Légumes">Fruits & Légumes</option>
+            <option value="Viandes & Poissons">Viandes & Poissons</option>
+            <option value="Produits Laitiers">Produits Laitiers</option>
+            <option value="Boissons">Boissons</option>
+            <option value="Épicerie">Épicerie</option>
+            <option value="Boulangerie">Boulangerie</option>
+            <option value="Électronique">Électronique</option>
+            <option value="Vêtements">Vêtements</option>
+            <option value="Maison & Jardin">Maison & Jardin</option>
+            <option value="Santé & Beauté">Santé & Beauté</option>
+            <option value="Autre">Autre</option>
+          </select>
+          @if (isFieldInvalid('categorie')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('categorie') }}</span>
+          </div>
+          }
+        </div>
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-image mr-1"></i> Image (URL)
-                </label>
-                <input type="text" formControlName="image" placeholder="URL de l'image"
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] placeholder-[#FED16A] focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent shadow-sm transition-all" />
-                @if (productForm.get('image')?.value) {
-                <div class="mt-2">
-                    <img [src]="productForm.get('image')?.value" alt="Aperçu"
-                        class="w-20 h-20 object-cover rounded-lg border border-[#FED16A]">
-                </div>
-                }
-            </div>
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-align-left text-[#386641] mr-2"></i>
+            Description
+          </label>
+          <textarea 
+            formControlName="description" 
+            rows="3" 
+            placeholder="Description du produit..."
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 placeholder-gray-400 resize-none"></textarea>
+        </div>
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-cubes mr-1"></i> Quantité *
-                </label>
-                <input type="number" formControlName="quantite" min="0" placeholder="0"
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] placeholder-[#FED16A] focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent shadow-sm transition-all" />
-                @if (isFieldInvalid('quantite')) {
-                <div class="text-zinc-900 text-sm mt-1 flex items-center gap-1">
-                    <i class="fas fa-exclamation-circle"></i> {{ getFieldError('quantite') }}
-                </div>
-                }
-            </div>
+        <!-- Image URL -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-image text-[#386641] mr-2"></i>
+            Image (URL)
+          </label>
+          <input 
+            type="text" 
+            formControlName="image" 
+            placeholder="URL de l'image"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 placeholder-gray-400" />
+          @if (productForm.get('image')?.value) {
+          <div class="mt-3 flex justify-center">
+            <img 
+              [src]="productForm.get('image')?.value" 
+              alt="Aperçu"
+              class="w-24 h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm">
+          </div>
+          }
+        </div>
 
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-1">
-                    <i class="fas fa-balance-scale mr-1"></i> Unité de mesure *
-                </label>
-                <select formControlName="unite"
-                    class="w-full px-3 py-2 border border-[#FED16A] rounded-lg bg-white text-[#386641] focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent appearance-none shadow-sm transition-all">
-                    <option value="" class="text-[#FED16A]">Sélectionnez une unité</option>
-                    <option value="KILOGRAMME" class="text-[#386641]">Kilogramme (kg)</option>
-                    <option value="GRAMME" class="text-[#386641]">Gramme (g)</option>
-                    <option value="LITRE" class="text-[#386641]">Litre (l)</option>
-                    <option value="MILLILITRE" class="text-[#386641]">Millilitre (ml)</option>
-                    <option value="PIECE" class="text-[#386641]">Pièce</option>
-                    <option value="BOITE" class="text-[#386641]">Boîte</option>
-                    <option value="SAC" class="text-[#386641]">Sac</option>
-                    <option value="CARTON" class="text-[#386641]">Carton</option>
-                    <option value="METRE" class="text-[#386641]">Mètre (m)</option>
-                    <option value="CENTIMETRE" class="text-[#386641]">Centimètre (cm)</option>
-                    <option value="AUTRE" class="text-[#386641]">Autre</option>
-                </select>
-                @if (isFieldInvalid('unite')) {
-                <div class="text-zinc-900 text-sm mt-1 flex items-center gap-1">
-                    <i class="fas fa-exclamation-circle"></i> {{ getFieldError('unite') }}
-                </div>
-                }
-            </div>
+        <!-- Quantity -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-cubes text-[#386641] mr-2"></i>
+            Quantité *
+          </label>
+          <input 
+            type="number" 
+            formControlName="quantite" 
+            min="0" 
+            placeholder="0"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 placeholder-gray-400" />
+          @if (isFieldInvalid('quantite')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('quantite') }}</span>
+          </div>
+          }
+        </div>
 
-            <!-- Disponibilité de livraison -->
-            <div>
-                <label class="block text-sm font-medium text-[#386641] mb-2">
-                    Disponibilité de livraison
-                </label>
-                <div class="flex items-center space-x-3">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" formControlName="livrable" class="sr-only peer" />
-                        <div
-                            class="w-14 h-7 bg-[#FED16A] rounded-full peer peer-checked:bg-[#386641] transition-colors duration-300">
-                        </div>
-                        <div
-                            class="absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-300 peer-checked:translate-x-7 flex items-center justify-center text-[#386641]">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                    </label>
-                    <span class="text-[#386641] font-medium">Produit livrable</span>
-                </div>
-                <p class="text-[#386641] text-sm mt-1">
-                    Activez cette option si le produit peut être livré.
-                </p>
-            </div>
+        <!-- Unit -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-balance-scale text-[#386641] mr-2"></i>
+            Unité de mesure *
+          </label>
+          <select 
+            formControlName="unite"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 outline-none transition-all text-gray-800 appearance-none bg-white cursor-pointer">
+            <option value="">Sélectionnez une unité</option>
+            <option value="KILOGRAMME">Kilogramme (kg)</option>
+            <option value="GRAMME">Gramme (g)</option>
+            <option value="LITRE">Litre (l)</option>
+            <option value="MILLILITRE">Millilitre (ml)</option>
+            <option value="PIECE">Pièce</option>
+            <option value="BOITE">Boîte</option>
+            <option value="SAC">Sac</option>
+            <option value="CARTON">Carton</option>
+            <option value="METRE">Mètre (m)</option>
+            <option value="CENTIMETRE">Centimètre (cm)</option>
+            <option value="AUTRE">Autre</option>
+          </select>
+          @if (isFieldInvalid('unite')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('unite') }}</span>
+          </div>
+          }
+        </div>
 
-            @if (successMessage) {
-            <div class="p-3 bg-white border border-[#386641] text-[#214721] rounded-lg flex items-start gap-2 text-sm">
-                <i class="fas fa-check-circle mt-0.5"></i>
-                <span>{{ successMessage }}</span>
+        <!-- Delivery Toggle -->
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                <i class="fas fa-truck text-[#386641] mr-2"></i>
+                Disponibilité de livraison
+              </label>
+              <p class="text-xs text-gray-600">Activez si le produit peut être livré</p>
             </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="livrable" class="sr-only peer" />
+              <div class="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:bg-[#386641] transition-colors duration-300"></div>
+              <div class="absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 peer-checked:translate-x-7"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        @if (successMessage) {
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle text-green-500"></i>
+            <p class="text-green-700 text-sm font-medium">{{ successMessage }}</p>
+          </div>
+        </div>
+        }
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 pt-4">
+          <button 
+            type="button" 
+            (click)="onCancel()"
+            class="flex-1 py-3 px-5 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm flex items-center justify-center gap-2">
+            <i class="fas fa-times-circle"></i>
+            <span>Annuler</span>
+          </button>
+
+          <button 
+            type="submit" 
+            [disabled]="productForm.invalid || isLoading"
+            class="flex-1 py-3 px-5 bg-gradient-to-r from-[#386641] to-[#6a994e] hover:from-[#2d5234] hover:to-[#386641] text-white font-semibold rounded-lg shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            @if (isLoading) {
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Modification...</span>
+            } @else {
+              <i class="fas fa-check-circle"></i>
+              <span>Enregistrer</span>
             }
+          </button>
+        </div>
 
-            <div class="flex gap-3 pt-4">
-                <button type="button" (click)="onCancel()"
-                    class="flex-1 py-2 px-5 bg-[#F97A00] text-white font-semibold rounded-lg hover:bg-[#FED16A] hover:text-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all shadow flex items-center justify-center gap-2 text-sm">
-                    <i class="fas fa-times-circle"></i> Annuler
-                </button>
+      </form>
 
-                <button type="submit" [disabled]="productForm.invalid || isLoading"
-                    class="flex-1 py-2 px-5 bg-[#386641] text-white font-semibold rounded-lg hover:bg-[#2E3D32] focus:outline-none focus:ring-2 focus:ring-[#386641] disabled:bg-[#C9C9C9] disabled:cursor-not-allowed transition-all shadow flex items-center justify-center gap-2 text-sm">
-                    @if (isLoading) {
-                    <i class="fas fa-spinner fa-spin"></i> Modification...
-                    } @else {
-                    <i class="fas fa-check-circle"></i> Enregistrer
-                    }
-                </button>
-            </div>
-
-        </form>
     </div>
+
+  </div>
+</div>
+
+<!-- Background Decoration -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute top-0 right-0 w-96 h-96 bg-[#386641]/5 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#F97A00]/5 rounded-full blur-3xl"></div>
 </div>

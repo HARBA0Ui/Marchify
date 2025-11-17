@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Panier } from '../models/panier';
 
 @Injectable({
@@ -10,7 +10,22 @@ export class PanierService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:3000/api/cart';
 
-  // Add a product to the cart (matches POST /add)
+  // 🔹 état partagé du nombre d’articles dans le panier
+  private cartCountSubject = new BehaviorSubject<number>(0);
+  cartCount$ = this.cartCountSubject.asObservable();
+
+  constructor() {}
+
+  // permet de mettre le compteur à jour depuis n’importe où
+  setCartCount(count: number) {
+    this.cartCountSubject.next(count);
+  }
+
+  // optionnel : getter du nombre courant
+  getCartCount(): number {
+    return this.cartCountSubject.value;
+  }
+
   ajouterProduit(
     clientId: string,
     produitId: string,
@@ -23,35 +38,44 @@ export class PanierService {
     });
   }
 
-  // Get the cart for a specific client (matches GET /:clientId)
   getPanierByClientId(clientId: string): Observable<Panier> {
     return this.http.get<Panier>(`${this.apiUrl}/${clientId}`);
   }
 
-  // Update quantities (matches PUT /update)
   modifierQuantites(
-    panierId: string,
-    produits: { produitId: string; quantite: number }[]
+    clientId: string,
+    updates: { produitId: string; quantite: number }[]
   ): Observable<any> {
     return this.http.put(`${this.apiUrl}/update`, {
-      panierId,
-      produits,
+      clientId,
+      updates,
     });
   }
 
-  // Recalculate total (matches GET /recalc/:clientId)
   recalculerTotal(clientId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/recalc/${clientId}`);
   }
 
-  // Confirm the order (matches POST /confirm)
   confirmerCommande(
-    panierId: string,
+    clientId: string,
     adresseLivraison: { rue: string; ville: string; codePostal: string }
   ): Observable<any> {
     return this.http.post(`${this.apiUrl}/confirm`, {
-      panierId,
+      clientId,
       adresseLivraison,
     });
+  }
+
+  // 🔹 enlever un produit
+  supprimerProduit(clientId: string, produitId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/remove`, {
+      clientId,
+      produitId,
+    });
+  }
+
+  // 🔹 vider tout le panier
+  viderPanier(clientId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/clear/${clientId}`);
   }
 }
