@@ -15,6 +15,7 @@ import { AuthComponent } from './features/auth/auth.component';
 import { ProductEditSellerComponent } from './features/seller/pages/product-edit-seller/product-edit-seller.component';
 import { MyOrders } from './features/activities/buyer/my-orders/my-orders';
 import { Deliveries } from './features/activities/delivery/deliveries/deliveries';
+import { Commandes } from './features/activities/seller/commandes/commandes';
 
 export const routes: Routes = [
   {
@@ -106,6 +107,11 @@ export const routes: Routes = [
     path:'vendeur/commandesList',
     title:'Commandes List',
     component:Deliveries
+  },   
+   {
+    path:'seller/list',
+    title:'Commandes List',
+    component:Commandes
   }
 
 

@@ -63,4 +63,45 @@ getCommandesByAcheteur(clientId: string): Observable<{ commandes: Commande[] }> 
   deleteCommande(commandeId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${commandeId}`);
   }
+
+
+   getStatsByBoutique(vendeurId: string) {
+    return this.http.get<{ stats: { boutique: string, count: number }[] }>(
+      `${this.apiUrl}/stats/vendeur/${vendeurId}`
+    );
+  }
+
+//   getStatsByBoutiqueAndMonth(vendeurId: string, month: string) {
+//   // Exemple d'endpoint : /commandes/stats?vendeurId=XXX&month=2025-11
+//   return this.http.get<{ stats: { boutique: string; count: number }[] }>(
+//     `${this.apiUrl}/commandes/stats?vendeurId=${vendeurId}&month=${month}`
+//   );
+// }
+// commande-service.ts
+// getStatsByBoutiqueAndMonth(vendeurId: string, year: number, month: number) {
+//   return this.http.get<{ stats: { boutique: string; count: number }[] }>(
+//     `${this.apiUrl}/stats/vendeur/${vendeurId}?year=${year}&month=${month}`
+//   );
+// }
+// commande-service.ts
+getStatsByMonth(vendeurId: string) {
+  return this.http.get<{ stats: { month: string; count: number }[] }>(
+    `${this.apiUrl}/stats/vendeur/${vendeurId}/months`
+  );
 }
+
+getStatsByMonthAndYear(vendeurId: string, year: number, month: number) {
+  return this.http.get<{ stats: { month: string; count: number }[] }>(
+    `${this.apiUrl}/stats/vendeur/${vendeurId}/months?year=${year}&month=${month}`
+  );
+}
+
+
+getStatsByStatusForMonth(vendeurId: string, year: number, month: number) {
+  return this.http.get<{ stats: { status: string; count: number }[] }>(
+    `${this.apiUrl}/stats/vendeur/${vendeurId}/status?year=${year}&month=${month}`
+  );
+}
+}
+
+
