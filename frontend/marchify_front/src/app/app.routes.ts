@@ -71,11 +71,13 @@ export const routes: Routes = [
     path: 'predict-results',
     title: 'Prediction Results',
     component: PredictResults,
-  }, {
-    path: "commande-list-vendor",
-    title: "Commande List Vendor",
-    component: CommandeListVendor
-  }, {
+  },
+  {
+    path: 'commande-list-vendor',
+    title: 'Commande List Vendor',
+    component: CommandeListVendor,
+  },
+  {
     path: 'delivery/missions',
     title: 'Delivery Missions',
     component: MissionList,
@@ -84,8 +86,11 @@ export const routes: Routes = [
     path: 'bondelivraison',
     title: 'bondelivraison List',
     component: ConfirmerLivraison,
-  }, {
-    path: 'login', title: 'login', component: AuthComponent
+  },
+  {
+    path: 'login',
+    title: 'login',
+    component: AuthComponent,
   },
   {
     path: 'register',
@@ -96,10 +101,15 @@ export const routes: Routes = [
     path: 'delivery/map',
     title: 'Delivery Map',
     component: MapComponent,
-  }, {
+  },
+  {
     path: 'notifications',
     title: 'Notifications',
     component: NotificationsList,
-  }
+  },
+  {
+    path: '*',
+    redirectTo: 'product-list',
+  },
 ];
 
