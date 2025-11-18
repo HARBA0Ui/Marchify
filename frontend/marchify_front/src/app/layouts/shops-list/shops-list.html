@@ -36,7 +36,7 @@
     @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (shop of shops; track shop.id) {
-      <app-shop-card [shop]="shop" />
+      <app-shop-card [shop]="shop" class="shop-card"/>
       }
     </div>
     }

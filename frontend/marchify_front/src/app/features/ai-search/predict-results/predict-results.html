@@ -1,89 +1,159 @@
-<div class="min-h-screen bg-[#faf2b8] py-20">
-  <div class="container mx-auto px-6 max-w-7xl">
-    
-    <!-- Header -->
-    <div class="text-center mb-14">
-      <h1 class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block">
-        <span class="text-[#386641]">Résultats de la</span>
-        <span class="text-zinc-900 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#FED16A]">
-          Prédiction
-        </span>
-      </h1>
-    </div>
-
-    <!-- Products Section -->
-    <h3 class="text-2xl font-bold text-[#386641] mb-6 flex items-center gap-2">
-      <span>🛒</span> Produits correspondants
-    </h3>
-    
-    <p class="text-sm md:text-base text-[#386641] mb-6">
-      {{ results.length }} produit{{ results.length !== 1 ? 's' : '' }} disponible{{ results.length !== 1 ? 's' : '' }}
-    </p>
-
-    <!-- Products Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      @for (r of results; track $index) {
-        <div class="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition-all duration-300">
-          
-          <!-- Image placeholder -->
-          <div class="relative h-32 overflow-hidden rounded-t-lg bg-gradient-to-br from-[#386641] to-[#6a994e]">
-            <div class="w-full h-full flex items-center justify-center text-white text-4xl">
-  <img 
-      [src]="r.image" 
-      [alt]="r.nom" 
-      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-    />              
-            
-            </div>
-          </div>
-
-          <!-- Product Info -->
-          <div class="p-3 flex flex-col gap-1">
-            <h3 class="text-md font-bold text-[#386641] truncate flex items-center gap-1">
-              {{ r.nom }}
-            </h3>
-
-            <p class="text-xs font-semibold text-black flex items-center gap-1">
-              <i class="fas fa-money-bill-wave"></i> {{ r.prix }} DT
-            </p>
-
-            <div class="flex items-center gap-2 text-[#386641] text-[10px] font-medium">
-              <i class="fa-solid fa-weight-scale w-4 text-center"></i>
-              <p>{{ r.unite }}</p>
-            </div>
-
-            <!-- Boutique Info -->
-            <div class="flex items-center gap-2 text-[#386641] text-[10px] font-medium mt-1">
-              <i class="fa-solid fa-store w-4 text-center"></i>
-              <p>{{ r.boutique.nom }}</p>
-            </div>
-
-            <!-- Distance -->
-            <div class="flex items-center gap-2 text-gray-600 text-[10px] font-medium">
-              <i class="fa-solid fa-location-dot w-4 text-center"></i>
-              <p>{{ r.distanceKm | number: '1.0-0' }} km</p>
-            </div>
-
-            <!-- Add to Cart Button -->
-            <button 
-              class="mt-2 w-full bg-[#386641] text-white py-1.5 rounded-lg font-semibold text-sm hover:bg-[#F97A00] hover:text-white transition-colors flex justify-center items-center gap-1"
-                (click)="onAddToCart(r)">
-              <i class="fas fa-shopping-cart"></i> Ajouter
-            </button>
-          </div>
-
-          <!-- Bottom border -->
-          <div class="border-b-4 border-[#386641] group-hover:border-[#F97A00] transition-colors duration-300"></div>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center gap-4 mb-3">
+        <div class="w-14 h-14 bg-gradient-to-br from-[#386641] to-[#6a994e] rounded-xl flex items-center justify-center shadow-md">
+          <i class="fas fa-brain text-white text-2xl"></i>
         </div>
-      }
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">
+            Résultats de la <span class="text-[#386641]">recherche IA</span>
+          </h1>
+          <p class="text-gray-600 mt-1">
+            {{ results.length }} produit{{ results.length !== 1 ? 's' : '' }} trouvé{{ results.length !== 1 ? 's' : '' }}
+          </p>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Empty State -->
-    @if (results.length === 0) {
-      <div class="text-center text-[#386641] py-16 bg-white rounded-lg shadow-md">
-        <p class="text-xl font-semibold">Aucun produit trouvé.</p>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- AI Prediction Info -->
+    @if (predictions && predictions.length > 0) {
+      <div class="bg-gradient-to-r from-[#386641]/10 to-[#F97A00]/10 rounded-lg p-6 mb-8 border-l-4 border-[#386641]">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 bg-[#386641] rounded-lg flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check-circle text-white text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-800 mb-2">Analyse IA terminée</h3>
+            <p class="text-gray-600 text-sm">
+              Notre intelligence artificielle a identifié 
+              <strong>{{ predictions[0]?.fr || predictions[0]?.name || 'des produits' }}</strong>
+              @if (predictions[0]?.value) {
+                avec une confiance de <strong>{{ (predictions[0].value * 100) | number: '1.0-0' }}%</strong>
+              }
+            </p>
+            
+            <!-- Top Predictions Badge -->
+            @if (predictions.length > 1) {
+              <div class="flex flex-wrap gap-2 mt-3">
+                @for (pred of predictions.slice(0, 3); track $index) {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white rounded-full text-xs border border-[#386641]/20">
+                    <i class="fas fa-tag text-[#386641]"></i>
+                    <span class="font-medium text-gray-700">{{ pred.fr || pred.name }}</span>
+                    <span class="text-gray-500">{{ (pred.value * 100) | number: '1.0-0' }}%</span>
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        </div>
       </div>
     }
 
+    <!-- Products Grid -->
+    @if (results.length > 0) {
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+          <i class="fas fa-shopping-basket text-[#386641]"></i>
+          Produits disponibles
+        </h2>
+        <p class="text-sm text-gray-600 mt-1">
+          Triés par pertinence et correspondance exacte
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (r of results; track r.id || $index) {
+          <div class="relative">
+            <!-- Match Quality Badge -->
+            @if (r.exactMatchScore && r.exactMatchScore >= 0.8) {
+              <div class="absolute -top-2 -right-2 z-10 bg-[#F97A00] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                <i class="fas fa-star"></i>
+                <span>Correspondance exacte</span>
+              </div>
+            }
+            @if (r.exactMatchScore && r.exactMatchScore >= 0.6 && r.exactMatchScore < 0.8) {
+              <div class="absolute -top-2 -right-2 z-10 bg-[#386641] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                <i class="fas fa-check"></i>
+                <span>Très pertinent</span>
+              </div>
+            }
+            
+            <app-product-card
+              [product]="r"
+              (addToCartEvent)="onAddToCart($event)"
+              (viewDetailsEvent)="onViewDetails($event)">
+            </app-product-card>
+            
+            <!-- Score Info (for debugging - can be removed in production) -->
+            @if (false) {
+              <div class="mt-2 text-xs text-gray-500 space-y-1">
+                <div>Score: {{ r.score | number: '1.0-3' }}</div>
+                <div>Match: {{ (r.exactMatchScore * 100) | number: '1.0-0' }}%</div>
+                <div>Confiance: {{ (r.matchConfidence * 100) | number: '1.0-0' }}%</div>
+                @if (r.distanceKm) {
+                  <div>Distance: {{ r.distanceKm }} km</div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (results.length === 0) {
+      <div class="bg-white rounded-lg shadow-sm p-16 text-center">
+        <div class="mx-auto bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-search text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Aucun produit trouvé</h3>
+        <p class="text-gray-600 mb-6">
+          Nous n'avons pas trouvé de produits correspondant à votre recherche.
+        </p>
+        <a 
+          routerLink="/ai-search/upload-predict"
+          class="inline-flex items-center gap-2 bg-[#386641] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#2d5234] transition-colors shadow-md">
+          <i class="fas fa-camera"></i>
+          <span>Nouvelle recherche</span>
+        </a>
+      </div>
+    }
+
+    <!-- Back Button -->
+    <div class="mt-8 flex justify-center">
+      <a 
+        routerLink="/ai-search/upload-predict"
+        class="inline-flex items-center gap-2 bg-white border-2 border-[#386641] text-[#386641] px-6 py-3 rounded-lg font-medium hover:bg-[#386641] hover:text-white transition-all shadow-sm">
+        <i class="fas fa-arrow-left"></i>
+        <span>Nouvelle recherche</span>
+      </a>
+    </div>
+
   </div>
+</div>
+
+<!-- AI Search FAB -->
+<div class="fixed bottom-6 right-6 z-50">
+  <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+  <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+  
+  <button
+    routerLink="/ai-search/upload-predict"
+    class="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
+    title="Nouvelle recherche">
+    <div class="relative">
+      <i class="fas fa-brain text-white text-2xl md:text-3xl"></i>
+      <div class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+        <i class="fas fa-camera text-white text-[8px] md:text-[10px]"></i>
+      </div>
+    </div>
+    <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
+      <i class="fas fa-sparkles text-xs"></i>
+    </div>
+  </button>
 </div>

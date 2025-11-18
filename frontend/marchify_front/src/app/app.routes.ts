@@ -16,6 +16,8 @@ import { ProductEditSellerComponent } from './features/seller/pages/product-edit
 import { MyOrders } from './features/activities/buyer/my-orders/my-orders';
 import { Deliveries } from './features/activities/delivery/deliveries/deliveries';
 import { Commandes } from './features/activities/seller/commandes/commandes';
+import { RegisterComponent } from './features/register-component/register-component';
+import { NotificationsList } from './layouts/notifications-list/notifications-list';
 
 export const routes: Routes = [
   {
@@ -85,8 +87,13 @@ export const routes: Routes = [
     path: 'bondelivraison',
     title: 'bondelivraison List',
     component: ConfirmerLivraison,
-  },{
-    path:'login',title:'login' ,component:AuthComponent
+  }, {
+    path: 'login', title: 'login', component: AuthComponent
+  },
+  {
+    path: 'register',
+    title: 'Inscription',
+    component: RegisterComponent,
   },
   {
     path: 'delivery/map',
@@ -112,6 +119,10 @@ export const routes: Routes = [
     path:'seller/list',
     title:'Commandes List',
     component:Commandes
+  }, {
+    path: 'notifications',
+    title: 'Notifications',
+    component: NotificationsList,
   }
 
 

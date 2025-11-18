@@ -6,167 +6,196 @@
         <i class="fas fa-shopping-cart"></i> Mon Panier
       </h1>
       @if (paniers.length > 0 && paniers[0].produits.length) {
-      <p class="text-gray-600 mt-1">
-        {{ paniers[0].produits.length }} article(s) dans votre panier
-      </p>
+        <p class="text-gray-600 mt-1">
+          {{ paniers[0].produits.length }} article(s) dans votre panier
+        </p>
       }
     </div>
   </div>
 
   <div class="max-w-6xl mx-auto px-4 py-8">
     <div class="flex flex-col lg:flex-row gap-6">
-
       <!-- Products List -->
       <div class="lg:w-2/3">
         <div class="bg-white rounded-lg shadow-md border border-gray-200">
           @if (loading) {
-          <div class="py-16 text-center">
-            <div
-              class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#386641] border-t-transparent">
+            <div class="py-16 text-center">
+              <div
+                class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#386641] border-t-transparent">
+              </div>
+              <p class="mt-4 text-gray-600">Chargement de votre panier...</p>
             </div>
-            <p class="mt-4 text-gray-600">Chargement de votre panier...</p>
-          </div>
-          } @else if (!paniers || paniers.length === 0 || !paniers[0].produits || paniers[0].produits.length === 0) {
-          <div class="py-16 text-center px-6">
-            <div class="mx-auto bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-shopping-cart text-gray-400 text-3xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">Votre panier est vide</h3>
-            <p class="text-gray-600 mb-6 max-w-md mx-auto">
-              Découvrez nos produits et ajoutez vos articles préférés au panier.
-            </p>
-            <button
-              class="bg-[#386641] hover:bg-[#2d5234] text-white font-medium px-6 py-3 rounded-lg transition duration-200 inline-flex items-center gap-2"
-              (click)="continuerAchats()">
-              <i class="fas fa-arrow-left"></i> Découvrir les produits
-            </button>
-          </div>
-          } @else {
-          <div class="divide-y divide-gray-200">
-            @for (p of paniers[0].produits; track p.produitId) {
-            <div class="flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors">
-
-              <!-- Product Icon -->
-              <div class="bg-[#386641] w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-box text-white text-2xl"></i>
+          } @else if (!paniers || paniers.length === 0 || !paniers[0].produits ||
+                      paniers[0].produits.length === 0) {
+            <div class="py-16 text-center px-6">
+              <div class="mx-auto bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-shopping-cart text-gray-400 text-3xl"></i>
               </div>
-
-              <!-- Product Info -->
-              <div class="flex-1 min-w-0">
-                <h3 class="font-semibold text-gray-800 text-lg mb-1">{{ p.nom }}</h3>
-                <p class="text-[#386641] font-medium">{{ p.prixUnitaire | number: '1.2-2' }} TND</p>
-                <span class="inline-block mt-1 text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                  <i class="fas fa-truck"></i> Livraison disponible
-                </span>
-              </div>
-
-              <!-- Quantity Controls -->
-              <div class="flex items-center gap-3">
-                <button
-                  class="w-10 h-10 bg-white border-2 border-gray-300 text-gray-700 rounded-lg flex items-center justify-center hover:border-[#386641] hover:text-[#386641] transition font-bold text-lg"
-                  (click)="decreaseQuantity(p)" [disabled]="p.quantite <= 1">
-                  −
-                </button>
-                <span class="w-12 text-center font-semibold text-gray-800 text-lg">{{ p.quantite }}</span>
-                <button
-                  class="w-10 h-10 bg-white border-2 border-gray-300 text-gray-700 rounded-lg flex items-center justify-center hover:border-[#386641] hover:text-[#386641] transition font-bold text-lg"
-                  (click)="increaseQuantity(p)">
-                  +
-                </button>
-              </div>
-
-              <!-- Price -->
-              <div class="text-right min-w-[100px]">
-                <div class="font-bold text-[#386641] text-xl">
-                  {{ p.prixTotal | number: '1.2-2' }} TND
-                </div>
-              </div>
-
-              <!-- Remove Button -->
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                Votre panier est vide
+              </h3>
+              <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                Découvrez nos produits et ajoutez vos articles préférés au panier.
+              </p>
               <button
-                class="w-10 h-10 text-red-500 hover:bg-red-50 rounded-lg transition flex items-center justify-center"
-                (click)="removeProduct(p)" title="Supprimer">
-                <i class="fas fa-trash-alt"></i>
+                class="bg-[#386641] hover:bg-[#2d5234] text-white font-medium px-6 py-3 rounded-lg transition duration-200 inline-flex items-center gap-2"
+                (click)="continuerAchats()">
+                <i class="fas fa-arrow-left"></i> Découvrir les produits
               </button>
             </div>
-            }
-          </div>
+          } @else {
+            <div class="divide-y divide-gray-200">
+              @for (p of paniers[0].produits; track p.produitId) {
+                <div class="flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors">
+                  <!-- Product Icon -->
+                  <div class="bg-[#386641] w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-box text-white text-2xl"></i>
+                  </div>
+
+                  <!-- Product Info -->
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-gray-800 text-lg mb-1">
+                      {{ p.nom }}
+                    </h3>
+                    <p class="text-[#386641] font-medium">
+                      {{ p.prixUnitaire | number: '1.2-2' }} TND
+                    </p>
+                    <span class="inline-block mt-1 text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
+                      <i class="fas fa-truck"></i> Livraison disponible
+                    </span>
+
+                    <!-- Message stock max (optionnel) -->
+                    <p class="text-xs text-red-500 mt-1"
+                       *ngIf="p.stock != null && p.quantite >= p.stock">
+                      Stock maximum atteint ({{ p.stock }}).
+                    </p>
+                  </div>
+
+                  <!-- Quantity Controls -->
+                  <div class="flex items-center gap-3">
+                    <button
+                      class="w-10 h-10 bg-white border-2 border-gray-300 text-gray-700 rounded-lg flex items-center justify-center hover:border-[#386641] hover:text-[#386641] transition font-bold text-lg"
+                      (click)="decreaseQuantity(p)"
+                      [disabled]="p.quantite <= 1">
+                      −
+                    </button>
+                    <span class="w-12 text-center font-semibold text-gray-800 text-lg">
+                      {{ p.quantite }}
+                    </span>
+                    <button
+                      class="w-10 h-10 bg-white border-2 border-gray-300 text-gray-700 rounded-lg flex items-center justify-center hover:border-[#386641] hover:text-[#386641] transition font-bold text-lg"
+                      (click)="increaseQuantity(p)"
+                      [disabled]="p.stock != null && p.quantite >= p.stock">
+                      +
+                    </button>
+                  </div>
+
+                  <!-- Price -->
+                  <div class="text-right min-w-[100px]">
+                    <div class="font-bold text-[#386641] text-xl">
+                      {{ p.prixTotal | number: '1.2-2' }} TND
+                    </div>
+                  </div>
+
+                  <!-- Remove Button -->
+                  <button
+                    class="w-10 h-10 text-red-500 hover:bg-red-50 rounded-lg transition flex items-center justify-center"
+                    (click)="removeProduct(p)"
+                    title="Supprimer">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              }
+            </div>
           }
         </div>
       </div>
 
       <!-- Summary Sidebar -->
       @if (paniers.length > 0 && paniers[0].produits.length) {
-      <div class="lg:w-1/3">
-        <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 sticky top-24">
-          <h3 class="text-xl font-semibold text-[#386641] mb-6 flex items-center gap-2">
-            <i class="fas fa-receipt"></i> Récapitulatif
-          </h3>
+        <div class="lg:w-1/3">
+          <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 sticky top-24">
+            <h3 class="text-xl font-semibold text-[#386641] mb-6 flex items-center gap-2">
+              <i class="fas fa-receipt"></i> Récapitulatif
+            </h3>
 
-          <div class="space-y-3 mb-6">
-            <div class="flex justify-between text-gray-600">
-              <span>Sous-total</span>
-              <span class="font-medium">{{ paniers[0].total | number: '1.2-2' }} TND</span>
-            </div>
-            <div class="flex justify-between text-gray-600">
-              <span>Livraison</span>
-              <span class="font-medium text-green-600">Gratuite</span>
-            </div>
-            <div class="flex justify-between text-gray-600">
-              <span>TVA (19%)</span>
-              <span class="font-medium">{{ getTax() | number: '1.2-2' }} TND</span>
-            </div>
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between text-gray-600">
+                <span>Sous-total</span>
+                <span class="font-medium">
+                  {{ paniers[0].total | number: '1.2-2' }} TND
+                </span>
+              </div>
+              <div class="flex justify-between text-gray-600">
+                <span>Livraison</span>
+                <span class="font-medium text-green-600">Gratuite</span>
+              </div>
+              <div class="flex justify-between text-gray-600">
+                <span>TVA (19%)</span>
+                <span class="font-medium">
+                  {{ getTax() | number: '1.2-2' }} TND
+                </span>
+              </div>
 
-            <div class="pt-4 border-t-2 border-gray-200 mt-4">
-              <div class="flex justify-between text-xl font-bold">
-                <span class="text-gray-800">Total</span>
-                <span class="text-[#386641]">{{ getTotalWithTax() | number: '1.2-2' }} TND</span>
+              <div class="pt-4 border-t-2 border-gray-200 mt-4">
+                <div class="flex justify-between text-xl font-bold">
+                  <span class="text-gray-800">Total</span>
+                  <span class="text-[#386641]">
+                    {{ getTotalWithTax() | number: '1.2-2' }} TND
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <button
-            class="w-full bg-[#386641] hover:bg-[#2d5234] text-white font-semibold py-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg mb-3 flex items-center justify-center gap-2 text-lg"
-            (click)="confirmerCommande()">
-            <i class="fas fa-check-circle"></i> Confirmer la commande
-          </button>
+            <button
+              class="w-full bg-[#386641] hover:bg-[#2d5234] text-white font-semibold py-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg mb-3 flex items-center justify-center gap-2 text-lg"
+              (click)="confirmerCommande()">
+              <i class="fas fa-check-circle"></i> Confirmer la commande
+            </button>
 
-          <button
-            class="w-full py-3 text-center rounded-lg border-2 border-[#386641] text-[#386641] font-medium hover:bg-[#386641] hover:text-white transition"
-            (click)="continuerAchats()">
-            <i class="fas fa-arrow-left"></i> Continuer mes achats
-          </button>
+            <button
+              class="w-full py-3 text-center rounded-lg border-2 border-[#386641] text-[#386641] font-medium hover:bg-[#386641] hover:text-white transition"
+              (click)="continuerAchats()">
+              <i class="fas fa-arrow-left"></i> Continuer mes achats
+            </button>
 
-          <!-- Trust Badges -->
-          <div class="mt-6 pt-6 border-t border-gray-200">
-            <div class="space-y-3 text-sm text-gray-600">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-shield-alt text-[#386641]"></i>
-                <span>Paiement sécurisé</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <i class="fas fa-truck text-[#386641]"></i>
-                <span>Livraison rapide</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <i class="fas fa-undo text-[#386641]"></i>
-                <span>Retour sous 14 jours</span>
+            <!-- Bouton optionnel pour vider le panier -->
+            <button
+              class="w-full py-3 text-center rounded-lg border-2 border-red-500 text-red-500 font-medium hover:bg-red-500 hover:text-white transition mt-3"
+              (click)="viderPanier()">
+              <i class="fas fa-trash-alt"></i> Vider le panier
+            </button>
+
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <div class="space-y-3 text-sm text-gray-600">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-shield-alt text-[#386641]"></i>
+                  <span>Paiement sécurisé</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-truck text-[#386641]"></i>
+                  <span>Livraison rapide</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-undo text-[#386641]"></i>
+                  <span>Retour sous 14 jours</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       }
     </div>
   </div>
 </div>
 
-<!-- AI Search FAB -->
+<!-- AI Search FAB (inchangé) -->
 <div class="fixed bottom-6 right-6 z-50">
   <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
   <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
 
-  <button routerLink="/ai-search/upload-predict"
+  <button
+    routerLink="/ai-search/upload-predict"
     class="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
     title="Recherche par IA">
     <div class="relative">
