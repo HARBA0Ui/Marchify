@@ -10,6 +10,7 @@ import livreurRoutes from "./routes/livreur.routes.js"
 import bonDelivraison from "./routes/bonDeLivraison.routes.js"
 import predictRoutes from "./routes/predict.routes.js"
 import userRoutes from "./routes/user.routes.js";
+import notifcationRoutes from "./routes/notifications.routes.js";
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/commandes", commandesRoutes);
 app.use("/api/livreur", livreurRoutes);
+app.use("/api/notifications", notifcationRoutes);
 app.use("/api/bonDeLivraison", bonDelivraison);
 
 // Start server

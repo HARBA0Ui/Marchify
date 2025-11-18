@@ -17,20 +17,50 @@
   height: 70px;
 }
 
-/* Logo */
-.navbar-brand .logo {
+/* Logo - SUPER TIGHT & CENTERED */
+.navbar-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  height: 100%;
+}
+
+.navbar-brand .logo {
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.01rem;  /* Reduced from 0.75rem to make them closer */
   text-decoration: none;
   color: #386641;
   font-size: 1.5rem;
   font-weight: 700;
   transition: transform 0.3s;
+  line-height: 1;
 }
 
 .navbar-brand .logo:hover {
   transform: scale(1.05);
+}
+
+/* Logo Image - PERFECTLY ALIGNED */
+.logo-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  display: block;
+  margin-bottom:16px ;
+  padding: 0;
+  flex-shrink: 0;
+  vertical-align: middle;  /* Extra centering */
+}
+
+/* Logo text - STICKY & CENTERED */
+.navbar-brand .logo span {
+  display: inline-flex;  /* Changed to inline-flex */
+  align-items: center;   /* Perfect vertical centering */
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  height: 40px;  /* Match logo height for perfect alignment */
 }
 
 .navbar-brand .logo i {
@@ -256,6 +286,8 @@
     transition: transform 0.3s;
     overflow-y: auto;
     padding: 1.5rem 0;
+    z-index: 1000;
+
   }
 
   .navbar-menu.active {
@@ -283,6 +315,7 @@
     padding: 0;
     margin: 0;
     transition: max-height 0.3s, padding 0.3s;
+    z-index: 1001;
   }
 
   .dropdown-menu.show {
@@ -321,6 +354,10 @@
   .btn-login span {
     display: none;
   }
+  
+  .navbar-brand .logo {
+    gap: 0.3rem;  /* Even tighter on tablets */
+  }
 }
 
 @media (max-width: 640px) {
@@ -329,7 +366,20 @@
   }
 
   .navbar-brand .logo {
+    
     font-size: 1.25rem;
+    gap: 0.1rem;  /* Tighter on mobile */
+  }
+
+  /* Adjust logo size on mobile */
+  .logo-img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+  }
+  
+  .navbar-brand .logo span {
+    height: 32px;  /* Match smaller logo */
   }
 
   .navbar-brand .logo i {
@@ -341,5 +391,198 @@
     width: 40px;
     height: 40px;
     justify-content: center;
+  }
+}
+
+/* Notification button badge */
+.notification-btn .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #F97A00;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+/* ========== Boutons Auth modernisés ========== */
+
+/* Bouton Connexion (vert principal) */
+.btn-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(135deg, #386641 0%, #6a994e 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(56, 102, 65, 0.3);
+}
+
+.btn-signin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 102, 65, 0.4);
+  background: linear-gradient(135deg, #2d5234 0%, #386641 100%);
+}
+
+.btn-signin:active {
+  transform: translateY(0);
+}
+
+/* Bouton Inscription (orange accent) */
+.btn-signup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(135deg, #F97A00 0%, #ff9933 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(249, 122, 0, 0.3);
+  margin-left: 0.5rem;
+}
+
+.btn-signup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 122, 0, 0.4);
+  background: linear-gradient(135deg, #e66d00 0%, #F97A00 100%);
+}
+
+.btn-signup:active {
+  transform: translateY(0);
+}
+
+/* Bouton Déconnexion (gris élégant) */
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(135deg, #4a5568 0%, #718096 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+  margin-left: 1rem;
+}
+
+.btn-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 85, 104, 0.4);
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+}
+
+/* Informations utilisateur */
+.user-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(56, 102, 65, 0.1);
+  border-radius: 50px;
+  color: #386641;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.user-info i {
+  font-size: 1.2rem;
+  color: #386641;
+}
+
+.username {
+  font-size: 0.95rem;
+}
+
+.role-tag {
+  font-size: 0.75rem;
+  background: #386641;
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* ========== Animation Ripple sur clic ========== */
+
+.ripple-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-btn::after {
+  
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple-btn:active::after {
+  width: 300px;
+  height: 300px;
+  transition: width 0s, height 0s;
+}
+
+/* ========== Responsive mobile ========== */
+
+@media (max-width: 768px) {
+
+  .btn-signin,
+  .btn-signup,
+  .btn-logout {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-signup {
+    margin-left: 0.25rem;
+  }
+
+  .user-info {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .username {
+    display: none;
+    /* cache le nom sur mobile si besoin */
+  }
+
+  .role-tag {
+    font-size: 0.7rem;
   }
 }

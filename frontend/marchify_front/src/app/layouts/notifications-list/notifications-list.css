@@ -1,0 +1,4 @@
+ /* Hover effect - increases opacity from 08/03 to 20/10 */
+  .notification-hover:hover {
+    background: linear-gradient(to right, var(--color-hover-start), var(--color-hover-end)) !important;
+  }

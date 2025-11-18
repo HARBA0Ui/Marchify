@@ -1,11 +1,13 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CommandeService } from '../../../../core/services/commande-service';
 import { CmdStatus, Commande } from '../../../../core/models/commande';
 import { LivreurService } from '../../../../core/services/livreur-service';
 
 @Component({
   selector: 'app-mission-list',
-  imports: [],
+  imports: [CommonModule, RouterLink],
   templateUrl: './mission-list.html',
   styleUrl: './mission-list.css',
 })
@@ -19,9 +21,9 @@ export class MissionList {
   error = '';
 
   statusList = [
-    { value: 'READY', label: 'Prête' },
-    { value: 'SHIPPED', label: 'En cours de livraison' },
-    { value: 'DELIVERED', label: 'Livrée' },
+    { value: 'READY', label: 'Prêtes' },
+    { value: 'SHIPPED', label: 'En livraison' },
+    { value: 'DELIVERED', label: 'Livrées' },
   ];
 
   ngOnInit(): void {
@@ -34,8 +36,7 @@ export class MissionList {
 
     this.livreurService.getMissionsDisponibles().subscribe({
       next: (data: any) => {
-        // 🔹 Si le backend renvoie { missions: [...] }
-        this.missions = Array.isArray(data) ? data  : data.missions ?? [];
+        this.missions = Array.isArray(data) ? data : data.missions ?? [];
         this.applyFilter();
         this.loading = false;
       },
@@ -71,6 +72,15 @@ export class MissionList {
     );
   }
 
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      READY: 'Prête',
+      SHIPPED: 'En livraison',
+      DELIVERED: 'Livrée'
+    };
+    return labels[status] || status;
+  }
+
   formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleString('fr-FR', {
       day: '2-digit',
@@ -82,14 +92,18 @@ export class MissionList {
   }
 
   acceptMission(missionId: string) {
-    const livreurId = '68f743532df2f750af13a58d'; // 🔹 ID du livreur connecté
+    const livreurId = '68f743532df2f750af13a58d';
     this.livreurService.accepterMission(livreurId, missionId).subscribe({
       next: (updatedMission) => {
         const index = this.missions.findIndex((m) => m.id === missionId);
         if (index !== -1) this.missions[index] = updatedMission;
         this.applyFilter();
+        alert('✅ Mission acceptée avec succès!');
       },
-      error: (err) => console.error('Erreur accepter mission:', err),
+      error: (err) => {
+        console.error('Erreur accepter mission:', err);
+        alert('❌ Erreur lors de l\'acceptation de la mission.');
+      },
     });
   }
 
@@ -99,11 +113,12 @@ export class MissionList {
         const index = this.missions.findIndex((m) => m.id === missionId);
         if (index !== -1) this.missions[index] = updatedMission;
         this.applyFilter();
+        alert('✅ Livraison confirmée avec succès!');
       },
-      error: (err) => console.error('Erreur livrer mission:', err),
+      error: (err) => {
+        console.error('Erreur livrer mission:', err);
+        alert('❌ Erreur lors de la confirmation de livraison.');
+      },
     });
   }
 }
-
-
-

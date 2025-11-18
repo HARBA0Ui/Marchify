@@ -1,26 +1,38 @@
-<div class="min-h-screen bg-[#f5f0d4] px-4 py-8">
-  <div class="max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-[#386641] mb-2">Mes Missions de Livraison</h1>
-      <p class="text-[#386641]/70 text-lg">Gérez vos livraisons en cours</p>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center gap-4 mb-3">
+        <div class="w-14 h-14 bg-gradient-to-br from-[#386641] to-[#6a994e] rounded-xl flex items-center justify-center shadow-md">
+          <i class="fas fa-truck-fast text-white text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">Mes Missions</h1>
+          <p class="text-gray-600 mt-1">
+            Gérez vos livraisons en cours
+          </p>
+        </div>
+      </div>
     </div>
+  </div>
 
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    
     <!-- Status Filter Tabs -->
-    <div class="mb-6 overflow-x-auto pb-2">
-      <div class="flex gap-2 min-w-max">
+    <div class="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-2">
+      <div class="flex gap-2 overflow-x-auto">
         @for (status of statusList; track status.value) {
           <button
             (click)="filterByStatus(status.value)"
-            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap
+            class="flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition-all whitespace-nowrap
                    {{ selectedStatus === status.value
-                     ? 'bg-[#386641] text-white'
-                     : 'bg-white text-[#386641] border border-[#FED16A]/40 hover:bg-[#FED16A]/10' }}">
-            {{ status.label }}
+                     ? 'bg-[#386641] text-white shadow-md'
+                     : 'text-gray-600 hover:bg-gray-50' }}">
+            <span>{{ status.label }}</span>
             <span
-              class="ml-2 px-2 py-0.5 text-xs font-bold rounded-full
+              class="px-2 py-0.5 text-xs font-bold rounded-full
                      {{ selectedStatus === status.value
-                       ? 'bg-white/30 text-white'
+                       ? 'bg-white/20 text-white'
                        : 'bg-[#F97A00] text-white' }}">
               {{ getMissionCount(status.value) }}
             </span>
@@ -31,23 +43,32 @@
 
     <!-- Loading -->
     @if (loading) {
-      <div class="text-center py-16">
-        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#386641] border-t-transparent"></div>
-        <p class="mt-4 text-[#386641] text-lg font-medium">Chargement des missions...</p>
+      <div class="flex flex-col items-center justify-center py-24">
+        <div class="w-16 h-16 border-4 border-[#386641] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 font-medium">Chargement des missions...</p>
       </div>
     }
 
     <!-- Error -->
     @if (error && !loading) {
-      <div class="bg-[#F97A00]/20 border-2 border-[#F97A00] text-[#386641] px-6 py-4 rounded-xl mb-6 font-medium">
-        {{ error }}
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+          <p class="text-red-700 font-medium">{{ error }}</p>
+        </div>
       </div>
     }
 
     <!-- Empty State -->
     @if (!loading && filteredMissions.length === 0) {
-      <div class="text-center py-16 bg-white rounded-2xl shadow-lg text-[#386641] font-medium">
-        Aucune mission {{ selectedStatus.toLowerCase() }}
+      <div class="bg-white rounded-lg shadow-sm p-16 text-center">
+        <div class="mx-auto bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-box-open text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Aucune mission {{ selectedStatus.toLowerCase() }}</h3>
+        <p class="text-gray-600">
+          Les missions apparaîtront ici lorsqu'elles seront disponibles.
+        </p>
       </div>
     }
 
@@ -55,65 +76,116 @@
     @if (!loading && filteredMissions.length > 0) {
       <div class="space-y-4">
         @for (mission of filteredMissions; track mission.id) {
-          <div class="bg-white rounded-lg border border-[#FED16A]/30 shadow-sm hover:shadow-md transition-shadow duration-200 p-4">
+          <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+            
             <!-- Header -->
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
-              <div>
-                <h3 class="text-lg font-bold text-[#386641]">
-                  Commande #{{ mission.id.substring(0, 8).toUpperCase() }}
-                </h3>
-                <p class="text-[#386641]/60 text-sm mt-1">
-                  {{ formatDate(mission.dateCommande) }}
-                </p>
+            <div class="p-5 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
+              <div class="flex flex-wrap justify-between items-start gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-12 h-12 bg-[#386641] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-shopping-bag text-white text-lg"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold text-gray-800">
+                      Commande #{{ mission.id.substring(0, 8).toUpperCase() }}
+                    </h3>
+                    <p class="text-gray-500 text-sm mt-1 flex items-center gap-1">
+                      <i class="fas fa-calendar text-xs"></i>
+                      {{ formatDate(mission.dateCommande) }}
+                    </p>
+                  </div>
+                </div>
+                <span 
+                  class="px-3 py-1.5 text-xs font-semibold rounded-full"
+                  [ngClass]="{
+                    'bg-yellow-100 text-yellow-800': mission.status === 'READY',
+                    'bg-blue-100 text-blue-800': mission.status === 'SHIPPED',
+                    'bg-green-100 text-green-800': mission.status === 'DELIVERED'
+                  }">
+                  {{ getStatusLabel(mission.status) }}
+                </span>
               </div>
-              <span class="px-3 py-1.5 text-xs font-semibold bg-[#386641] text-white rounded-lg">
-                {{ mission.status }}
-              </span>
             </div>
 
-            <!-- Products -->
-            <div class="mb-4">
-              <h4 class="text-[#386641] font-bold text-md mb-2">
-                Produits à livrer ({{ getTotalProduits(mission) }})
-              </h4>
-              <div class="space-y-2">
-                @for (produit of mission.produits; track produit.produitId || $index) {
-                  <div class="flex justify-between text-sm text-black">
-                    <span>{{ produit.nom }} ({{ produit.quantite }} × {{ produit.prixUnitaire }} DT)</span>
-                    <span class="font-medium text-zinc-900">{{ produit.prixTotal }} DT</span>
+            <!-- Content -->
+            <div class="p-5">
+              
+              <!-- Products -->
+              <div class="mb-5">
+                <h4 class="text-gray-800 font-semibold text-sm mb-3 flex items-center gap-2">
+                  <i class="fas fa-boxes text-[#386641]"></i>
+                  Produits à livrer ({{ getTotalProduits(mission) }})
+                </h4>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+                  @for (produit of mission.produits; track produit.produitId || $index) {
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-700">
+                        <span class="font-medium">{{ produit.nom }}</span>
+                        <span class="text-gray-500"> × {{ produit.quantite }}</span>
+                      </span>
+                      <span class="font-semibold text-gray-900">{{ produit.prixTotal }} TND</span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="flex flex-wrap justify-between items-center pt-4 border-t border-gray-200 gap-3">
+                <div>
+                  <p class="text-gray-500 text-xs mb-1">Total de la commande</p>
+                  <p class="font-bold text-[#386641] text-2xl">{{ mission.totalCommande }} TND</p>
+                </div>
+
+                @if (mission.status === 'READY') {
+                  <button 
+                    (click)="acceptMission(mission.id)"
+                    class="px-6 py-3 bg-[#386641] hover:bg-[#2d5234] text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Accepter la mission</span>
+                  </button>
+                }
+                @if (mission.status === 'SHIPPED') {
+                  <button 
+                    (click)="completeDelivery(mission.id)"
+                    class="px-6 py-3 bg-[#F97A00] hover:bg-[#e86900] text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-2">
+                    <i class="fas fa-truck-fast"></i>
+                    <span>Confirmer livraison</span>
+                  </button>
+                }
+                @if (mission.status === 'DELIVERED') {
+                  <div class="px-6 py-3 bg-green-100 text-green-800 text-sm font-semibold rounded-lg flex items-center gap-2">
+                    <i class="fas fa-check-double"></i>
+                    <span>Livraison terminée</span>
                   </div>
                 }
               </div>
-            </div>
 
-            <!-- Total & Actions -->
-            <div class="flex flex-wrap justify-between items-center pt-3 border-t border-[#FED16A]/50 gap-3">
-              <div>
-                <p class="text-[#386641]/60 text-sm">Total</p>
-                <p class="font-bold text-[#386641] text-lg">{{ mission.totalCommande }} DT</p>
-              </div>
-
-              @if (mission.status === 'READY') {
-                <button (click)="acceptMission(mission.id)"
-                  class="px-4 py-2 bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white text-sm font-medium rounded-lg transition-colors">
-                  ✓ Accepter
-                </button>
-              }
-              @if (mission.status === 'SHIPPED') {
-                <button (click)="completeDelivery(mission.id)"
-                  class="px-4 py-2 bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white text-sm font-medium rounded-lg transition-colors">
-                  ✓ Livrer
-                </button>
-              }
-              @if (mission.status === 'DELIVERED') {
-                <span class="px-4 py-2 bg-[#386641] text-white text-sm font-medium rounded-lg">
-                   Livraison terminée
-                </span>
-              }
             </div>
           </div>
         }
       </div>
     }
+
   </div>
+</div>
+
+<!-- AI Search FAB -->
+<div class="fixed bottom-6 right-6 z-50">
+  <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+  <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+  
+  <button
+    routerLink="/ai-search/upload-predict"
+    class="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
+    title="Recherche par IA">
+    <div class="relative">
+      <i class="fas fa-brain text-white text-2xl md:text-3xl"></i>
+      <div class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+        <i class="fas fa-camera text-white text-[8px] md:text-[10px]"></i>
+      </div>
+    </div>
+    <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
+      <i class="fas fa-sparkles text-xs"></i>
+    </div>
+  </button>
 </div>

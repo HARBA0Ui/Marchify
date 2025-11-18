@@ -1,121 +1,207 @@
-<div class="min-h-screen bg-[#f5efc1] p-6 md:p-10">
-
-  <div class="flex items-center justify-between mb-8">
-    <h1 class="text-3xl md:text-4xl font-bold text-[#386641] flex items-center gap-3">
-      <span class="bg-[#F97A00] text-white p-3 rounded-xl shadow-md flex items-center justify-center">
-        <i class="fa-solid fa-truck-fast text-xl"></i>
-      </span>
-      Confirmer les livraisons des produits
-    </h1>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 py-6">
+    <div class="max-w-7xl mx-auto px-4">
+      <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+        <div class="w-12 h-12 bg-[#F97A00] rounded-xl flex items-center justify-center shadow-md">
+          <i class="fas fa-truck-fast text-white text-xl"></i>
+        </div>
+        <span>Mes livraisons</span>
+      </h1>
+      <p class="text-gray-600 mt-2 ml-15">
+        Gérez vos missions de livraison en cours
+      </p>
+    </div>
   </div>
 
-  @if (isLoading) {
-    <div class="flex justify-center items-center py-10">
-      <i class="fa-solid fa-spinner animate-spin text-[#386641] text-3xl"></i>
-      <span class="ml-3 text-[#386641] font-medium text-lg">
-        Chargement des missions...
-      </span>
-    </div>
-  }
-
-  @if (error) {
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6 shadow-sm">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
-        <p class="text-red-700 font-medium">{{ error }}</p>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Loading State -->
+    @if (isLoading) {
+      <div class="flex flex-col items-center justify-center py-24">
+        <div class="w-16 h-16 border-4 border-[#386641] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 font-medium">Chargement des missions...</p>
       </div>
-    </div>
-  }
+    }
 
-  @if (livraisons.length === 0 && !isLoading) {
-    <div
-      class="bg-[#FED16A]/50 border border-[#FED16A] text-[#386641] p-4 rounded-lg mb-6 flex items-center gap-3 font-medium shadow-sm"
-    >
-      <i class="fa-solid fa-circle-info text-zinc-900"></i>
-      <span>Aucune livraison assignée pour ce livreur.</span>
-    </div>
-  }
+    <!-- Error State -->
+    @if (error) {
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6 shadow-sm">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+          <p class="text-red-700 font-medium">{{ error }}</p>
+        </div>
+      </div>
+    }
 
-  @if (livraisons.length > 0) {
-    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#FED16A]/40">
-      <table class="min-w-full border-collapse">
-        <thead class="bg-[#386641] text-white">
-          <tr>
-            <th class="px-5 py-4 text-left text-sm font-semibold">
-              <i class="fa-solid fa-solid fa-truck-ramp-box mr-2"></i> Livraison
-            </th>
-            <th class="px-5 py-4 text-left text-sm font-semibold">
-              <i class="fa-solid fa-store mr-2"></i> Boutique
-            </th>
-            <th class="px-5 py-4 text-left text-sm font-semibold">
-              <i class="fa-solid fa-user mr-2"></i> Client
-            </th>
-            <th class="px-5 py-4 text-left text-sm font-semibold">
-              <i class="fa-solid fa-phone mr-2"></i> Téléphone
-            </th>
-            <th class="px-5 py-4 text-left text-sm font-semibold">
-              <i class="fa-solid fa-circle-info mr-2"></i> Statut
-            </th>
-            <th class="px-5 py-4 text-left text-sm font-semibold">
-              <i class="fa-solid fa-calendar-days mr-2"></i> Créé le
-            </th>
-            <th class="px-5 py-4 text-center text-sm font-semibold">
-              <i class="fa-solid fa-gear mr-2"></i> Action
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+    <!-- Empty State -->
+    @if (livraisons.length === 0 && !isLoading) {
+      <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+        <div class="mx-auto bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-truck text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Aucune livraison en cours</h3>
+        <p class="text-gray-600">
+          Vous n'avez aucune mission de livraison assignée pour le moment.
+        </p>
+      </div>
+    }
+
+    <!-- Deliveries Table -->
+    @if (livraisons.length > 0) {
+      <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-[#386641]">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-hashtag mr-2"></i> Commande
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-store mr-2"></i> Boutique
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-user mr-2"></i> Client
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-phone mr-2"></i> Téléphone
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-info-circle mr-2"></i> Statut
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-calendar mr-2"></i> Date
+                </th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
+                  <i class="fas fa-bolt mr-2"></i> Action
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @for (bon of livraisons; track bon.id) {
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm font-mono text-gray-900 font-medium">
+                      #{{ bon.commandeId.substring(0, 8) }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <div class="w-8 h-8 bg-[#386641] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-store text-white text-xs"></i>
+                      </div>
+                      <span class="text-sm font-semibold text-gray-900">
+                        {{ bon.commande.boutique.nom }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm text-gray-700">
+                      {{ bon.commande.client.prenom }} {{ bon.commande.client.nom }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <a [href]="'tel:' + bon.commande.client.telephone" 
+                       class="text-sm text-[#386641] hover:text-[#F97A00] font-medium flex items-center gap-1">
+                      <i class="fas fa-phone text-xs"></i>
+                      {{ bon.commande.client.telephone || '-' }}
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span [ngClass]="getStatusClass(bon.status)" 
+                          class="px-3 py-1 rounded-full text-xs font-semibold">
+                      {{ getLabel(bon.status) }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ bon.dateCreation | date: 'dd/MM/yyyy HH:mm' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    @if (bon.status === 'PENDING_PICKUP') {
+                      <button
+                        class="px-4 py-2 bg-[#F97A00] hover:bg-[#e86900] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all inline-flex items-center gap-2"
+                        (click)="accepterMission(bon.id)">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Accepter</span>
+                      </button>
+                    }
+                    @if (bon.status === 'IN_TRANSIT') {
+                      <button
+                        class="px-4 py-2 bg-[#386641] hover:bg-[#2d5234] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all inline-flex items-center gap-2"
+                        (click)="confirmerLivraison(bon.id)">
+                        <i class="fas fa-truck-fast"></i>
+                        <span>Livrer</span>
+                      </button>
+                    }
+                    @if (bon.status === 'DELIVERED') {
+                      <span class="text-green-600 font-medium text-sm flex items-center justify-center gap-1">
+                        <i class="fas fa-check-circle"></i>
+                        Livrée
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="md:hidden divide-y divide-gray-200">
           @for (bon of livraisons; track bon.id) {
-            <tr
-              class="hover:bg-[#faf6dc]/60 transition duration-200 border-b border-[#FED16A]/40"
-            >
-              <td class="px-5 py-4 font-mono text-gray-700 text-sm">
-                #{{ bon.commandeId.substring(0, 6) }}
-              </td>
-              <td class="px-5 py-4 font-semibold text-[#386641]">
-                {{ bon.commande.boutique.nom }}
-              </td>
-              <td class="px-5 py-4 text-gray-700 text-sm">
-                {{ bon.commande.client.prenom }} {{ bon.commande.client.nom }}
-              </td>
-              <td class="px-5 py-4 text-gray-600 text-sm">
-                {{ bon.commande.client.telephone || '-' }}
-              </td>
-              <td class="px-5 py-4">
-                <span
-                  [class]="getStatusClass(bon.status)"
-                  class="px-3 py-1 rounded-full text-xs font-semibold capitalize"
-                >
+            <div class="p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-mono text-gray-500">
+                    #{{ bon.commandeId.substring(0, 8) }}
+                  </span>
+                  <h3 class="font-semibold text-gray-900 mt-1">
+                    {{ bon.commande.boutique.nom }}
+                  </h3>
+                </div>
+                <span [ngClass]="getStatusClass(bon.status)" 
+                      class="px-2 py-1 rounded-full text-xs font-semibold">
                   {{ getLabel(bon.status) }}
                 </span>
-              </td>
-              <td class="px-5 py-4 text-gray-500 text-sm">
-                {{ bon.dateCreation | date: 'dd/MM HH:mm' }}
-              </td>
-              <td class="px-5 py-4 text-center">
-                @if (bon.status === 'PENDING_PICKUP') {
-                  <button
-                    class="px-4 py-2 bg-[#F97A00] hover:bg-[#e66a00] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition flex items-center gap-1 mx-auto"
-                    (click)="accepterMission(bon.id)"
-                  >
-                    <i class="fa-solid fa-circle-check"></i>
-                    Accepter
-                  </button>
-                }
-                @if (bon.status === 'IN_TRANSIT') {
-                  <button
-                    class="px-4 py-2 bg-[#386641] hover:bg-[#2d5434] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition flex items-center gap-1 mx-auto"
-                    (click)="confirmerLivraison(bon.id)"
-                  >
-                    <i class="fa-solid fa-truck-fast"></i>
-                    Livrer
-                  </button>
-                }
-              </td>
-            </tr>
+              </div>
+
+              <div class="space-y-2 text-sm mb-3">
+                <div class="flex items-center gap-2 text-gray-600">
+                  <i class="fas fa-user w-4"></i>
+                  <span>{{ bon.commande.client.prenom }} {{ bon.commande.client.nom }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-600">
+                  <i class="fas fa-phone w-4"></i>
+                  <a [href]="'tel:' + bon.commande.client.telephone" class="text-[#386641] font-medium">
+                    {{ bon.commande.client.telephone || '-' }}
+                  </a>
+                </div>
+                <div class="flex items-center gap-2 text-gray-500 text-xs">
+                  <i class="fas fa-calendar w-4"></i>
+                  <span>{{ bon.dateCreation | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+
+              @if (bon.status === 'PENDING_PICKUP') {
+                <button
+                  class="w-full px-4 py-2 bg-[#F97A00] hover:bg-[#e86900] text-white text-sm font-medium rounded-lg shadow-sm transition-all flex items-center justify-center gap-2"
+                  (click)="accepterMission(bon.id)">
+                  <i class="fas fa-check-circle"></i>
+                  <span>Accepter la mission</span>
+                </button>
+              }
+              @if (bon.status === 'IN_TRANSIT') {
+                <button
+                  class="w-full px-4 py-2 bg-[#386641] hover:bg-[#2d5234] text-white text-sm font-medium rounded-lg shadow-sm transition-all flex items-center justify-center gap-2"
+                  (click)="confirmerLivraison(bon.id)">
+                  <i class="fas fa-truck-fast"></i>
+                  <span>Confirmer la livraison</span>
+                </button>
+              }
+            </div>
           }
-        </tbody>
-      </table>
-    </div>
-  }
+        </div>
+      </div>
+    }
+  </div>
 </div>

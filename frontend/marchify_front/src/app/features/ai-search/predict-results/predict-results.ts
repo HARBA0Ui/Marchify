@@ -1,11 +1,13 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { Product } from '../../../core/models/product';
 import { PanierService } from '../../../core/services/panier';
+import { ProductCard } from '../../../layouts/product-card/product-card';
 
 @Component({
   selector: 'app-predict-results',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, RouterLink, ProductCard],
   templateUrl: './predict-results.html',
   styleUrl: './predict-results.css',
 })
@@ -18,26 +20,31 @@ export class PredictResults {
     const data = localStorage.getItem('predictResult');
     if (data) {
       const parsed = JSON.parse(data);
-      this.predictions = parsed.predictions;
-      this.results = parsed.results;
+      this.predictions = parsed.predictions || [];
+      this.results = parsed.results || [];
+      console.log('Loaded results:', this.results);
     }
   }
-  // ✅ Handle events emitted from ProductCard
-    onAddToCart(product: Product) {
-      const clientid = '68f743532df2f750af13a584'; // replace with actual panier ID or get from user session
-      const quantite = 1; // default quantity for now
-  
-      this.panierService
-        .ajouterProduit(clientid, product.id, quantite)
-        .subscribe({
-          next: (res) => {
-            console.log('Produit ajouté au panier:', res);
-            alert(`${product.nom} ajouté au panier !`);
-          },
-          error: (err) => {
-            console.error('Erreur ajout produit:', err);
-            alert('Impossible d’ajouter le produit au panier.');
-          },
-        });
-    }
+
+  onAddToCart(product: Product) {
+    const clientid = '68f743532df2f750af13a584';
+    const quantite = 1;
+
+    this.panierService
+      .ajouterProduit(clientid, product.id, quantite)
+      .subscribe({
+        next: (res) => {
+          console.log('Produit ajouté au panier:', res);
+        },
+        error: (err) => {
+          console.error('Erreur ajout produit:', err);
+          alert("❌ Impossible d'ajouter le produit au panier.");
+        },
+      });
+  }
+
+  onViewDetails(product: Product) {
+    console.log('View product details:', product);
+    // TODO: Navigate to product details page if you have one
+  }
 }
