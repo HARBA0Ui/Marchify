@@ -6,37 +6,37 @@ import { PricePipe } from '../../../../price-pipe';
 
 @Component({
   selector: 'app-deliveries',
-  imports: [DatePipe,PricePipe,NgClass],
+  imports: [DatePipe, PricePipe, NgClass],
   templateUrl: './deliveries.html',
   styleUrl: './deliveries.css',
 })
 export class Deliveries implements OnInit {
 
-  private bonDeLivraison:BondeLivraisonService=inject(BondeLivraisonService)
-  private livreurId='69125c47534311c380dc6f58';
+  private bonDeLivraison: BondeLivraisonService = inject(BondeLivraisonService)
+  private livreurId = '69125c47534311c380dc6f58';
   selectedLivraison: BonDeLivraison | null = null;
-showModal = false;
+  showModal = false;
 
-  deliveries:BonDeLivraison[]=[]
- ngOnInit(): void {
-  this.bonDeLivraison
-    .getBondelisraisonsByLivreur(this.livreurId)
-    .subscribe(res => {
-      console.log("Deliveries API response:", res);
-      this.deliveries = res.bons; // <-- FIX
-    });
-}
+  deliveries: BonDeLivraison[] = []
+  ngOnInit(): void {
+    this.bonDeLivraison
+      .getBondelisraisonsByLivreur(this.livreurId)
+      .subscribe(res => {
+        console.log("Deliveries API response:", res);
+        this.deliveries = res;   // <--- FIX
+      });
+  }
 
 
-openModal(livraison: BonDeLivraison) {
-  this.selectedLivraison = livraison;
-  this.showModal = true;
-}
+  openModal(livraison: BonDeLivraison) {
+    this.selectedLivraison = livraison;
+    this.showModal = true;
+  }
 
-closeModal() {
-  this.showModal = false;
-  this.selectedLivraison = null;
-}
+  closeModal() {
+    this.showModal = false;
+    this.selectedLivraison = null;
+  }
 
 
 }
