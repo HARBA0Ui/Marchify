@@ -6,6 +6,24 @@ import {
   createNotification,
 } from "../services/notification.service.js";
 
+export const getCommadesByAcheteur= async (req, res) => {
+  try{
+    const { clientId } = req.params;
+
+    const commandes = await db.commande.findMany({
+      where: { clientId },
+      include: {
+        produits: { include: { produit: true } },
+        client: true
+      },
+      orderBy: { dateCommande: "desc" }
+    });
+
+    res.json({ commandes });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 export const getCommandesVendeur = async (req, res) => {
   try {
     const { vendeurId } = req.params;

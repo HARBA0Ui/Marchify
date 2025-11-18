@@ -1,0 +1,109 @@
+<div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+      {{ selectedMonthForStatus ? '📊 Statuts des commandes' : '📈 Nombre de commandes par mois' }}
+    </h2>
+
+    <!-- Back Button -->
+    @if (selectedMonthForStatus) {
+      <div class="flex gap-2">
+        <button 
+          (click)="backToMonthlyView()"
+          class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
+          <i class="fas fa-arrow-left text-gray-700"></i> Retour
+        </button>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="flex gap-2">
+      <button 
+        (click)="refresh()" 
+        class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
+        <i class="fas fa-sync-alt text-gray-700"></i> Actualiser
+      </button>
+      <button 
+        (click)="downloadChart()" 
+        class="text-sm px-4 py-2 bg-[#386641] text-white hover:bg-[#F4991A] rounded-lg shadow-md transition-all duration-200 flex items-center gap-2">
+        <i class="fas fa-download"></i> Exporter PNG
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="h-72 flex flex-col items-center justify-center text-[#386641]">
+      <div class="w-12 h-12 border-4 border-gray-200 border-t-[#386641] rounded-full animate-spin mb-3"></div>
+      <p class="text-gray-500 text-sm flex items-center gap-2"> <i class="fas fa-spinner animate-spin"></i>  Chargement des données...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error) {
+    <div class="h-64 flex flex-col items-center justify-center text-red-600 font-medium">
+     <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>      {{ error }}
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && !error && rawData.length === 0 && !selectedMonthForStatus) {
+    <div class="h-64 flex flex-col items-center justify-center text-gray-400">
+      <div class="text-5xl mb-3 animate-pulse">📦</div>
+      <p class="text-lg">Aucune commande trouvée pour cette période</p>
+    </div>
+  }
+
+  <!-- Monthly Bar Chart -->
+  @if (!loading && !error && rawData.length > 0 && !selectedMonthForStatus) {
+    <div class="h-80 bg-gray-50 p-4 rounded-xl shadow-inner hover:shadow-lg transition-all duration-200">
+      <canvas 
+        baseChart
+        [data]="statsData"
+        [options]="chartOptions"
+        type="bar"
+        (chartClick)="onChartClick($event)">
+      </canvas>
+    </div>
+  }
+
+  <!-- Status Doughnut Chart -->
+  @if (!loading && !error && selectedMonthForStatus) {
+    <div class="h-80 bg-gray-50 p-4 rounded-xl shadow-inner hover:shadow-lg transition-all duration-200">
+      <canvas 
+        baseChart
+        [data]="statusData"
+        [options]="statusOptions"
+        type="doughnut">
+      </canvas>
+    </div>
+  }
+
+  <!-- Summary Stats -->
+  @if (!loading && !error && rawData.length > 0 && !selectedMonthForStatus) {
+    <div class="mt-6 grid grid-cols-3 gap-4 text-center">
+      <div class="bg-[#E6F4EA] p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center gap-2">
+        <i class="ri-shopping-cart-line text-[#386641] text-xl"></i>
+        <p class="text-xs text-[#386641] font-medium">Total</p>
+        <p class="text-2xl font-bold text-[#27472D]">{{ totalOrders }}</p>
+      </div>
+      <div class="bg-[#FFF4E6] p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center gap-2">
+        <i class="ri-bar-chart-line text-[#D97706] text-xl"></i>
+        <p class="text-xs text-[#D97706] font-medium">Moyenne</p>
+        <p class="text-2xl font-bold text-[#B45309]">{{ avgOrders }}</p>
+      </div>
+      <div class="bg-[#E6F4EA] p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center gap-2">
+        <i class="ri-calendar-line text-[#386641] text-xl"></i>
+        <p class="text-xs text-[#386641] font-medium">Mois</p>
+        <p class="text-2xl font-bold text-[#27472D]">{{ monthCount }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Status Summary -->
+  @if (!loading && !error && selectedMonthForStatus) {
+    <div class="mt-6 text-center text-gray-500">
+      <p class="text-sm">Statuts des commandes pour <span class="font-medium text-gray-700">{{ selectedMonthForStatus }}</span></p>
+    </div>
+  }
+</div>

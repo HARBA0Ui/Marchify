@@ -45,15 +45,37 @@ export const getBonsDeLivraisonByLivreur = async (req, res) => {
   try {
     const { livreurId } = req.params;
 
+    // 🔍 Vérification de l'ID Mongo
     if (!livreurId || livreurId.length !== 24) {
       return res.status(400).json({ message: "ID de livreur invalide" });
     }
 
-    const bons = await db.bonDeLivraison.findMany({
-      where: { livreurId },
+   const bons = await db.bonDeLivraison.findMany({
+  where: { livreurId },
+  include: {
+    commande: {
       include: {
-        commande: {
+        client: {
+          select: { nom: true, prenom: true, telephone: true }
+        },
+        boutique: {
+          select: { nom: true, telephone: true, adresse: true }
+        },
+        produits: {
           include: {
+            produit: { select: { nom: true, prix: true } }
+          }
+        }
+      }
+    },
+    livreur: {
+      include: {
+        user: { select: { nom: true, prenom: true } }
+      }
+    }
+  },
+  orderBy: { dateCreation: "desc" }
+});
             client: { select: { nom: true, prenom: true, telephone: true } },
             boutique: { select: { nom: true, telephone: true } },
             produits: {
@@ -70,19 +92,23 @@ export const getBonsDeLivraisonByLivreur = async (req, res) => {
       orderBy: { dateCreation: "desc" },
     });
 
-    if (bons.length === 0) {
+
+    // Aucun bon trouvé
+    if (!bons || bons.length === 0) {
       return res.status(404).json({
         message: "Aucun bon de livraison trouvé pour ce livreur",
         livreurId,
       });
     }
 
-    res.json({ bons });
+    // ✔ Réponse propre
+    return res.status(200).json({ bons });
+
   } catch (error) {
-    console.error(" getBonsDeLivraisonByLivreur error:", error);
-    res.status(500).json({
+    console.error("getBonsDeLivraisonByLivreur error:", error);
+    return res.status(500).json({
       message: "Erreur serveur lors de la récupération des bons",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
     });
   }
 };
@@ -384,3 +410,6 @@ export const failDelivery = async (req, res) => {
     });
   }
 };
+
+
+

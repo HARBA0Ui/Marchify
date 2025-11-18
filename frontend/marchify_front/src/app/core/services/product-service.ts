@@ -21,6 +21,9 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
+   getProductsByIds(ids: string[]): Observable<Product[]> {
+    return this.http.post<Product[]>(`${this.apiUrl}/batch`, ids);
+  }
   // 🔹 Create a new product
   createProduct(product: ProductCreateRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}`, product); // no FormData

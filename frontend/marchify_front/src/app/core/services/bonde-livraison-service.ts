@@ -17,6 +17,8 @@
   });
     }
 
+  getBondelisraisonsByLivreur(livreurId:string):Observable<{bons:BonDeLivraison[]}>{  
+    return this.http.get<{bons:BonDeLivraison[]}>(`${this.apiUrl}/livreur/${livreurId}`)
     getBondelisraisonsByLivreur(livreurId:string):Observable<BonDeLivraison[]>{  
       return this.http.get<BonDeLivraison[]>(`${this.apiUrl}/livreur/${livreurId}`)
     }
