@@ -5,7 +5,10 @@ import {
   preparerCommande,
   getCommandesBoutique
   , updateCommandeStatus,
-  getCommadesByAcheteur
+  getCommadesByAcheteur,
+  getStatsCommandesByBoutique,
+  getStatsByMonth,
+  getStatsByStatusForMonth
 } from "../controllers/commande.controller.js"
 
 const router = express.Router();
@@ -20,4 +23,10 @@ router.get("/boutique/:boutiqueId", getCommandesBoutique);
 router.patch("/status/:commandeId", updateCommandeStatus);
 router.get("/commandesList/:clientId",getCommadesByAcheteur);
 
+router.get("/stats/vendeur/:vendeurId", getStatsCommandesByBoutique);
+
+router.get('/stats/vendeur/:vendeurId/months', getStatsByMonth);
+
+
+router.get('/stats/vendeur/:vendeurId/status', getStatsByStatusForMonth);
 export default router;

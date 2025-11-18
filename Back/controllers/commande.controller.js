@@ -144,3 +144,178 @@ export const updateCommandeStatus = async (req, res) => {
       .json({ message: "Erreur lors de la mise à jour du statut" });
   }
 };
+export const getStatsCommandesByBoutique = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+    });
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    const commandes = await db.commande.findMany({
+      where: { boutiqueId: { in: boutiqueIds } }
+    });
+
+    // Group commands by boutique
+    const stats = boutiques.map(b => ({
+      boutique: b.nom,
+      count: commandes.filter(c => c.boutiqueId === b.id).length
+    }));
+
+    res.json({ stats });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// e.g., GET /api/stats/vendeur/:vendeurId?year=2025&month=11
+// GET /api/stats/vendeur/:vendeurId/months
+export const getStatsByMonth = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+
+    // Get all boutiques of this vendor
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+      select: { id: true }
+    });
+
+    if (boutiques.length === 0) {
+      return res.json({ stats: [] });
+    }
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    // Group commands by month (YYYY-MM format)
+ const commands = await db.commande.findMany({
+      where: {
+        boutiqueId: { in: boutiqueIds } // ✅ Prisma handles string → ObjectId internally
+      },
+      select: {
+        dateCommande: true
+      }
+    });
+    // Format as { month: "2025-11", count: 42 }
+    const monthlyCount = {};
+
+    commands.forEach(cmd => {
+      const d = new Date(cmd.dateCommande);
+      // Handle invalid dates
+      if (isNaN(d.getTime())) {
+        console.warn('⚠️ Invalid dateCommande:', cmd.dateCommande);
+        return;
+      }
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      monthlyCount[monthKey] = (monthlyCount[monthKey] || 0) + 1;
+    });
+
+
+     // 🔹 4. Format & sort
+    const stats = Object.entries(monthlyCount)
+      .map(([month, count]) => ({ month, count }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+
+    res.json({ stats });
+
+  } catch (error) {
+    // 🔹 5. Log REAL error
+    console.error('❌ [getStatsByMonth] Server error:', error);
+    
+    // Send safe error to client
+    res.status(500).json({
+      message: 'Erreur lors du calcul des statistiques',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+};
+}
+// GET /api/stats/vendeur/:vendeurId/months?year=2025&month=11
+export const getStatsByMonthAndYear = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+    const { year, month } = req.query;
+
+    const yr = parseInt(year );
+    const mo = parseInt(month ); // 1–12
+
+    const startDate = new Date(Date.UTC(yr, mo - 1, 1));
+    const endDate = new Date(Date.UTC(yr, mo, 0, 23, 59, 59, 999));
+
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+      select: { id: true }
+    });
+
+    if (boutiques.length === 0) {
+      return res.json({ stats: [] });
+    }
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    const count = await db.commande.count({
+      where: {
+        boutiqueId: { in: boutiqueIds },
+        dateCommande: { gte: startDate, lte: endDate }
+      }
+    });
+
+    res.json({
+      stats: [{
+        month: `${yr}-${String(mo).padStart(2, '0')}`,
+        count
+      }]
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching stats for month:', error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+}
+
+export const getStatsByStatusForMonth = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+    const { year, month } = req.query;
+
+    const yr = parseInt(year );
+    const mo = parseInt(month ); // 1–12
+
+    const startDate = new Date(Date.UTC(yr, mo - 1, 1));
+    const endDate = new Date(Date.UTC(yr, mo, 0, 23, 59, 59, 999));
+
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+      select: { id: true }
+    });
+
+    if (boutiques.length === 0) {
+      return res.json({ stats: [] });
+    }
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    // Group by status
+    const results = await db.commande.groupBy({
+      by: ['status'],
+      where: {
+        boutiqueId: { in: boutiqueIds },
+        dateCommande: { gte: startDate, lte: endDate }
+      },
+      _count: { _all: true }
+    });
+
+    // Format: { status: 'DELIVERED', count: 12 }
+    const stats = results.map(r => ({
+      status: r.status,
+      count: r._count._all
+    }));
+
+    res.json({ stats });
+
+  } catch (error) {
+    console.error('❌ Error fetching status stats:', error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+};
