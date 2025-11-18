@@ -13,6 +13,9 @@ import { PredictResults } from './features/ai-search/predict-results/predict-res
 import { MapComponent } from './map/map';
 import { AuthComponent } from './features/auth/auth.component';
 import { ProductEditSellerComponent } from './features/seller/pages/product-edit-seller/product-edit-seller.component';
+import { MyOrders } from './features/activities/buyer/my-orders/my-orders';
+import { Deliveries } from './features/activities/delivery/deliveries/deliveries';
+import { Commandes } from './features/activities/seller/commandes/commandes';
 import { RegisterComponent } from './features/register-component/register-component';
 import { NotificationsList } from './layouts/notifications-list/notifications-list';
 
@@ -103,13 +106,30 @@ export const routes: Routes = [
     component: MapComponent,
   },
   {
+    path:'client/ordersList',
+    title:'Orders List',
+    component:MyOrders
+  },
+  {
+    path:'livreur/deliveries',
+    title:'Deliveries List',
+    component:Deliveries
+  },
+    {
+    path:'vendeur/commandesList',
+    title:'Commandes List',
+    component:Deliveries
+  },   
+   {
+    path:'seller/list',
+    title:'Commandes List',
+    component:Commandes
+  }, {
     path: 'notifications',
     title: 'Notifications',
     component: NotificationsList,
-  },
-  {
-    path: '*',
-    redirectTo: 'product-list',
-  },
+  }
+
+
 ];
 

@@ -1,0 +1,27 @@
+/* commandes.css */
+canvas {
+  max-width: 100%;
+}
+
+/* Smooth tooltip animation */
+.chartjs-tooltip {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .chart-container {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Button hover effects */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}

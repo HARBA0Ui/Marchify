@@ -4,7 +4,8 @@ import {
   getDetailCommande,
   preparerCommande,
   getCommandesBoutique
-  , updateCommandeStatus
+  , updateCommandeStatus,
+  getCommadesByAcheteur
 } from "../controllers/commande.controller.js"
 
 const router = express.Router();
@@ -17,6 +18,6 @@ router.patch("/preparer/:commandeId", preparerCommande);
 
 router.get("/boutique/:boutiqueId", getCommandesBoutique);
 router.patch("/status/:commandeId", updateCommandeStatus);
-
+router.get("/commandesList/:clientId",getCommadesByAcheteur);
 
 export default router;
