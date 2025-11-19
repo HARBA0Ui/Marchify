@@ -102,7 +102,7 @@ export class NavbarComponent implements OnInit {
     },
     // Seller/Vendor items
     {
-      label: 'creer un boutique',
+      label: 'Creer un boutique',
       path: '/seller/shop-creation',
       icon: 'fas fa-store',
       roles: ['vendeur', 'seller'],
@@ -118,7 +118,14 @@ export class NavbarComponent implements OnInit {
       path: 'commande-list-vendor',
       icon: 'fas fa-clipboard-list',
       roles: ['vendeur', 'seller'],
+    }, {
+      label: 'Statistiques des commandes',
+      path: 'seller/commande-satistics',
+      icon: 'fas fa-chart-bar',
+      roles: ['vendeur', 'seller'],
+      
     },
+    
     {
       label: 'Ajouter produit',
       path: '/seller/product-add',

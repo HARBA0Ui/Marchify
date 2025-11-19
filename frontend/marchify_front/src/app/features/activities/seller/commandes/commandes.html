@@ -1,109 +1,268 @@
-<div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
-  <!-- Header -->
-  <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
-    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      {{ selectedMonthForStatus ? '📊 Statuts des commandes' : '📈 Nombre de commandes par mois' }}
-    </h2>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-extrabold text-[#386641] mb-2 flex items-center gap-3">
+        <i class="fas fa-chart-line"></i>
+        Statistiques des Commandes
+      </h1>
+      <p class="text-gray-600">Analysez vos performances et suivez l'évolution de vos commandes</p>
+    </div>
 
-    <!-- Back Button -->
-    @if (selectedMonthForStatus) {
-      <div class="flex gap-2">
-        <button 
-          (click)="backToMonthlyView()"
-          class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
-          <i class="fas fa-arrow-left text-gray-700"></i> Retour
-        </button>
+    <!-- Error State -->
+    @if (error) {
+      <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-md mb-6">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+          <div>
+            <p class="text-red-800 font-semibold text-lg">Erreur</p>
+            <p class="text-red-700">{{ error }}</p>
+          </div>
+        </div>
       </div>
     }
 
-    <!-- Actions -->
-    <div class="flex gap-2">
-      <button 
-        (click)="refresh()" 
-        class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
-        <i class="fas fa-sync-alt text-gray-700"></i> Actualiser
-      </button>
-      <button 
-        (click)="downloadChart()" 
-        class="text-sm px-4 py-2 bg-[#386641] text-white hover:bg-[#F4991A] rounded-lg shadow-md transition-all duration-200 flex items-center gap-2">
-        <i class="fas fa-download"></i> Exporter PNG
-      </button>
-    </div>
+    <!-- Loading State -->
+    @if (loading && !error) {
+      <div class="flex flex-col items-center justify-center py-32">
+        <div class="w-20 h-20 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mb-6"></div>
+        <p class="text-[#386641] font-semibold text-xl">Chargement des statistiques...</p>
+      </div>
+    }
+
+    <!-- Main Content -->
+    @if (!loading && !error) {
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Orders -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#386641] hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-14 h-14 bg-gradient-to-br from-[#386641] to-[#6a994e] rounded-lg flex items-center justify-center">
+              <i class="fas fa-shopping-cart text-white text-2xl"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-500 uppercase">Total</span>
+          </div>
+          <p class="text-4xl font-bold text-[#386641] mb-1">{{ stats.total }}</p>
+          <p class="text-sm text-gray-600">Commandes totales</p>
+        </div>
+
+        <!-- Average -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#F97A00] hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-14 h-14 bg-gradient-to-br from-[#F97A00] to-[#FED16A] rounded-lg flex items-center justify-center">
+              <i class="fas fa-chart-bar text-white text-2xl"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-500 uppercase">Moyenne</span>
+          </div>
+          <p class="text-4xl font-bold text-[#F97A00] mb-1">{{ stats.average }}</p>
+          <p class="text-sm text-gray-600">Par mois</p>
+        </div>
+
+        <!-- Top Month -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <i class="fas fa-trophy text-white text-2xl"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-500 uppercase">Meilleur</span>
+          </div>
+          <p class="text-2xl font-bold text-purple-600 mb-1">{{ stats.topMonthCount }}</p>
+          <p class="text-sm text-gray-600">{{ stats.topMonth || 'N/A' }}</p>
+        </div>
+
+        <!-- Trend -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <i class="fas" [class.fa-arrow-up]="stats.trend >= 0" [class.fa-arrow-down]="stats.trend < 0" class="text-white text-2xl"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-500 uppercase">Tendance</span>
+          </div>
+          <p class="text-4xl font-bold mb-1" [class.text-green-600]="stats.trend >= 0" [class.text-red-600]="stats.trend < 0">
+            {{ stats.trend >= 0 ? '+' : '' }}{{ stats.trend }}%
+          </p>
+          <p class="text-sm text-gray-600">vs mois précédent</p>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Monthly Bar Chart - Takes 2 columns -->
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+          <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                @if (selectedMonthForStatus) {
+                  <i class="fas fa-pie-chart text-[#F97A00]"></i>
+                  Répartition par Statut
+                } @else {
+                  <i class="fas fa-chart-bar text-[#386641]"></i>
+                  Évolution Mensuelle
+                }
+              </h2>
+              <p class="text-sm text-gray-500 mt-1">
+                @if (selectedMonthForStatus) {
+                  Cliquez pour revenir à la vue mensuelle
+                } @else {
+                  Cliquez sur une barre pour voir les statuts
+                }
+              </p>
+            </div>
+
+            <div class="flex gap-2">
+              @if (selectedMonthForStatus) {
+                <button 
+                  (click)="backToMonthlyView()"
+                  class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2 text-sm font-medium">
+                  <i class="fas fa-arrow-left"></i> Retour
+                </button>
+              }
+              
+              <button 
+                (click)="refresh()" 
+                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2 text-sm font-medium">
+                <i class="fas fa-sync-alt"></i> Actualiser
+              </button>
+              
+              <button 
+                (click)="downloadChart()" 
+                class="px-4 py-2 bg-[#386641] text-white hover:bg-[#F97A00] rounded-lg shadow-md transition-all duration-200 flex items-center gap-2 text-sm font-medium">
+                <i class="fas fa-download"></i> Exporter
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart Container -->
+          <div class="h-96 bg-gradient-to-br from-gray-50 to-white p-4 rounded-lg">
+            @if (!selectedMonthForStatus) {
+              <canvas 
+                #barChart
+                baseChart
+                [data]="monthlyData"
+                [options]="monthlyOptions"
+                type="bar">
+              </canvas>
+            } @else {
+              <canvas 
+                #statusChart
+                baseChart
+                [data]="statusData"
+                [options]="statusOptions"
+                type="doughnut">
+              </canvas>
+            }
+          </div>
+        </div>
+
+        <!-- Trend Line Chart - Takes 1 column -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <i class="fas fa-chart-line text-[#F97A00]"></i>
+              Courbe de Tendance
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">Évolution sur la période</p>
+          </div>
+
+          <div class="h-96 bg-gradient-to-br from-orange-50 to-white p-4 rounded-lg">
+            <canvas 
+              #trendChart
+              baseChart
+              [data]="trendData"
+              [options]="trendOptions"
+              type="line">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-filter text-[#386641] text-xl"></i>
+            <label class="text-gray-700 font-semibold">Filtrer par période:</label>
+          </div>
+          
+          <select 
+            [(ngModel)]="selectedMonth"
+            (change)="filterByMonth()"
+            class="px-4 py-2 border-2 border-[#386641]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent text-gray-700 font-medium bg-white hover:border-[#386641] transition-all">
+            @for (option of monthsOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+
+          @if (selectedMonth) {
+            <button 
+              (click)="selectedMonth = ''; filterByMonth()"
+              class="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium">
+              <i class="fas fa-times"></i> Réinitialiser
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      @if (rawData.length === 0 && !selectedMonthForStatus) {
+        <div class="bg-white rounded-xl shadow-lg p-12 text-center mt-8">
+          <div class="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-box-open text-gray-400 text-5xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">Aucune donnée disponible</h3>
+          <p class="text-gray-600 mb-6">Aucune commande trouvée pour cette période</p>
+          <button 
+            (click)="refresh()"
+            class="px-6 py-3 bg-[#386641] text-white hover:bg-[#F97A00] rounded-lg shadow-md transition-all duration-200 inline-flex items-center gap-2 font-medium">
+            <i class="fas fa-sync-alt"></i> Actualiser
+          </button>
+        </div>
+      }
+
+      <!-- Info Cards -->
+      @if (rawData.length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <!-- Monthly Count -->
+          <div class="bg-gradient-to-br from-[#386641] to-[#6a994e] rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-calendar-alt text-4xl opacity-50"></i>
+              <span class="text-6xl font-bold opacity-20">{{ stats.monthCount }}</span>
+            </div>
+            <p class="text-xl font-semibold mb-1">{{ stats.monthCount }}</p>
+            <p class="text-white/80">Mois analysés</p>
+          </div>
+
+          <!-- Best Performance -->
+          <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-medal text-4xl opacity-50"></i>
+              <span class="text-6xl font-bold opacity-20">1</span>
+            </div>
+            <p class="text-xl font-semibold mb-1">{{ stats.topMonth || 'N/A' }}</p>
+            <p class="text-white/80">Meilleure performance</p>
+          </div>
+
+          <!-- Growth -->
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-rocket text-4xl opacity-50"></i>
+              <span class="text-6xl font-bold opacity-20">%</span>
+            </div>
+            <p class="text-xl font-semibold mb-1">{{ stats.trend >= 0 ? '+' : '' }}{{ stats.trend }}%</p>
+            <p class="text-white/80">Croissance mensuelle</p>
+          </div>
+        </div>
+      }
+
+    }
   </div>
+</div>
 
-  <!-- Loading -->
-  @if (loading) {
-    <div class="h-72 flex flex-col items-center justify-center text-[#386641]">
-      <div class="w-12 h-12 border-4 border-gray-200 border-t-[#386641] rounded-full animate-spin mb-3"></div>
-      <p class="text-gray-500 text-sm flex items-center gap-2"> <i class="fas fa-spinner animate-spin"></i>  Chargement des données...</p>
-    </div>
-  }
-
-  <!-- Error -->
-  @if (error) {
-    <div class="h-64 flex flex-col items-center justify-center text-red-600 font-medium">
-     <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>      {{ error }}
-    </div>
-  }
-
-  <!-- Empty State -->
-  @if (!loading && !error && rawData.length === 0 && !selectedMonthForStatus) {
-    <div class="h-64 flex flex-col items-center justify-center text-gray-400">
-      <div class="text-5xl mb-3 animate-pulse">📦</div>
-      <p class="text-lg">Aucune commande trouvée pour cette période</p>
-    </div>
-  }
-
-  <!-- Monthly Bar Chart -->
-  @if (!loading && !error && rawData.length > 0 && !selectedMonthForStatus) {
-    <div class="h-80 bg-gray-50 p-4 rounded-xl shadow-inner hover:shadow-lg transition-all duration-200">
-      <canvas 
-        baseChart
-        [data]="statsData"
-        [options]="chartOptions"
-        type="bar"
-        (chartClick)="onChartClick($event)">
-      </canvas>
-    </div>
-  }
-
-  <!-- Status Doughnut Chart -->
-  @if (!loading && !error && selectedMonthForStatus) {
-    <div class="h-80 bg-gray-50 p-4 rounded-xl shadow-inner hover:shadow-lg transition-all duration-200">
-      <canvas 
-        baseChart
-        [data]="statusData"
-        [options]="statusOptions"
-        type="doughnut">
-      </canvas>
-    </div>
-  }
-
-  <!-- Summary Stats -->
-  @if (!loading && !error && rawData.length > 0 && !selectedMonthForStatus) {
-    <div class="mt-6 grid grid-cols-3 gap-4 text-center">
-      <div class="bg-[#E6F4EA] p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center gap-2">
-        <i class="ri-shopping-cart-line text-[#386641] text-xl"></i>
-        <p class="text-xs text-[#386641] font-medium">Total</p>
-        <p class="text-2xl font-bold text-[#27472D]">{{ totalOrders }}</p>
-      </div>
-      <div class="bg-[#FFF4E6] p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center gap-2">
-        <i class="ri-bar-chart-line text-[#D97706] text-xl"></i>
-        <p class="text-xs text-[#D97706] font-medium">Moyenne</p>
-        <p class="text-2xl font-bold text-[#B45309]">{{ avgOrders }}</p>
-      </div>
-      <div class="bg-[#E6F4EA] p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center gap-2">
-        <i class="ri-calendar-line text-[#386641] text-xl"></i>
-        <p class="text-xs text-[#386641] font-medium">Mois</p>
-        <p class="text-2xl font-bold text-[#27472D]">{{ monthCount }}</p>
-      </div>
-    </div>
-  }
-
-  <!-- Status Summary -->
-  @if (!loading && !error && selectedMonthForStatus) {
-    <div class="mt-6 text-center text-gray-500">
-      <p class="text-sm">Statuts des commandes pour <span class="font-medium text-gray-700">{{ selectedMonthForStatus }}</span></p>
-    </div>
-  }
+<!-- Background Decoration -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute top-0 right-0 w-96 h-96 bg-[#386641]/5 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#F97A00]/5 rounded-full blur-3xl"></div>
 </div>

@@ -277,12 +277,21 @@
                 {{ actionBtn.label }}
               </button>
               }
+              <!-- ✅ SHIPPED - Waiting for delivery -->
+              @else if (commande.status === CmdStatus.SHIPPED) {
+              <span class="px-6 py-3 bg-purple-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                <i class="fas fa-truck"></i>
+                En cours de livraison
+              </span>
+              }
+              <!-- DELIVERED -->
               @else if (commande.status === CmdStatus.DELIVERED) {
               <span class="px-6 py-3 bg-gradient-to-r from-[#386641] to-[#6a994e] text-white text-sm font-semibold rounded-xl flex items-center gap-2">
                 <i class="fas fa-check-double"></i>
                 Commande livrée
               </span>
               }
+              <!-- CANCELLED -->
               @else if (commande.status === CmdStatus.CANCELLED) {
               <span class="px-6 py-3 bg-gray-400 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
                 <i class="fas fa-ban"></i>

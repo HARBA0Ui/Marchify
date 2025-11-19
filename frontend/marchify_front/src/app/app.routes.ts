@@ -123,10 +123,6 @@ export const routes: Routes = [
     component:Deliveries
   },   
    {
-    path:'seller/list',
-    title:'Commandes List',
-    component:Commandes
-  }, {
     path: 'notifications',
     title: 'Notifications',
     component: NotificationsList,
@@ -138,6 +134,11 @@ export const routes: Routes = [
     path:'seller/shop-product-seller/:id',
     title:'Shop Products Seller',
     component:ShopProductsSellerComponent
+  }, {
+     path: 'seller/commande-satistics',
+     title: 'Commandes Statistics',
+     component: Commandes,
+      
   }
 ];
 

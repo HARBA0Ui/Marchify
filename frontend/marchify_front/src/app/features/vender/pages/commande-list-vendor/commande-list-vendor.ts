@@ -169,13 +169,12 @@ export class CommandeListVendor implements OnInit {
     );
   }
 
-  // ✅ Handle action based on current status
+  // ✅ Handle action based on current status (NO DELIVERY for vendor)
   handleStatusAction(commande: Commande): void {
     const actionMap: Partial<Record<CmdStatus, () => void>> = {
       [CmdStatus.PENDING]: () => this.accepterCommande(commande.id),
       [CmdStatus.PROCESSING]: () => this.preparerCommande(commande.id),
       [CmdStatus.READY]: () => this.expedierCommande(commande.id),
-      [CmdStatus.SHIPPED]: () => this.livrerCommande(commande.id),
     };
 
     const action = actionMap[commande.status];
@@ -186,7 +185,6 @@ export class CommandeListVendor implements OnInit {
     }
   }
 
-  // ✅ Accept order (PENDING → PROCESSING)
   accepterCommande(commandeId: string): void {
     if (!confirm('Accepter cette commande et commencer le traitement ?'))
       return;
@@ -206,10 +204,8 @@ export class CommandeListVendor implements OnInit {
       .subscribe({
         next: (response) => {
           if (!response) return;
-
           const updated = response.commande;
           const index = this.commandes.findIndex((c) => c.id === commandeId);
-
           if (index !== -1) {
             this.commandes[index] = updated;
             this.filterByStatus(this.selectedStatus);
@@ -219,7 +215,6 @@ export class CommandeListVendor implements OnInit {
       });
   }
 
-  // ✅ Prepare order (PROCESSING → READY)
   preparerCommande(commandeId: string): void {
     if (!confirm('Marquer cette commande comme prête pour la livraison ?'))
       return;
@@ -239,10 +234,8 @@ export class CommandeListVendor implements OnInit {
       .subscribe({
         next: (response) => {
           if (!response) return;
-
           const updated = response.commande;
           const index = this.commandes.findIndex((c) => c.id === commandeId);
-
           if (index !== -1) {
             this.commandes[index] = updated;
             this.filterByStatus(this.selectedStatus);
@@ -252,7 +245,6 @@ export class CommandeListVendor implements OnInit {
       });
   }
 
-  // ✅ Ship order (READY → SHIPPED)
   expedierCommande(commandeId: string): void {
     if (!confirm('Marquer cette commande comme expédiée ?')) return;
 
@@ -271,10 +263,8 @@ export class CommandeListVendor implements OnInit {
       .subscribe({
         next: (response) => {
           if (!response) return;
-
           const updated = response.commande;
           const index = this.commandes.findIndex((c) => c.id === commandeId);
-
           if (index !== -1) {
             this.commandes[index] = updated;
             this.filterByStatus(this.selectedStatus);
@@ -284,42 +274,9 @@ export class CommandeListVendor implements OnInit {
       });
   }
 
-  // ✅ Deliver order (SHIPPED → DELIVERED)
-  livrerCommande(commandeId: string): void {
-    if (!confirm('Confirmer la livraison de cette commande ?')) return;
-
-    this.isLoading.set(true);
-
-    this.commandeService
-      .livrerCommande(commandeId)
-      .pipe(
-        catchError((err) => {
-          console.error('❌ Error delivering:', err);
-          this.error.set(err.error?.message || 'Erreur lors de la livraison');
-          return of(null);
-        }),
-        finalize(() => this.isLoading.set(false))
-      )
-      .subscribe({
-        next: (response) => {
-          if (!response) return;
-
-          const updated = response.commande;
-          const index = this.commandes.findIndex((c) => c.id === commandeId);
-
-          if (index !== -1) {
-            this.commandes[index] = updated;
-            this.filterByStatus(this.selectedStatus);
-            console.log('✅ Commande livrée');
-          }
-        },
-      });
-  }
-
-  // ✅ Cancel order
   annulerCommande(commandeId: string): void {
     const raison = prompt("Raison de l'annulation (optionnel):");
-    if (raison === null) return; // User clicked cancel
+    if (raison === null) return;
 
     if (!confirm('Êtes-vous sûr de vouloir annuler cette commande ?')) return;
 
@@ -338,10 +295,8 @@ export class CommandeListVendor implements OnInit {
       .subscribe({
         next: (response) => {
           if (!response) return;
-
           const updated = response.commande;
           const index = this.commandes.findIndex((c) => c.id === commandeId);
-
           if (index !== -1) {
             this.commandes[index] = updated;
             this.filterByStatus(this.selectedStatus);
@@ -361,6 +316,7 @@ export class CommandeListVendor implements OnInit {
     return this.expandedProductDetails.has(index);
   }
 
+  // ✅ Vendor can only progress to SHIPPED (not DELIVERED)
   getActionButton(
     status: CmdStatus
   ): { label: string; icon: string; color: string } | null {
@@ -381,11 +337,6 @@ export class CommandeListVendor implements OnInit {
         label: 'Expédier',
         icon: 'fa-truck',
         color: 'bg-purple-500 hover:bg-purple-600',
-      },
-      [CmdStatus.SHIPPED]: {
-        label: 'Marquer livrée',
-        icon: 'fa-box-check',
-        color: 'bg-teal-500 hover:bg-teal-600',
       },
     };
 
@@ -427,7 +378,6 @@ export class CommandeListVendor implements OnInit {
       [CmdStatus.PENDING]: CmdStatus.PROCESSING,
       [CmdStatus.PROCESSING]: CmdStatus.READY,
       [CmdStatus.READY]: CmdStatus.SHIPPED,
-      [CmdStatus.SHIPPED]: CmdStatus.DELIVERED,
     };
 
     return flow[status] ?? null;

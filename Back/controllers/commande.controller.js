@@ -430,3 +430,148 @@ export const updateCommandeStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Get stats by month for a vendeur
+export const getStatsByMonth = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+
+    // Get all boutiques for this vendeur
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+      select: { id: true }
+    });
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    if (boutiqueIds.length === 0) {
+      return res.json({ stats: [] });
+    }
+
+    // Get all commandes for these boutiques
+    const commandes = await db.commande.findMany({
+      where: {
+        boutiqueId: { in: boutiqueIds }
+      },
+      select: {
+        dateCommande: true
+      }
+    });
+
+    // Group by month
+    const monthCounts = {};
+    commandes.forEach(cmd => {
+      const date = new Date(cmd.dateCommande);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1;
+    });
+
+    // Convert to array format
+    const stats = Object.entries(monthCounts).map(([month, count]) => ({
+      month,
+      count
+    }));
+
+    res.json({ stats });
+  } catch (error) {
+    console.error('getStatsByMonth error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get stats by month and year for a vendeur
+export const getStatsByMonthAndYear = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+    const { year, month } = req.query;
+
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+      select: { id: true }
+    });
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    if (boutiqueIds.length === 0) {
+      return res.json({ stats: [] });
+    }
+
+    // Create date range for the specific month
+    const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59);
+
+    const commandes = await db.commande.findMany({
+      where: {
+        boutiqueId: { in: boutiqueIds },
+        dateCommande: {
+          gte: startDate,
+          lte: endDate
+        }
+      }
+    });
+
+    const monthKey = `${year}-${String(month).padStart(2, '0')}`;
+    const stats = [{
+      month: monthKey,
+      count: commandes.length
+    }];
+
+    res.json({ stats });
+  } catch (error) {
+    console.error('getStatsByMonthAndYear error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get stats by status for a specific month
+export const getStatsByStatusForMonth = async (req, res) => {
+  try {
+    const { vendeurId } = req.params;
+    const { year, month } = req.query;
+
+    const boutiques = await db.boutique.findMany({
+      where: { vendeurId },
+      select: { id: true }
+    });
+
+    const boutiqueIds = boutiques.map(b => b.id);
+
+    if (boutiqueIds.length === 0) {
+      return res.json({ stats: [] });
+    }
+
+    // Create date range
+    const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59);
+
+    const commandes = await db.commande.findMany({
+      where: {
+        boutiqueId: { in: boutiqueIds },
+        dateCommande: {
+          gte: startDate,
+          lte: endDate
+        }
+      },
+      select: {
+        status: true
+      }
+    });
+
+    // Group by status
+    const statusCounts = {};
+    commandes.forEach(cmd => {
+      statusCounts[cmd.status] = (statusCounts[cmd.status] || 0) + 1;
+    });
+
+    // Convert to array format
+    const stats = Object.entries(statusCounts).map(([status, count]) => ({
+      status,
+      count
+    }));
+
+    res.json({ stats });
+  } catch (error) {
+    console.error('getStatsByStatusForMonth error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
