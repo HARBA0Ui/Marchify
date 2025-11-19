@@ -24,7 +24,7 @@ export class PanierList implements OnInit, OnDestroy {
   // 🔹 clientId dynamique depuis auth
   private clientId: string | null = null;
 
-  constructor(private panierService: PanierService) { }
+  constructor(private panierService: PanierService) {}
 
   ngOnInit() {
     // 🔹 S'abonner aux changements d'état auth
@@ -226,6 +226,8 @@ export class PanierList implements OnInit, OnDestroy {
       return;
     }
 
+    
+
     if (this.paniers.length === 0 || this.paniers[0].produits.length === 0) {
       alert('❌ Votre panier est vide');
       return;
@@ -243,18 +245,34 @@ export class PanierList implements OnInit, OnDestroy {
       .confirmerCommande(this.clientId, adresseLivraison)
       .subscribe({
         next: (res) => {
-          console.log('Commande confirmée:', res);
+          console.log('Commande(s) confirmée(s):', res);
           this.loading = false;
 
-          const commandeId = res.commande?.id || 'N/A';
+          // ✅ Handle multiple commandes
+          const commandesCount = res.commandes?.length || 1;
           const total = this.getTotalWithTax();
 
-          alert(
-            `✅ Commande confirmée avec succès!\n\n` +
-            `Numéro de commande: ${commandeId.substring(0, 8)}\n` +
-            `Total: ${total.toFixed(2)} TND\n\n` +
-            `Votre commande sera livrée sous peu.`
-          );
+          if (commandesCount > 1) {
+            const commandeIds = res.commandes
+              .map((c: any) => c.id.substring(0, 8))
+              .join(', ');
+
+            alert(
+              `✅ ${commandesCount} commandes confirmées avec succès!\n\n` +
+                `Numéros de commande: ${commandeIds}\n` +
+                `Total: ${total.toFixed(2)} TND\n\n` +
+                `Vos commandes seront livrées sous peu.`
+            );
+          } else {
+            const commandeId =
+              res.commandes?.[0]?.id || res.commande?.id || 'N/A';
+            alert(
+              `✅ Commande confirmée avec succès!\n\n` +
+                `Numéro de commande: ${commandeId.substring(0, 8)}\n` +
+                `Total: ${total.toFixed(2)} TND\n\n` +
+                `Votre commande sera livrée sous peu.`
+            );
+          }
 
           this.loadPanier(this.clientId!);
         },
@@ -268,7 +286,7 @@ export class PanierList implements OnInit, OnDestroy {
               .join('\n');
             alert(
               `❌ Stock insuffisant:\n\n${produits}\n\n` +
-              `Veuillez mettre à jour votre panier.`
+                `Veuillez mettre à jour votre panier.`
             );
           } else if (
             err.status === 400 &&

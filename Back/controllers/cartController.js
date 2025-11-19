@@ -1,5 +1,7 @@
-  import db from "../db/prisma.js";
-
+import db from "../db/prisma.js";
+import {
+  createNotification,
+} from "../services/notification.service.js";
   export const addToCart = async (req, res) => {
     try {
       const { clientId, produitId, quantite = 1 } = req.body;
@@ -158,33 +160,43 @@
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  };
+};
+  
+export const confirmOrder = async (req, res) => {
+  try {
+    const { clientId, adresseLivraison } = req.body;
+    const panier = await fetchCart(clientId);
 
-  export const confirmOrder = async (req, res) => {
-    try {
-      const { clientId, adresseLivraison } = req.body;
-      const panier = await fetchCart(clientId);
+    if (panier.produits.length === 0)
+      return res.status(400).json({ message: "Le panier est vide" });
 
-      if (panier.produits.length === 0)
-        return res.status(400).json({ message: "Le panier est vide" });
+    const outOfStock = panier.produits.filter(
+      (p) => p.produit.quantite < p.quantite
+    );
+    if (outOfStock.length > 0) {
+      return res.status(400).json({
+        message: "Certains produits sont indisponibles",
+        produits: outOfStock.map((p) => ({
+          nom: p.produit.nom,
+          disponible: p.produit.quantite,
+        })),
+      });
+    }
 
-      // Vérifier stock
-      const outOfStock = panier.produits.filter((p) => p.produit.quantite < p.quantite);
-      if (outOfStock.length > 0) {
-        return res.status(400).json({
-          message: "Certains produits sont indisponibles",
-          produits: outOfStock.map((p) => ({ nom: p.produit.nom, disponible: p.produit.quantite })),
-        });
+    const produitsParBoutique = {};
+    panier.produits.forEach((p) => {
+      const boutiqueId = p.produit.boutiqueId;
+      if (!produitsParBoutique[boutiqueId]) {
+        produitsParBoutique[boutiqueId] = [];
       }
+      produitsParBoutique[boutiqueId].push(p);
+    });
 
-      // Calcul total commande
-      const totalCommande = panier.produits.reduce((acc, p) => acc + p.prixTotal, 0);
+    const commandes = [];
 
-      // Vérifier si tous les produits viennent de la même boutique
-      const boutiqueIds = [...new Set(panier.produits.map((p) => p.produit.boutiqueId))];
-      const boutiqueId = boutiqueIds.length === 1 ? boutiqueIds[0] : null;
+    for (const [boutiqueId, produits] of Object.entries(produitsParBoutique)) {
+      const totalCommande = produits.reduce((acc, p) => acc + p.prixTotal, 0);
 
-      // Création commande
       const commande = await db.commande.create({
         data: {
           clientId,
@@ -192,26 +204,81 @@
           totalCommande,
           boutiqueId,
           produits: {
-            create: panier.produits.map((p) => ({
+            create: produits.map((p) => ({
               quantite: p.quantite,
               prixTotal: p.prixTotal,
               produit: { connect: { id: p.produitId } },
-              boutique: { connect: { id: p.produit.boutiqueId } }
-            }))
-          }
+              boutique: { connect: { id: boutiqueId } },
+            })),
+          },
         },
-        include: { produits: true }
+        include: {
+          produits: { include: { produit: true } },
+          client: true,
+          boutique: { include: { vendeur: true } },
+        },
       });
 
-      // Vider le panier
-      await db.panierProduit.deleteMany({ where: { panierId: panier.id } });
-      await db.panier.update({ where: { id: panier.id }, data: { total: 0 } });
+      commandes.push(commande);
+      const orderNumber = commande.id.slice(-8).toUpperCase();
 
-      res.json({ message: "Commande confirmée", commande });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+      // ✅ Notify CLIENT
+      try {
+        await createNotification({
+          userId: clientId,
+          type: "ORDER_PLACED",
+          data: { orderNumber },
+          commandeId: commande.id,
+          actionUrl: `/orders/${commande.id}`,
+          metadata: {
+            orderTotal: commande.totalCommande,
+            itemsCount: commande.produits.length,
+          },
+        });
+        console.log(`📬 Client notified: Order ${orderNumber}`);
+      } catch (err) {
+        console.error("Client notification error:", err);
+      }
+
+      // ✅ Notify VENDEUR
+      if (commande.boutique?.vendeur?.userId) {
+        try {
+          await createNotification({
+            userId: commande.boutique.vendeur.userId,
+            type: "NEW_ORDER_RECEIVED",
+            data: { orderNumber },
+            commandeId: commande.id,
+            actionUrl: `/seller/commande-list-vendor`,
+            metadata: {
+              orderTotal: commande.totalCommande,
+              itemsCount: commande.produits.length,
+              clientName: `${commande.client.nom} ${
+                commande.client.prenom || ""
+              }`.trim(),
+              clientPhone: commande.client.telephone,
+            },
+          });
+          console.log(`📬 Vendeur notified: Order ${orderNumber}`);
+        } catch (err) {
+          console.error("Vendeur notification error:", err);
+        }
+      }
     }
-  };
+
+    await db.panierProduit.deleteMany({ where: { panierId: panier.id } });
+    await db.panier.update({ where: { id: panier.id }, data: { total: 0 } });
+
+    res.json({
+      message: `${commandes.length} commande(s) confirmée(s)`,
+      commandes,
+      count: commandes.length,
+    });
+  } catch (error) {
+    console.error("confirmOrder error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
   export const removeFromCart = async (req, res) => {

@@ -155,6 +155,7 @@ export class CommandeListVendor implements OnInit {
             ? data
             : data.commandes ?? [];
           this.commandes = commandesArray;
+          console.log(`✅ Loaded ${commandesArray.length} commandes`);
           this.filterByStatus(this.selectedStatus);
         },
       });
@@ -163,41 +164,188 @@ export class CommandeListVendor implements OnInit {
   filterByStatus(status: CmdStatus): void {
     this.selectedStatus = status;
     this.filteredCommandes = this.commandes.filter((c) => c.status === status);
+    console.log(
+      `🔍 Filtered: ${this.filteredCommandes.length} commandes with status ${status}`
+    );
   }
 
-  updateStatus(commandeId: string): void {
-    const nextStatus = this.getNextStatus(
-      this.commandes.find((c) => c.id === commandeId)?.status
-    );
-    if (!nextStatus) return;
+  // ✅ Handle action based on current status
+  handleStatusAction(commande: Commande): void {
+    const actionMap: Partial<Record<CmdStatus, () => void>> = {
+      [CmdStatus.PENDING]: () => this.accepterCommande(commande.id),
+      [CmdStatus.PROCESSING]: () => this.preparerCommande(commande.id),
+      [CmdStatus.READY]: () => this.expedierCommande(commande.id),
+      [CmdStatus.SHIPPED]: () => this.livrerCommande(commande.id),
+    };
+
+    const action = actionMap[commande.status];
+    if (action) {
+      action();
+    } else {
+      console.log(`ℹ️ No action available for status: ${commande.status}`);
+    }
+  }
+
+  // ✅ Accept order (PENDING → PROCESSING)
+  accepterCommande(commandeId: string): void {
+    if (!confirm('Accepter cette commande et commencer le traitement ?'))
+      return;
+
+    this.isLoading.set(true);
 
     this.commandeService
-      .preparerCommande(commandeId)
-      .pipe(catchError(() => of(null)))
+      .accepterCommande(commandeId)
+      .pipe(
+        catchError((err) => {
+          console.error('❌ Error accepting:', err);
+          this.error.set(err.error?.message || "Erreur lors de l'acceptation");
+          return of(null);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
       .subscribe({
-        next: (updatedData: any) => {
-          if (!updatedData) return;
-          const updated: Commande = updatedData.commande ?? updatedData;
+        next: (response) => {
+          if (!response) return;
+
+          const updated = response.commande;
           const index = this.commandes.findIndex((c) => c.id === commandeId);
+
           if (index !== -1) {
             this.commandes[index] = updated;
             this.filterByStatus(this.selectedStatus);
+            console.log('✅ Commande acceptée');
           }
         },
       });
   }
 
-  cancelCommande(commandeId: string): void {
-    if (!confirm('Êtes-vous sûr de vouloir annuler cette commande ?')) return;
+  // ✅ Prepare order (PROCESSING → READY)
+  preparerCommande(commandeId: string): void {
+    if (!confirm('Marquer cette commande comme prête pour la livraison ?'))
+      return;
+
+    this.isLoading.set(true);
 
     this.commandeService
-      .updateCommandeStatus(commandeId, CmdStatus.CANCELLED)
+      .preparerCommande(commandeId)
+      .pipe(
+        catchError((err) => {
+          console.error('❌ Error preparing:', err);
+          this.error.set(err.error?.message || 'Erreur lors de la préparation');
+          return of(null);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
       .subscribe({
-        next: (updated) => {
+        next: (response) => {
+          if (!response) return;
+
+          const updated = response.commande;
           const index = this.commandes.findIndex((c) => c.id === commandeId);
+
           if (index !== -1) {
             this.commandes[index] = updated;
             this.filterByStatus(this.selectedStatus);
+            console.log('✅ Commande préparée');
+          }
+        },
+      });
+  }
+
+  // ✅ Ship order (READY → SHIPPED)
+  expedierCommande(commandeId: string): void {
+    if (!confirm('Marquer cette commande comme expédiée ?')) return;
+
+    this.isLoading.set(true);
+
+    this.commandeService
+      .expedierCommande(commandeId)
+      .pipe(
+        catchError((err) => {
+          console.error('❌ Error shipping:', err);
+          this.error.set(err.error?.message || "Erreur lors de l'expédition");
+          return of(null);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response) return;
+
+          const updated = response.commande;
+          const index = this.commandes.findIndex((c) => c.id === commandeId);
+
+          if (index !== -1) {
+            this.commandes[index] = updated;
+            this.filterByStatus(this.selectedStatus);
+            console.log('✅ Commande expédiée');
+          }
+        },
+      });
+  }
+
+  // ✅ Deliver order (SHIPPED → DELIVERED)
+  livrerCommande(commandeId: string): void {
+    if (!confirm('Confirmer la livraison de cette commande ?')) return;
+
+    this.isLoading.set(true);
+
+    this.commandeService
+      .livrerCommande(commandeId)
+      .pipe(
+        catchError((err) => {
+          console.error('❌ Error delivering:', err);
+          this.error.set(err.error?.message || 'Erreur lors de la livraison');
+          return of(null);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response) return;
+
+          const updated = response.commande;
+          const index = this.commandes.findIndex((c) => c.id === commandeId);
+
+          if (index !== -1) {
+            this.commandes[index] = updated;
+            this.filterByStatus(this.selectedStatus);
+            console.log('✅ Commande livrée');
+          }
+        },
+      });
+  }
+
+  // ✅ Cancel order
+  annulerCommande(commandeId: string): void {
+    const raison = prompt("Raison de l'annulation (optionnel):");
+    if (raison === null) return; // User clicked cancel
+
+    if (!confirm('Êtes-vous sûr de vouloir annuler cette commande ?')) return;
+
+    this.isLoading.set(true);
+
+    this.commandeService
+      .annulerCommande(commandeId, raison || undefined)
+      .pipe(
+        catchError((err) => {
+          console.error('❌ Error cancelling:', err);
+          this.error.set(err.error?.message || "Erreur lors de l'annulation");
+          return of(null);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response) return;
+
+          const updated = response.commande;
+          const index = this.commandes.findIndex((c) => c.id === commandeId);
+
+          if (index !== -1) {
+            this.commandes[index] = updated;
+            this.filterByStatus(this.selectedStatus);
+            console.log('✅ Commande annulée');
           }
         },
       });
@@ -213,7 +361,41 @@ export class CommandeListVendor implements OnInit {
     return this.expandedProductDetails.has(index);
   }
 
-  // ✅ Helper methods for safe access
+  getActionButton(
+    status: CmdStatus
+  ): { label: string; icon: string; color: string } | null {
+    const buttons: Partial<
+      Record<CmdStatus, { label: string; icon: string; color: string }>
+    > = {
+      [CmdStatus.PENDING]: {
+        label: 'Accepter',
+        icon: 'fa-check',
+        color: 'bg-blue-500 hover:bg-blue-600',
+      },
+      [CmdStatus.PROCESSING]: {
+        label: 'Marquer prête',
+        icon: 'fa-check-circle',
+        color: 'bg-green-500 hover:bg-green-600',
+      },
+      [CmdStatus.READY]: {
+        label: 'Expédier',
+        icon: 'fa-truck',
+        color: 'bg-purple-500 hover:bg-purple-600',
+      },
+      [CmdStatus.SHIPPED]: {
+        label: 'Marquer livrée',
+        icon: 'fa-box-check',
+        color: 'bg-teal-500 hover:bg-teal-600',
+      },
+    };
+
+    return buttons[status] ?? null;
+  }
+
+  canCancelCommande(status: CmdStatus): boolean {
+    return status === CmdStatus.PENDING || status === CmdStatus.PROCESSING;
+  }
+
   getPrixUnitaire(cmdProduit: any): number {
     return (
       cmdProduit.produit?.prix ||
@@ -245,13 +427,10 @@ export class CommandeListVendor implements OnInit {
       [CmdStatus.PENDING]: CmdStatus.PROCESSING,
       [CmdStatus.PROCESSING]: CmdStatus.READY,
       [CmdStatus.READY]: CmdStatus.SHIPPED,
+      [CmdStatus.SHIPPED]: CmdStatus.DELIVERED,
     };
 
     return flow[status] ?? null;
-  }
-
-  canCancelCommande(status: CmdStatus): boolean {
-    return status === CmdStatus.PENDING || status === CmdStatus.PROCESSING;
   }
 
   getStatusInfo(status: CmdStatus) {
