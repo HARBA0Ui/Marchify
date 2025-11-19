@@ -13,6 +13,13 @@ interface NavItem {
   children?: NavItem[];
 }
 
+interface DropdownItem {
+  label: string;
+  path: string;
+  icon: string;
+  roles: string[]; // Which roles can see this item
+}
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -28,14 +35,13 @@ export class NavbarComponent implements OnInit {
 
   isMobileMenuOpen = false;
   activeDropdown: string | null = null;
+  isUserDropdownOpen = false; // 🔹 New: User dropdown state
 
   get unreadCount(): number {
     return this.notificationService.unreadCount();
   }
-  // observable du nombre d'articles dans le panier
-  cartCount$!: Observable<number>;
 
-  // 🔹 observable de l'état auth
+  cartCount$!: Observable<number>;
   authState$!: Observable<AuthState>;
 
   navItems: NavItem[] = [
@@ -78,18 +84,85 @@ export class NavbarComponent implements OnInit {
     },
   ];
 
+  // 🔹 Role-specific dropdown menu items
+  userDropdownItems: DropdownItem[] = [
+    // Buyer/Client items
+    {
+      label: 'Mes commandes',
+      path: '/client/ordersList',
+      icon: 'fas fa-receipt',
+      roles: ['acheteur', 'client'],
+    },
+
+    {
+      label: 'Mon panier',
+      path: '/panier-list',
+      icon: 'fas fa-shopping-cart',
+      roles: ['acheteur', 'client'],
+    },
+    // Seller/Vendor items
+    {
+      label: 'creer un boutique',
+      path: '/seller/shop-creation',
+      icon: 'fas fa-store',
+      roles: ['vendeur', 'seller'],
+    },
+    {
+      label: 'Mes boutiques',
+      path: 'seller/shop-list',
+      icon: 'fas fa-box',
+      roles: ['vendeur', 'seller'],
+    },
+    {
+      label: 'Commandes reçues',
+      path: 'commande-list-vendor',
+      icon: 'fas fa-clipboard-list',
+      roles: ['vendeur', 'seller'],
+    },
+    {
+      label: 'Ajouter produit',
+      path: '/seller/product-add',
+      icon: 'fas fa-plus-circle',
+      roles: ['vendeur', 'seller'],
+    },
+    // Delivery items
+    {
+      label: 'Mes livraisons',
+      path: '/livreur/deliveries',
+      icon: 'fas fa-truck',
+      roles: ['livreur', 'delivery'],
+    },
+    {
+      label: 'Missions',
+      path: '/delivery/missions',
+      icon: 'fas fa-tasks',
+      roles: ['livreur', 'delivery'],
+    },
+    {
+      label: 'Carte',
+      path: '/delivery/map',
+      icon: 'fas fa-map-marked-alt',
+      roles: ['livreur', 'delivery'],
+    },
+  ];
+
   ngOnInit() {
-    // Load notifications when component initializes
     this.loadNotifications();
   }
 
   loadNotifications(): void {
-    // Replace with actual user ID from your auth service
     const userId = '691a32b256ab8476dc908dc3';
     this.notificationService.getNotifications(userId).subscribe();
     this.cartCount$ = this.panierService.cartCount$;
-    // 🔹 on s'abonne à l'état auth
     this.authState$ = this.authService.authState$;
+  }
+
+  // 🔹 Filter dropdown items based on user role
+  getFilteredDropdownItems(role: string | null | undefined): DropdownItem[] {
+    if (!role) return [];
+    return this.userDropdownItems.filter((item) =>
+      item.roles.includes(role.toLowerCase())
+    );
   }
 
   toggleMobileMenu() {
@@ -98,6 +171,16 @@ export class NavbarComponent implements OnInit {
 
   toggleDropdown(label: string) {
     this.activeDropdown = this.activeDropdown === label ? null : label;
+  }
+
+  // 🔹 Toggle user dropdown
+  toggleUserDropdown() {
+    this.isUserDropdownOpen = !this.isUserDropdownOpen;
+  }
+
+  // 🔹 Close user dropdown
+  closeUserDropdown() {
+    this.isUserDropdownOpen = false;
   }
 
   closeDropdown() {
@@ -123,12 +206,11 @@ export class NavbarComponent implements OnInit {
   logout() {
     this.authService.logout().subscribe({
       next: () => {
-        // pas besoin de refreshAuthState, le BehaviorSubject s'en charge
+        this.closeUserDropdown();
         this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('Erreur logout:', err);
-        // l'état auth a déjà été nettoyé dans clearSession
         this.router.navigate(['/login']);
       },
     });
@@ -137,5 +219,6 @@ export class NavbarComponent implements OnInit {
   closeMobileMenu() {
     this.isMobileMenuOpen = false;
     this.activeDropdown = null;
+    this.isUserDropdownOpen = false;
   }
 }

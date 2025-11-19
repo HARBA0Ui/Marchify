@@ -1,67 +1,123 @@
-<div class="min-h-screen bg-[#faf2b8] py-20">
-    <div class="container mx-auto px-6 max-w-7xl">
-        <div class="text-center mb-14">
-            <h1 class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block">
-                <span class="text-[#386641]">Mes</span>
-                <span
-                    class="text-zinc-900 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#FED16A]">Boutiques</span>
-            </h1>
-            <p class="text-base text-[#386641] max-w-2xl mx-auto">
-                Découvrez vos boutiques et explorez leurs produits.
-            </p>
-            <button class="btn bg-[#F97A00] text-white px-4 py-2 rounded-lg hover:bg-[#FED16A] transition-colors mb-4"
-                (click)="createNewShop()">Créer une nouvelle boutique</button>
+<div class="page-wrapper">
+  <div class="container mx-auto px-6 max-w-7xl">
+    <!-- Header -->
+    <div class="text-center mb-14">
+      <h1 class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block">
+        <span class="text-[#386641]">Mes</span>
+        <span class="text-zinc-900 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#FED16A]">
+          Boutiques
+        </span>
+      </h1>
+      <p class="text-base text-[#386641] max-w-2xl mx-auto">
+        Découvrez vos boutiques et explorez leurs produits.
+      </p>
+      <button 
+        class="btn bg-gradient-to-r from-[#F97A00] to-[#FED16A] text-white px-6 py-3 rounded-xl hover:from-[#F97A00] hover:to-[#FF8C00] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold mt-4 inline-flex items-center gap-2"
+        (click)="createNewShop()">
+        <i class="fa-solid fa-plus"></i>
+        Créer une nouvelle boutique
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    @if (error()) {
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+      <div class="flex items-center">
+        <i class="fa-solid fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+        <div>
+          <p class="text-red-800 font-semibold">Erreur</p>
+          <p class="text-red-700 text-sm">{{ error() }}</p>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-24">
+      <div class="w-16 h-16 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mb-4"></div>
+      <p class="text-[#386641] font-medium text-lg">Chargement des boutiques...</p>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @else if (!isLoading() && shops.length === 0 && !error()) {
+    <div class="text-center py-20">
+      <div class="w-24 h-24 bg-gradient-to-br from-[#FFF9D9] to-[#FED16A] rounded-full flex items-center justify-center mx-auto mb-6">
+        <i class="fa-solid fa-store text-4xl text-[#386641]"></i>
+      </div>
+      <h3 class="text-2xl font-semibold text-[#386641] mb-2">Aucune boutique</h3>
+      <p class="text-[#386641] text-base mb-6">Vous n'avez pas encore créé de boutique.</p>
+      <button 
+        class="bg-gradient-to-r from-[#386641] to-[#6a994e] text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2"
+        (click)="createNewShop()">
+        <i class="fa-solid fa-plus"></i>
+        Créer ma première boutique
+      </button>
+    </div>
+    }
+
+    <!-- Shops Grid -->
+    @else if (!isLoading() && shops.length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      @for (shop of shops; track shop.id) {
+      <div class="group relative bg-white rounded-2xl shadow-lg border border-[#386641]/10 hover:border-[#F97A00] hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2">
+        <!-- Top Badge -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#386641] to-[#F97A00] group-hover:from-[#F97A00] group-hover:to-[#FED16A] transition-all duration-500"></div>
+
+        <!-- Card Content -->
+        <div class="p-6">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-4">
+            <h2 class="text-xl font-bold text-[#386641] group-hover:text-zinc-900 transition-colors duration-300 flex-1 pr-2">
+              {{ shop.nom }}
+            </h2>
+            <span class="text-xs font-semibold bg-[#386641]/10 text-[#386641] px-3 py-1 rounded-full uppercase whitespace-nowrap">
+              {{ shop.categorie }}
+            </span>
+          </div>
+
+          <!-- Shop Details -->
+          <div class="space-y-3 text-sm text-gray-700 mb-6">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot text-[#F97A00] w-5 text-center mt-0.5"></i>
+              <p class="flex-1 leading-relaxed">{{ shop.adresse }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-phone text-[#386641] w-5 text-center"></i>
+              <p>{{ shop.telephone }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-box text-[#F97A00] w-5 text-center"></i>
+              <p class="font-medium text-[#386641]">
+                {{ shop.produits?.length ?? 0 }} produit{{ (shop.produits?.length ?? 0) !== 1 ? 's' : '' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-2 pt-4 border-t border-[#386641]/10">
+            <!-- ✅ Using routerLink for navigation -->
+            <a
+              [routerLink]="['/seller/shop-product-seller', shop.id]"
+              class="flex-1 bg-gradient-to-r from-[#F97A00] to-[#FF8C00] text-white px-4 py-2.5 rounded-xl hover:from-[#FF8C00] hover:to-[#F97A00] transition-all duration-300 shadow hover:shadow-md font-medium flex items-center justify-center gap-2 no-underline">
+              <i class="fa-solid fa-eye text-sm"></i>
+              Produits
+            </a>
+            <button
+              class="flex-1 bg-gradient-to-r from-[#386641] to-[#6a994e] text-white px-4 py-2.5 rounded-xl hover:from-[#6a994e] hover:to-[#386641] transition-all duration-300 shadow hover:shadow-md font-medium flex items-center justify-center gap-2"
+              (click)="editShop(shop.id)">
+              <i class="fa-solid fa-pen-to-square text-sm"></i>
+              Modifier
+            </button>
+          </div>
         </div>
 
-        @if (loading) {
-        <div class="flex flex-col items-center justify-center py-24">
-            <div class="w-14 h-14 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mb-4"></div>
-            <p class="text-[#386641] font-medium text-base">Chargement des boutiques...</p>
-        </div>
-        } @else if (shops.length === 0) {
-        <div class="text-center py-20">
-            <i class="fa-solid fa-store text-5xl text-zinc-900 mb-3"></i>
-            <h3 class="text-xl font-semibold text-[#386641] mb-1">Aucune boutique disponible</h3>
-            <p class="text-[#386641] text-sm">Les boutiques apparaîtront ici prochainement.</p>
-        </div>
-        } @else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            @for (shop of shops; track shop.id) {
-            <a [routerLink]="['/seller/shop-products', shop.id]"
-                class="group relative block bg-[#FFF9D9] rounded-xl shadow-md border border-[#386641]/20 hover:border-[#F97A00] hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-0.5">
-                <div
-                    class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#386641] to-[#F97A00] group-hover:from-[#F97A00] group-hover:to-[#FED16A] transition-all duration-500">
-                </div>
-                <div class="p-5 flex flex-col gap-4">
-                    <div class="flex items-center justify-between">
-                        <h2
-                            class="text-lg font-bold uppercase tracking-wide text-[#386641] group-hover:text-zinc-900 transition-colors duration-300">
-                            {{ shop.nom }}
-                        </h2>
-                        <span
-                            class="text-xs font-medium bg-[#386641]/10 text-zinc-900 px-2 py-0.5 rounded-full uppercase">
-                            {{ shop.categorie }}
-                        </span>
-                    </div>
-                    <div class="flex flex-col gap-3 text-sm text-black">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-[#386641] w-5 text-center"></i>
-                            <p class="truncate">{{ shop.adresse }}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-phone text-zinc-900 w-5 text-center"></i>
-                            <p>{{ shop.telephone }}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-box text-[#386641] w-5 text-center"></i>
-                            <p>{{ shop.produits?.length ?? 0 }} produit{{ (shop.produits?.length ?? 0) !== 1 ? 's' : ''
-                                }}</p>
-                        </div>
-                    </div>
-                </div>
-            </a>
-            }
-        </div>
-        }
+        <!-- Hover Border Effect -->
+        <div class="absolute inset-0 border-2 border-transparent group-hover:border-[#F97A00]/30 rounded-2xl pointer-events-none transition-all duration-500"></div>
+      </div>
+      }
     </div>
+    }
+  </div>
 </div>

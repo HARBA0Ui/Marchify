@@ -1,27 +1,46 @@
-<div class="min-h-screen bg-[#f5f0d4] px-4 py-8">
-  <div class="max-w-7xl mx-auto">
+<div class="page-wrapper">
+  <div class="container mx-auto px-6 max-w-7xl py-8">
+    
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-[#386641] mb-2">Gestion des Commandes</h1>
-      <p class="text-[#386641]/70 text-lg">Gérez vos commandes et mettez à jour leur statut</p>
+    <div class="text-center mb-10">
+      <h1 class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block">
+        <span class="text-[#386641]">Gestion des</span>
+        <span class="text-zinc-900 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#FED16A]">
+          Commandes
+        </span>
+      </h1>
+      <p class="text-base text-[#386641] max-w-2xl mx-auto mt-3">
+        Gérez vos commandes et mettez à jour leur statut en temps réel
+      </p>
     </div>
 
+    <!-- Shop Selector -->
+    @if (userShops.length > 1) {
+    <div class="mb-6 bg-white rounded-xl p-4 shadow-md border border-[#386641]/10">
+      <label class="text-[#386641] font-semibold text-sm mb-2 block">Sélectionner une boutique</label>
+      <select 
+        (change)="onShopChange($any($event.target).value)"
+        class="w-full px-4 py-2 border border-[#FED16A]/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#386641] text-[#386641]">
+        @for (shop of userShops; track shop.id) {
+        <option [value]="shop.id" [selected]="shop.id === selectedShopId">
+          {{ shop.nom }}
+        </option>
+        }
+      </select>
+    </div>
+    }
+
     <!-- Status Tabs -->
-    <div class="mb-6 overflow-x-auto pb-2">
-      <div class="flex gap-2 min-w-max">
+    <div class="mb-8 overflow-x-auto pb-2">
+      <div class="flex gap-3 min-w-max">
         @for (status of statusList; track status.value) {
         <button
           (click)="filterByStatus(status.value)"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap
-                 {{ selectedStatus === status.value 
-                   ? 'bg-[#386641] text-white' 
-                   : 'bg-white text-[#386641] border border-[#FED16A]/40 hover:bg-[#FED16A]/10' }}">
+          class="px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-300 whitespace-nowrap transform hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-2
+                 {{ selectedStatus === status.value ? 'bg-gradient-to-r from-[#386641] to-[#6a994e] text-white' : 'bg-white text-[#386641] border-2 border-[#FED16A]/40 hover:bg-[#FED16A]/20' }}">
+          <i class="fas {{ status.icon }}"></i>
           {{ status.label }}
-          <span
-            class="ml-2 px-2 py-0.5 text-xs font-bold rounded-full
-                   {{ selectedStatus === status.value 
-                     ? 'bg-white/30 text-white' 
-                     : 'bg-[#F97A00] text-white' }}">
+          <span class="ml-1 px-2.5 py-0.5 text-xs font-bold rounded-full {{ selectedStatus === status.value ? 'bg-white/30 text-white' : 'bg-[#F97A00] text-white' }}">
             {{ getCommandeCount(status.value) }}
           </span>
         </button>
@@ -29,106 +48,240 @@
       </div>
     </div>
 
-    <!-- Loading -->
-    @if (loading) {
-      <div class="text-center py-16">
-        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#386641] border-t-transparent"></div>
-        <p class="mt-4 text-[#386641] text-lg font-medium">Chargement des commandes...</p>
+    <!-- Error -->
+    @if (error() && !isLoading()) {
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+      <div class="flex items-center">
+        <i class="fa-solid fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+        <div>
+          <p class="text-red-800 font-semibold">Erreur</p>
+          <p class="text-red-700 text-sm">{{ error() }}</p>
+        </div>
       </div>
+    </div>
     }
 
-    <!-- Error -->
-    @if (error && !loading) {
-      <div class="bg-[#F97A00]/20 border-2 border-[#F97A00] text-[#386641] px-6 py-4 rounded-xl mb-6 font-medium">
-        {{ error }}
-      </div>
+    <!-- Loading -->
+    @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-24">
+      <div class="w-16 h-16 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mb-4"></div>
+      <p class="text-[#386641] font-medium text-lg">Chargement des commandes...</p>
+    </div>
     }
 
     <!-- Empty -->
-    @if (!loading && filteredCommandes.length === 0) {
-      <div class="text-center py-16 bg-white rounded-2xl shadow-lg text-[#386641] font-medium">
-        Aucune commande {{ getStatusInfo(selectedStatus).label.toLowerCase() }}
+    @else if (!isLoading() && filteredCommandes.length === 0) {
+    <div class="text-center py-20 bg-white rounded-2xl shadow-lg">
+      <div class="w-24 h-24 bg-gradient-to-br from-[#FFF9D9] to-[#FED16A] rounded-full flex items-center justify-center mx-auto mb-6">
+        <i class="fa-solid fa-box text-4xl text-[#386641]"></i>
       </div>
+      <h3 class="text-2xl font-semibold text-[#386641] mb-2">Aucune commande</h3>
+      <p class="text-[#386641]/70">Aucune commande {{ getStatusInfo(selectedStatus).label.toLowerCase() }}</p>
+    </div>
     }
 
-    <!-- Commande List -->
-    @if (!loading && filteredCommandes.length > 0) {
-      <div class="space-y-4">
-        @for (commande of filteredCommandes; track commande.id) {
-        <div class="bg-white rounded-lg border border-[#FED16A]/30 shadow-sm hover:shadow-md transition-shadow duration-200 p-4">
-          
+    <!-- Commandes List -->
+    @else if (!isLoading() && filteredCommandes.length > 0) {
+    <div class="space-y-4">
+      @for (commande of filteredCommandes; track commande.id; let idx = $index) {
+      <div class="bg-white rounded-xl shadow-md border border-[#386641]/10 hover:border-[#F97A00] hover:shadow-xl transition-all duration-300 overflow-hidden">
+        
+        <div class="h-1 bg-gradient-to-r from-[#386641] to-[#F97A00]"></div>
+
+        <div class="p-6">
           <!-- Header -->
-          <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
+          <div class="flex flex-wrap justify-between items-center gap-4 pb-4 border-b border-[#386641]/10">
             <div>
               <h3 class="text-lg font-bold text-[#386641]">
                 Commande #{{ commande.id.substring(0, 8).toUpperCase() }}
               </h3>
               <p class="text-[#386641]/60 text-sm mt-1">
+                <i class="far fa-calendar-alt mr-1"></i>
                 {{ formatDate(commande.dateCommande) }}
               </p>
             </div>
-            <span class="px-3 py-1.5 text-xs font-semibold bg-[#386641] text-white rounded-lg">
+            <span class="px-4 py-2 text-xs font-bold rounded-full {{ getStatusInfo(commande.status).color }} text-white flex items-center gap-2">
+              <i class="fas {{ getStatusInfo(commande.status).icon }}"></i>
               {{ getStatusInfo(commande.status).label }}
             </span>
           </div>
 
-          <!-- Client Info -->
-          <div class="mb-4 p-3 bg-[#FED16A]/10 rounded-lg">
-            <h4 class="text-[#386641] font-bold text-md mb-2">Client</h4>
-            <div class="text-black text-sm space-y-1">
-              <p class="flex items-center gap-2">
-                <i class="fas fa-user"></i> {{ commande.client.nom }}
-              </p>
-              <p class="flex items-center gap-2">
-                <i class="fas fa-envelope"></i> {{ commande.client.email }}
-              </p>
-              <p class="flex items-center gap-2">
-                <i class="fas fa-phone"></i> {{ commande.client.telephone }}
-              </p>
-              <p class="flex items-center gap-2">
-                <i class="fas fa-map-marker-alt"></i>
-                {{ commande.adresseLivraison.rue }}, {{ commande.adresseLivraison.ville }}
-              </p>
-            </div>
-          </div>
+          <!-- Content -->
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 py-4">
+            
+            <!-- Client Info -->
+            <div class="p-4 bg-gradient-to-br from-[#FFF9D9] to-[#FED16A]/30 rounded-lg">
+              <h4 class="text-[#386641] font-bold text-sm mb-3 flex items-center gap-2">
+                <i class="fas fa-user-circle"></i>
+                Client
+              </h4>
+              <div class="text-[#386641] text-xs space-y-2">
+                <p class="flex items-start gap-2">
+                  <i class="fas fa-user w-4 mt-0.5"></i>
+                  <span class="font-medium">{{ getClientFullName(commande) }}</span>
+                </p>
+                <p class="flex items-start gap-2">
+                  <i class="fas fa-envelope w-4 mt-0.5"></i>
+                  <span class="break-all">{{ commande.client.email }}</span>
+                </p>
+                <p class="flex items-start gap-2">
+                  <i class="fas fa-phone w-4 mt-0.5"></i>
+                  {{ commande.client.telephone }}
+                </p>
+              </div>
 
-          <!-- Produits -->
-          <div class="mb-4">
-            <h4 class="text-[#386641] font-bold text-md mb-2">
-              Produits ({{ getTotalProduits(commande) }})
-            </h4>
-            <div class="space-y-2">
-              @for (produit of commande.produits; track produit.produitId || $index) {
-              <div class="flex justify-between text-sm text-black">
-                <span>{{ produit.nom }} ({{ produit.quantite }} × {{ produit.prixUnitaire }} DT)</span>
-                <span class="font-medium text-zinc-900">{{ produit.prixTotal }} DT</span>
+              <div class="mt-4 pt-4 border-t border-[#386641]/20">
+                <h5 class="text-[#386641] font-bold text-xs mb-2 flex items-center gap-1">
+                  <i class="fas fa-map-marker-alt"></i>
+                  Livraison
+                </h5>
+                <p class="text-[#386641] text-xs leading-relaxed">
+                  {{ commande.adresseLivraison.rue }}<br>
+                  {{ commande.adresseLivraison.ville }}, {{ commande.adresseLivraison.codePostal }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Products -->
+            <div class="lg:col-span-3">
+              <div class="flex justify-between items-center mb-3">
+                <h4 class="text-[#386641] font-bold text-sm flex items-center gap-2">
+                  <i class="fas fa-box"></i>
+                  Produits
+                </h4>
+                <button
+                  (click)="toggleProductDetails(idx)"
+                  class="text-[#F97A00] hover:text-[#386641] text-sm font-semibold flex items-center gap-1 transition-colors">
+                  <i class="fas" [class.fa-chevron-down]="!isProductDetailsExpanded(idx)" [class.fa-chevron-up]="isProductDetailsExpanded(idx)"></i>
+                  {{ isProductDetailsExpanded(idx) ? 'Masquer' : 'Voir détails' }}
+                </button>
+              </div>
+
+              <!-- Compact -->
+              @if (!isProductDetailsExpanded(idx)) {
+              <div class="bg-gradient-to-r from-[#386641]/5 to-[#FED16A]/5 p-4 rounded-lg">
+                <div class="flex justify-between items-center">
+                  <span class="text-[#386641] font-medium text-sm">{{ getTotalProductTypes(commande) }} article(s)</span>
+                  <span class="text-[#386641] font-medium text-sm">{{ getTotalProduits(commande) }} unité(s)</span>
+                  <span class="text-[#386641] font-bold text-lg">{{ commande.totalCommande }} DT</span>
+                </div>
+              </div>
+              }
+
+              <!-- Expanded -->
+              @if (isProductDetailsExpanded(idx)) {
+              <div class="space-y-3">
+                @for (cmdProduit of commande.produits; track cmdProduit.id) {
+                <div class="bg-white p-4 rounded-lg border-2 border-[#386641]/20 hover:border-[#F97A00] transition-all shadow-sm">
+                  <div class="flex gap-4">
+                    
+                    <!-- Product Image -->
+                    @if (getProductImage(cmdProduit)) {
+                    <div class="flex-shrink-0">
+                      <img 
+                        [src]="getProductImage(cmdProduit)!" 
+                        [alt]="getProductNom(cmdProduit)" 
+                        class="w-24 h-24 object-cover rounded-lg border-2 border-[#386641]/10">
+                    </div>
+                    }
+
+                    <div class="flex-1">
+                      <div class="flex justify-between mb-2">
+                        <div class="flex-1">
+                          <h5 class="text-[#386641] font-bold text-base">{{ getProductNom(cmdProduit) }}</h5>
+                          
+                          @if (getProductCategorie(cmdProduit)) {
+                          <span class="inline-block px-2 py-1 bg-[#FED16A]/30 text-[#386641] text-xs font-semibold rounded-full mt-1">
+                            {{ getProductCategorie(cmdProduit) }}
+                          </span>
+                          }
+                        </div>
+                        
+                        <div class="text-right ml-4">
+                          <p class="text-[#386641] font-bold text-xl">{{ cmdProduit.prixTotal }} DT</p>
+                          <p class="text-[#386641]/60 text-xs">Total</p>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-3 gap-3 p-3 bg-gradient-to-r from-[#FFF9D9] to-[#FED16A]/20 rounded-lg">
+                        <div class="text-center">
+                          <p class="text-[#386641]/60 text-xs mb-1">Quantité</p>
+                          <p class="text-[#386641] font-bold text-sm">
+                            {{ cmdProduit.quantite }}
+                            @if (getProductUnite(cmdProduit)) {
+                              <span class="text-xs font-normal">{{ getUnitLabel(getProductUnite(cmdProduit)) }}</span>
+                            }
+                          </p>
+                        </div>
+                        
+                        <div class="text-center border-x border-[#386641]/20">
+                          <p class="text-[#386641]/60 text-xs mb-1">Prix Unit.</p>
+                          <p class="text-[#386641] font-bold text-sm">{{ getPrixUnitaire(cmdProduit) | number:'1.2-2' }} DT</p>
+                        </div>
+                        
+                        <div class="text-center">
+                          <p class="text-[#386641]/60 text-xs mb-1">Sous-total</p>
+                          <p class="text-[#386641] font-bold text-sm">{{ cmdProduit.prixTotal }} DT</p>
+                        </div>
+                      </div>
+
+                      <div class="mt-2 p-2 bg-[#386641]/5 rounded text-center text-xs text-[#386641] font-medium">
+                        {{ cmdProduit.quantite }} × {{ getPrixUnitaire(cmdProduit) | number:'1.2-2' }} DT = {{ cmdProduit.prixTotal }} DT
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                }
+
+                <!-- Total Summary -->
+                <div class="bg-gradient-to-r from-[#386641] to-[#6a994e] p-4 rounded-lg text-white">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <p class="text-white/80 text-xs mb-1">Total de la commande</p>
+                      <p class="text-white font-bold text-2xl">{{ commande.totalCommande }} DT</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-white/80 text-xs">{{ getTotalProductTypes(commande) }} produit(s)</p>
+                      <p class="text-white/80 text-xs">{{ getTotalProduits(commande) }} unité(s)</p>
+                    </div>
+                  </div>
+                </div>
               </div>
               }
             </div>
           </div>
 
-          <!-- Total & Actions -->
-          <div class="flex flex-wrap justify-between items-center pt-3 border-t border-[#FED16A]/50 gap-3">
+          <!-- Footer -->
+          <div class="flex flex-wrap justify-between items-center pt-4 border-t border-[#386641]/10 gap-4">
             <div>
-              <p class="text-[#386641]/60 text-sm">Total</p>
-              <p class="font-bold text-[#386641] text-lg">{{ commande.totalCommande }} DT</p>
+              <p class="text-[#386641]/60 text-xs mb-1">Total</p>
+              <p class="font-bold text-[#386641] text-2xl">{{ commande.totalCommande }} DT</p>
             </div>
 
-            @if (getNextStatus(commande.status)) {
-            <button (click)="updateStatus(commande.id)"
-              class="px-4 py-2 bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white text-sm font-medium rounded-lg transition-colors">
-              ✓ {{ getStatusInfo(getNextStatus(commande.status)!).label }}
-            </button>
-            }
-            @if (!getNextStatus(commande.status) && commande.status === 'READY') {
-            <span class="px-4 py-2 bg-[#386641] text-white text-sm font-medium rounded-lg">
-              ✓ Terminée
-            </span>
-            }
+            <div class="flex gap-2">
+              @if (canCancelCommande(commande.status)) {
+              <button 
+                (click)="cancelCommande(commande.id)"
+                class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-all flex items-center gap-2">
+                <i class="fas fa-times"></i>
+                Annuler
+              </button>
+              }
+
+              @if (getNextStatus(commande.status)) {
+              <button 
+                (click)="updateStatus(commande.id)"
+                class="px-6 py-3 bg-gradient-to-r from-[#F97A00] to-[#FF8C00] hover:from-[#FF8C00] hover:to-[#F97A00] text-white text-sm font-semibold rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2">
+                <i class="fas fa-arrow-right"></i>
+                {{ getStatusInfo(getNextStatus(commande.status)!).label }}
+              </button>
+              }
+            </div>
           </div>
         </div>
-        }
       </div>
+      }
+    </div>
     }
   </div>
 </div>

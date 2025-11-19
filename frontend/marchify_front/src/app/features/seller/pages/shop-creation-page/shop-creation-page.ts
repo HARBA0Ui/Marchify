@@ -28,6 +28,7 @@ export class ShopCreationPage implements OnInit {
   errorMessage = '';
   successMessage = '';
 
+  // ✅ Changed to vendeurId
   currentVendeurId: string | null = null;
 
   popularCategories = [
@@ -37,11 +38,6 @@ export class ShopCreationPage implements OnInit {
     'Boissons',
     'Épicerie',
     'Boulangerie',
-    'Électronique',
-    'Vêtements',
-    'Maison & Jardin',
-    'Santé & Beauté',
-    'Autre',
   ];
 
   constructor() {
@@ -56,36 +52,52 @@ export class ShopCreationPage implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('ShopCreationPage initialized');
+    console.log('🚀 ShopCreationPage initialized');
 
     const currentUser = this.authService.getCurrentUser();
 
     if (!currentUser) {
       this.errorMessage = 'Vous devez être connecté pour créer une boutique.';
-      console.warn('User not logged in');
+      console.error('❌ User not logged in');
+      this.router.navigate(['/login']);
       return;
     }
 
     if (currentUser.role !== 'VENDEUR') {
       this.errorMessage = 'Seuls les vendeurs peuvent créer une boutique.';
-      console.warn('User is not a vendor');
+      console.error('❌ User is not a vendor');
+      this.router.navigate(['/login']);
       return;
     }
 
-    this.currentVendeurId = currentUser.id;
-    console.log('Current vendeur ID:', this.currentVendeurId);
+    // ✅ Get vendeurId from the user object (included in login response)
+    this.currentVendeurId = this.authService.getVendeurId();
+
+    if (!this.currentVendeurId) {
+      this.errorMessage = 'ID vendeur non trouvé. Veuillez vous reconnecter.';
+      console.error('❌ Vendeur ID not found in user object');
+      return;
+    }
+
+    console.log('✅ Current vendeur ID:', this.currentVendeurId);
   }
 
   async onGetLocation(): Promise<void> {
     this.isLoadingLocation = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
     try {
       const { address, lat, lon } = await this.locationService.getAddress();
+
       this.shopForm.patchValue({ address });
-      console.log(`Detected location: ${address} (${lat}, ${lon})`);
+
+      console.log(`📍 Detected location: ${address} (${lat}, ${lon})`);
       this.successMessage = 'Localisation détectée avec succès !';
+
       setTimeout(() => (this.successMessage = ''), 3000);
     } catch (error) {
-      console.error('Erreur de géolocalisation:', error);
+      console.error('❌ Erreur de géolocalisation:', error);
       this.errorMessage = 'Impossible de détecter la localisation.';
       setTimeout(() => (this.errorMessage = ''), 3000);
     } finally {
@@ -96,11 +108,14 @@ export class ShopCreationPage implements OnInit {
   onSubmit(): void {
     if (!this.shopForm.valid) {
       this.markAllFieldsAsTouched();
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
       return;
     }
 
     if (!this.currentVendeurId) {
-      this.errorMessage = 'Impossible de créer la boutique : vendeur non identifié.';
+      this.errorMessage =
+        'Impossible de créer la boutique : vendeur non identifié.';
+      console.error('❌ Vendeur ID is missing');
       return;
     }
 
@@ -112,35 +127,46 @@ export class ShopCreationPage implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
+    // ✅ Using vendeurId instead of userId
     const shopRequest: ShopCreateRequest = {
       nom: this.shopForm.get('name')?.value,
       adresse: this.shopForm.get('address')?.value,
-      localisation: { lat: 36.8065, lng: 10.1815 },
+      localisation: { lat: 36.8065, lng: 10.1815 }, // TODO: Use real location
       categorie: this.shopForm.get('category')?.value,
       telephone: `+216 ${this.shopForm.get('phone')?.value}`,
-      vendeurId: this.currentVendeurId!,
+      vendeurId: this.currentVendeurId!, // ✅ Now using the correct vendeurId
     };
 
-    console.log('Creating shop:', shopRequest);
+    console.log('🏪 Creating shop:', shopRequest);
 
     this.shopService.createShop(shopRequest).subscribe({
       next: (createdShop) => {
         this.isLoading = false;
         this.successMessage = 'Boutique créée avec succès !';
-        console.log('Created shop:', createdShop);
+        console.log('✅ Created shop:', createdShop);
 
-        setTimeout(() => this.router.navigate(['/seller/dashboard']), 1500);
+        // Redirect to shop list after 1.5 seconds
+        setTimeout(() => {
+          this.router.navigate(['/seller/shop-list']);
+        }, 1500);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = 'Erreur lors de la création de la boutique.';
-        console.error(error);
+        console.error('❌ Error creating shop:', error);
+
+        // Check for specific error messages
+        if (error.error?.message) {
+          this.errorMessage = error.error.message;
+        } else {
+          this.errorMessage = 'Erreur lors de la création de la boutique.';
+        }
       },
     });
   }
 
   onCancel(): void {
-    this.router.navigate(['/seller/dashboard']);
+    console.log('❌ Shop creation cancelled');
+    this.router.navigate(['/seller/shop-list']);
   }
 
   private markAllFieldsAsTouched(): void {
@@ -158,9 +184,14 @@ export class ShopCreationPage implements OnInit {
   getFieldError(fieldName: string): string {
     const field = this.shopForm.get(fieldName);
     if (!field || !field.errors) return '';
+
     if (field.errors['required']) return 'Ce champ est obligatoire';
-    if (field.errors['minlength']) return 'Trop court';
-    if (field.errors['pattern']) return 'Format invalide';
+    if (field.errors['minlength']) {
+      const requiredLength = field.errors['minlength'].requiredLength;
+      return `Minimum ${requiredLength} caractères requis`;
+    }
+    if (field.errors['pattern']) return 'Format invalide (ex: 98 123 456)';
+
     return 'Champ invalide';
   }
 }

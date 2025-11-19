@@ -17,12 +17,25 @@ export interface AdresseLivraison {
 }
 
 export interface CommandeProduit {
-  id:string;
+  id: string;
   produitId: string;
   nom: string;
   quantite: number;
   prixUnitaire: number;
   prixTotal: number;
+  produit?: {
+    id: string;
+    nom: string;
+    prix: number;
+    categorie: string;
+    description: string;
+    image: string;
+    quantite: number;
+    unite: string;
+    unitePersonnalisee?: string;
+    livrable: boolean;
+    boutiqueId: string;
+  };
 }
 export interface ClientInfo {
   id: string;

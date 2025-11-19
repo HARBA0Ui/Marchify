@@ -52,10 +52,9 @@ export class ShopService {
       .delete<void>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError<void>('deleteShop')));
   }
-  /** ✅ Get boutiques by vendeur ID */
   getShopsByVendeurId(vendeurId: string): Observable<Shop[]> {
     return this.http
-      .get<Shop[]>(`${this.apiUrl}?vendeurId=${vendeurId}`)
+      .get<Shop[]>(`${this.apiUrl}/vendeur/${vendeurId}`)
       .pipe(catchError(this.handleError<Shop[]>('getShopsByVendeurId', [])));
   }
 }

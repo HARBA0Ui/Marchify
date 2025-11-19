@@ -18,6 +18,8 @@ import { Deliveries } from './features/activities/delivery/deliveries/deliveries
 import { Commandes } from './features/activities/seller/commandes/commandes';
 import { RegisterComponent } from './features/register-component/register-component';
 import { NotificationsList } from './layouts/notifications-list/notifications-list';
+import { ShopsListSellerComponent } from './features/seller/pages/shops-list-seller/shops-list-seller.component';
+import { ShopProductsSellerComponent } from './features/seller/pages/shop-products-seller/shop-products-seller.component';
 
 export const routes: Routes = [
   {
@@ -128,8 +130,14 @@ export const routes: Routes = [
     path: 'notifications',
     title: 'Notifications',
     component: NotificationsList,
+  }, {
+     path: 'seller/shop-list',
+     title: 'Shops List Seller',
+      component: ShopsListSellerComponent,
+  }, {
+    path:'seller/shop-product-seller/:id',
+    title:'Shop Products Seller',
+    component:ShopProductsSellerComponent
   }
-
-
 ];
 

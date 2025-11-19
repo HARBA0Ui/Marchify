@@ -1,99 +1,193 @@
-<div class="min-h-screen bg-gradient-to-br from-[#faf2b8] to-[#faf2b0] py-20">
-    <div class="container mx-auto px-6 max-w-7xl">
-        @if (shop && shop.nom) {
-        <div class="text-center mb-14">
-            <h1 class="text-5xl font-extrabold text-[#386641] tracking-tight mb-3 relative inline-block">
-                Produits de la boutique :
-                <span
-                    class="text-zinc-900 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-gradient-to-r from-[#386641] to-[#F97A00]">
-                    {{ shop.nom }}
+<div class="page-wrapper">
+  <div class="container">
+    
+    <!-- Filters Sidebar -->
+    <aside class="filters">
+      <div class="filters-content">
+        <h2>Filtrer les produits</h2>
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+          <h3>Catégorie</h3>
+          <label [class.active]="selectedCategory === ''">
+            <input type="radio" name="category" [(ngModel)]="selectedCategory" value="" (change)="applyFilters()">
+            <span>Toutes les catégories</span>
+          </label>
+          <label *ngFor="let cat of categories" [class.active]="selectedCategory === cat">
+            <input type="radio" name="category" [(ngModel)]="selectedCategory" [value]="cat" (change)="applyFilters()">
+            <span>{{ cat }}</span>
+          </label>
+        </div>
+
+        <!-- Price Filter -->
+        <div class="filter-group">
+          <h3>Prix</h3>
+          <label [class.active]="priceFilter === 'all'">
+            <input type="radio" name="price" [(ngModel)]="priceFilter" value="all" (change)="applyFilters()">
+            <span>Tous les prix</span>
+          </label>
+          <label [class.active]="priceFilter === 'low'">
+            <input type="radio" name="price" [(ngModel)]="priceFilter" value="low" (change)="applyFilters()">
+            <span>Moins de 10 DT</span>
+          </label>
+          <label [class.active]="priceFilter === 'medium'">
+            <input type="radio" name="price" [(ngModel)]="priceFilter" value="medium" (change)="applyFilters()">
+            <span>10 - 50 DT</span>
+          </label>
+          <label [class.active]="priceFilter === 'high'">
+            <input type="radio" name="price" [(ngModel)]="priceFilter" value="high" (change)="applyFilters()">
+            <span>Plus de 50 DT</span>
+          </label>
+        </div>
+
+        <!-- Sort Filter -->
+        <div class="filter-group">
+          <h3>Trier par</h3>
+          <label [class.active]="sortBy === 'name'">
+            <input type="radio" name="sort" [(ngModel)]="sortBy" value="name" (change)="applySorting()">
+            <span>Nom (A-Z)</span>
+          </label>
+          <label [class.active]="sortBy === 'price-asc'">
+            <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-asc" (change)="applySorting()">
+            <span>Prix croissant</span>
+          </label>
+          <label [class.active]="sortBy === 'price-desc'">
+            <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-desc" (change)="applySorting()">
+            <span>Prix décroissant</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Clear Filters Button -->
+      <button class="clear-filters-btn" (click)="clearFilters()">
+        Réinitialiser les filtres
+      </button>
+    </aside>
+
+    <!-- Products Section -->
+    <main class="products-section">
+      <!-- Header -->
+      @if (shop && shop.nom) {
+      <div class="products-header text-center">
+        <h1 class="!text-4xl font-bold">Produits de {{ shop.nom }}</h1>
+        <p>Gérez vos produits : modifiez ou supprimez rapidement vos articles.</p>
+        <p><strong>{{ filteredProducts.length }} produits disponibles</strong></p>
+        
+        <!-- ✅ Using routerLink with shopId -->
+        <a
+          [routerLink]="['/seller/product-add']"
+          [queryParams]="{ shopId: shopId }"
+          class="add-product-btn inline-flex items-center gap-2 no-underline">
+          <i class="fa-solid fa-plus"></i>
+          Ajouter un produit
+        </a>
+      </div>
+      }
+
+      <!-- Error Message -->
+      @if (error()) {
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+        <div class="flex items-center">
+          <i class="fa-solid fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+          <div>
+            <p class="text-red-800 font-semibold">Erreur</p>
+            <p class="text-red-700 text-sm">{{ error() }}</p>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Loading State -->
+      @if (isLoading()) {
+      <div class="loading">
+        <div class="w-16 h-16 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mb-4 mx-auto"></div>
+        <p>Chargement des produits...</p>
+      </div>
+      }
+
+      <!-- Products Grid -->
+      @else if (!isLoading() && filteredProducts.length > 0) {
+      <div class="products-grid">
+        @for (product of filteredProducts; track product.id) {
+        <div class="product-card group">
+          <div class="product-badge"></div>
+
+          <div class="product-content">
+            <div class="product-image-wrapper">
+              <img [src]="product.image" alt="{{ product.nom }}"
+                class="product-image" />
+              <div class="image-overlay"></div>
+            </div>
+
+            <div class="product-info">
+              <h2 class="product-title">
+                {{ product.nom }}
+              </h2>
+              <p class="product-description">
+                {{ product.description }}
+              </p>
+              <div class="product-meta">
+                <span class="product-price">
+                  {{ product.prix }} DT
                 </span>
-            </h1>
-            <p class="text-base text-[#386641] max-w-2xl mx-auto mt-4">
-                Gérez vos produits : modifiez ou supprimez rapidement vos articles.
-            </p>
-            <button
-                class="mt-6 bg-gradient-to-r from-[#F97A00] to-[#FED16A] text-white px-6 py-3 rounded-xl hover:from-[#F97A00] hover:to-[#FF8C00] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold flex items-center gap-2 mx-auto"
-                (click)="addProduct()">
-                <i class="fa-solid fa-plus"></i>
-                Ajouter un produit
-            </button>
+                <span class="product-category">
+                  {{ product.categorie }}
+                </span>
+              </div>
+            </div>
+
+            <div class="product-actions">
+              <!-- ✅ Using routerLink for edit -->
+              <a
+                [routerLink]="['/edit', product.id]"
+                class="btn-edit no-underline">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Modifier
+              </a>
+              <button class="btn-delete" (click)="deleteProduct(product.id)">
+                <i class="fa-solid fa-trash"></i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <div class="product-border"></div>
         </div>
         }
+      </div>
+      }
 
-        @if (products.length === 0) {
-        <div class="text-center py-20">
-            <div
-                class="w-24 h-24 bg-gradient-to-br from-[#FFF9D9] to-[#FED16A] rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fa-solid fa-box text-3xl text-zinc-900"></i>
-            </div>
-            <h3 class="text-2xl font-semibold text-[#386641] mb-2">Aucun produit disponible</h3>
-            <p class="text-[#386641] text-lg">Les produits apparaîtront ici prochainement.</p>
+      <!-- No Results -->
+      @else if (!isLoading() && filteredProducts.length === 0) {
+      <div class="no-results">
+        <div class="w-24 h-24 bg-gradient-to-br from-[#FFF9D9] to-[#FED16A] rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="fa-solid fa-box text-4xl text-[#386641]"></i>
         </div>
-        } @else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            @for (product of products; track product.id) {
-            <div
-                class="group relative bg-[#FFF9D9] rounded-2xl shadow-lg border border-[#386641]/20 hover:border-[#F97A00] hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2">
-                <!-- Bandeau gradient en haut avec couleurs d'origine -->
-                <div
-                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#386641] to-[#F97A00] group-hover:from-[#F97A00] group-hover:to-[#FED16A] transition-all duration-500">
-                </div>
+        <h3>Aucun produit trouvé</h3>
+        <p>Essayez d'ajuster vos filtres</p>
+        <button (click)="clearFilters()" class="btn-show-all">Voir tous les produits</button>
+      </div>
+      }
+    </main>
+  </div>
 
-                <!-- Image du produit -->
-                <div class="p-4">
-                    <div class="relative overflow-hidden rounded-xl mb-4">
-                        <img [src]="product.image" alt="{{ product.nom }}"
-                            class="w-full h-48 object-cover rounded-xl transition-transform duration-500 group-hover:scale-105" />
-                        <div
-                            class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300 rounded-xl">
-                        </div>
-                    </div>
-
-                    <!-- Informations du produit -->
-                    <div class="space-y-3">
-                        <h2
-                            class="text-lg font-bold text-[#386641] line-clamp-1 group-hover:text-zinc-900 transition-colors">
-                            {{ product.nom }}
-                        </h2>
-                        <p class="text-sm text-gray-700 line-clamp-2 leading-relaxed">
-                            {{ product.description }}
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-zinc-900 bg-[#FFF4A4] px-3 py-1 rounded-full">
-                                {{ product.prix }} DT
-                            </span>
-                            <span class="text-xs font-medium bg-[#386641]/10 text-[#386641] px-2 py-1 rounded-full">
-                                {{ product.categorie }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Actions avec couleurs d'origine -->
-                    <div class="flex gap-3 mt-6 pt-4 border-t border-[#386641]/20">
-                        <button
-                            class="flex-1 bg-gradient-to-r from-[#F97A00] to-[#FF8C00] text-white px-4 py-2.5 rounded-xl hover:from-[#FF8C00] hover:to-[#F97A00] transition-all duration-300 shadow hover:shadow-md font-medium flex items-center justify-center gap-2 group/btn"
-                            (click)="editProduct(product.id)">
-                            <i
-                                class="fa-solid fa-pen-to-square text-sm group-hover/btn:scale-110 transition-transform"></i>
-                            Modifier
-                        </button>
-                        <button
-                            class="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2.5 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow hover:shadow-md font-medium flex items-center justify-center gap-2 group/btn"
-                            (click)="deleteProduct(product.id)">
-                            <i class="fa-solid fa-trash text-sm group-hover/btn:scale-110 transition-transform"></i>
-                            Supprimer
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Effet de survol -->
-                <div
-                    class="absolute inset-0 border-2 border-transparent group-hover:border-[#F97A00]/30 rounded-2xl pointer-events-none transition-all duration-500">
-                </div>
-            </div>
-            }
+  <!-- AI Search Button -->
+  <div class="fixed bottom-6 left-6 z-50">
+    <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+    <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+    <a
+      routerLink="/ai-search/upload-predict"
+      class="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50 no-underline"
+      title="Recherche par IA">
+      <div class="relative">
+        <i class="fas fa-brain text-white text-2xl md:text-3xl"></i>
+        <div class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+          <i class="fas fa-camera text-white text-[8px]"></i>
         </div>
-        }
-    </div>
+      </div>
+      <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
+        <i class="fas fa-sparkles text-xs"></i>
+      </div>
+    </a>
+  </div>
 </div>

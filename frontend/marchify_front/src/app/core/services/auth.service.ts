@@ -20,6 +20,8 @@ export interface LoginResponse {
     prenom: string;
     email: string;
     role: 'CLIENT' | 'VENDEUR' | 'LIVREUR' | string;
+    vendeurId?: string; // ✅ Added
+    livreurId?: string; // ✅ Added
   };
   token: string;
 }
@@ -31,14 +33,13 @@ export interface AuthState {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:3000/api/users';
   private tokenKey = 'auth_token';
   private userKey = 'user';
 
-  // 🔹 Observable de l'état d'authentification
   private authStateSubject = new BehaviorSubject<AuthState>(
     this.getInitialAuthState()
   );
@@ -46,7 +47,6 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // Calculer l'état initial depuis le localStorage
   private getInitialAuthState(): AuthState {
     const token = localStorage.getItem(this.tokenKey);
     const userStr = localStorage.getItem(this.userKey);
@@ -60,14 +60,16 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, {
-      email,
-      PWD: password,
-    }).pipe(
-      tap((resp) => {
-        this.setSession(resp.token, resp.user);
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, {
+        email,
+        PWD: password,
       })
-    );
+      .pipe(
+        tap((resp) => {
+          this.setSession(resp.token, resp.user);
+        })
+      );
   }
 
   register(userData: RegisterData): Observable<LoginResponse> {
@@ -89,8 +91,7 @@ export class AuthService {
   private setSession(token: string, user: any): void {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.userKey, JSON.stringify(user));
-    
-    // 🔹 Émettre le nouvel état
+
     this.authStateSubject.next({
       isLogged: true,
       user,
@@ -101,8 +102,7 @@ export class AuthService {
   private clearSession(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
-    
-    // 🔹 Émettre l'état déconnecté
+
     this.authStateSubject.next({
       isLogged: false,
       user: null,
@@ -126,5 +126,17 @@ export class AuthService {
   getUserRole(): string | null {
     const user = this.getCurrentUser();
     return user?.role || null;
+  }
+
+  // ✅ NEW: Get vendeurId directly from stored user
+  getVendeurId(): string | null {
+    const user = this.getCurrentUser();
+    return user?.vendeurId || null;
+  }
+
+  // ✅ NEW: Get livreurId directly from stored user
+  getLivreurId(): string | null {
+    const user = this.getCurrentUser();
+    return user?.livreurId || null;
   }
 }
