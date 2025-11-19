@@ -1,0 +1,110 @@
+<div class="container">
+  <!-- Filters Sidebar -->
+  <aside class="filters">
+    <div class="filters-content">
+      <h2>Filtrer les produits</h2>
+
+      <!-- Category Filter -->
+      <div class="filter-group">
+        <h3>Catégorie</h3>
+        <label [class.active]="selectedCategory === ''">
+          <input type="radio" name="category" [(ngModel)]="selectedCategory" value="" (change)="applyFilters()">
+          <span>Toutes les catégories</span>
+        </label>
+        <label *ngFor="let cat of categories" [class.active]="selectedCategory === cat">
+          <input type="radio" name="category" [(ngModel)]="selectedCategory" [value]="cat" (change)="applyFilters()">
+          <span>{{ cat }}</span>
+        </label>
+      </div>
+
+      <!-- Delivery Filter -->
+      <div class="filter-group">
+        <h3>Livraison</h3>
+        <label [class.active]="deliveryFilter === 'all'">
+          <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="all" (change)="applyFilters()">
+          <span>Tous les produits</span>
+        </label>
+        <label [class.active]="deliveryFilter === 'livrable'">
+          <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="livrable" (change)="applyFilters()">
+          <span>Livrable</span>
+        </label>
+        <label [class.active]="deliveryFilter === 'non-livrable'">
+          <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="non-livrable"
+            (change)="applyFilters()">
+          <span>Non livrable</span>
+        </label>
+      </div>
+
+      <!-- Sort Filter -->
+      <div class="filter-group">
+        <h3>Trier par</h3>
+        <label [class.active]="sortBy === 'name'">
+          <input type="radio" name="sort" [(ngModel)]="sortBy" value="name" (change)="applySorting()">
+          <span>Nom (A-Z)</span>
+        </label>
+        <label [class.active]="sortBy === 'price-asc'">
+          <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-asc" (change)="applySorting()">
+          <span>Prix croissant</span>
+        </label>
+        <label [class.active]="sortBy === 'price-desc'">
+          <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-desc" (change)="applySorting()">
+          <span>Prix décroissant</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Clear Filters Button - Sticky at bottom -->
+    <button class="clear-filters-btn" (click)="clearFilters()">
+      Réinitialiser les filtres
+    </button>
+  </aside>
+
+  <!-- Products Section -->
+  <main class="products-section">
+    <!-- Header -->
+    <div class="products-header text-center">
+      <h1 class="!text-4xl font-bold">NosProduits</h1>
+      <p>Découvrez nos boutiques partenaires et explorez leurs univers uniques.</p>
+      <p><strong>{{ filteredProducts.length }} produits disponibles</strong></p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <p>Chargement des produits...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!isLoading && filteredProducts.length > 0" class="products-grid">
+      <app-product-card *ngFor="let product of filteredProducts; trackBy: trackById" [product]="product"
+        (addToCartEvent)="onAddToCart($event)" (viewDetailsEvent)="onViewDetails($event)">
+      </app-product-card>
+    </div>
+
+    <!-- No Results -->
+    <div *ngIf="!isLoading && filteredProducts.length === 0" class="no-results">
+      <h3>Aucun produit trouvé</h3>
+      <p>Essayez d'ajuster vos filtres</p>
+      <button (click)="clearFilters()" style="margin-top: 1rem;">Voir tous les produits</button>
+    </div>
+  </main>
+
+  <div class="fixed bottom-6 left-6 z-50">
+    <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+    <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+
+    <button routerLink="/ai-search/upload-predict"
+      class="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
+      title="Recherche par IA">
+      <div class="relative">
+        <i class="fas fa-brain text-white text-2xl md:text-3xl"></i>
+        <div
+          class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+          <i class="fas fa-camera text-white text-[8px]"></i>
+        </div>
+      </div>
+      <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
+        <i class="fas fa-sparkles text-xs"></i>
+      </div>
+    </button>
+  </div>
+</div>

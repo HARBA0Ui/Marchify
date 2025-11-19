@@ -1,0 +1,46 @@
+<div
+    class="register-bg min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFF4A4] via-[#FED16A] to-[#F97A00]">
+
+    <!-- Form Container -->
+    <div
+        class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8 max-w-md w-full text-[#386641] shadow-[0_0_20px_#F97A00]/70">
+
+        <h2
+            class="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-[#386641] to-[#F97A00] bg-clip-text text-transparent">
+            Connexion
+        </h2>
+
+        <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-4">
+
+            <div>
+                <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Email</label>
+                <input type="email" name="email" [(ngModel)]="email" required
+                    class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+                    placeholder="Votre email" />
+            </div>
+
+            <div>
+                <label class="block font-medium text-[#386641]/90 mb-1 text-sm">Mot de passe</label>
+                <input type="password" name="password" [(ngModel)]="password" required
+                    class="w-full p-3 text-sm rounded-xl bg-[#FFF4A4]/40 border border-[#FED16A]/60 text-black placeholder-[#386641]/60 focus:ring-2 focus:ring-[#F97A00]/60 outline-none transition"
+                    placeholder="••••••••" />
+            </div>
+
+            <!-- Message d'erreur -->
+            @if (errorMessage)
+            {
+            <div class="mt-2 p-2 text-sm bg-red-100/70 text-zinc-900 rounded-lg border-l-4 border-[#F97A00]">
+                {{ errorMessage }}
+            </div>
+            }
+
+            <button type="submit" [disabled]="loginForm.invalid"
+                class="w-full bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white font-bold py-3 text-sm rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                Se connecter
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

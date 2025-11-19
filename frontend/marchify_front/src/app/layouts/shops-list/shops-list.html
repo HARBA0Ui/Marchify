@@ -1,0 +1,65 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <h1 class="text-4xl font-bold text-[#386641] mb-2 flex items-center gap-3">
+        <i class="fas fa-store"></i> Nos Boutiques
+      </h1>
+      <p class="text-gray-600 text-lg">
+        Découvrez nos boutiques partenaires et explorez leurs univers uniques.
+      </p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    @if (isLoading) {
+    <div class="flex flex-col items-center justify-center py-24">
+      <div class="w-16 h-16 border-4 border-[#386641] border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600 font-medium">Chargement des boutiques...</p>
+    </div>
+    }
+
+    @else if (shops.length === 0) {
+    <div class="text-center py-20 bg-white rounded-lg shadow-sm">
+      <div class="mx-auto bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+        <i class="fas fa-store text-gray-400 text-3xl"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">
+        Aucune boutique disponible
+      </h3>
+      <p class="text-gray-600">
+        Les boutiques apparaîtront ici prochainement.
+      </p>
+    </div>
+    }
+
+    @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (shop of shops; track shop.id) {
+      <app-shop-card [shop]="shop" />
+      }
+    </div>
+    }
+  </div>
+</div>
+
+<!-- AI Search FAB -->
+<div class="fixed bottom-6 left-6 z-50">
+  <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+  <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+
+  <button routerLink="/ai-search/upload-predict"
+    class="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
+    title="Recherche par IA">
+    <div class="relative">
+      <i class="fas fa-brain text-white text-2xl md:text-3xl"></i>
+      <div
+        class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+        <i class="fas fa-camera text-white text-[8px]"></i>
+      </div>
+    </div>
+    <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
+      <i class="fas fa-sparkles text-xs"></i>
+    </div>
+  </button>
+</div>

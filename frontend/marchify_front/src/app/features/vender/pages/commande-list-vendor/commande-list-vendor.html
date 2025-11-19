@@ -1,0 +1,134 @@
+<div class="min-h-screen bg-[#f5f0d4] px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-[#386641] mb-2">Gestion des Commandes</h1>
+      <p class="text-[#386641]/70 text-lg">Gérez vos commandes et mettez à jour leur statut</p>
+    </div>
+
+    <!-- Status Tabs -->
+    <div class="mb-6 overflow-x-auto pb-2">
+      <div class="flex gap-2 min-w-max">
+        @for (status of statusList; track status.value) {
+        <button
+          (click)="filterByStatus(status.value)"
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap
+                 {{ selectedStatus === status.value 
+                   ? 'bg-[#386641] text-white' 
+                   : 'bg-white text-[#386641] border border-[#FED16A]/40 hover:bg-[#FED16A]/10' }}">
+          {{ status.label }}
+          <span
+            class="ml-2 px-2 py-0.5 text-xs font-bold rounded-full
+                   {{ selectedStatus === status.value 
+                     ? 'bg-white/30 text-white' 
+                     : 'bg-[#F97A00] text-white' }}">
+            {{ getCommandeCount(status.value) }}
+          </span>
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="text-center py-16">
+        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#386641] border-t-transparent"></div>
+        <p class="mt-4 text-[#386641] text-lg font-medium">Chargement des commandes...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error && !loading) {
+      <div class="bg-[#F97A00]/20 border-2 border-[#F97A00] text-[#386641] px-6 py-4 rounded-xl mb-6 font-medium">
+        {{ error }}
+      </div>
+    }
+
+    <!-- Empty -->
+    @if (!loading && filteredCommandes.length === 0) {
+      <div class="text-center py-16 bg-white rounded-2xl shadow-lg text-[#386641] font-medium">
+        Aucune commande {{ getStatusInfo(selectedStatus).label.toLowerCase() }}
+      </div>
+    }
+
+    <!-- Commande List -->
+    @if (!loading && filteredCommandes.length > 0) {
+      <div class="space-y-4">
+        @for (commande of filteredCommandes; track commande.id) {
+        <div class="bg-white rounded-lg border border-[#FED16A]/30 shadow-sm hover:shadow-md transition-shadow duration-200 p-4">
+          
+          <!-- Header -->
+          <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-[#386641]">
+                Commande #{{ commande.id.substring(0, 8).toUpperCase() }}
+              </h3>
+              <p class="text-[#386641]/60 text-sm mt-1">
+                {{ formatDate(commande.dateCommande) }}
+              </p>
+            </div>
+            <span class="px-3 py-1.5 text-xs font-semibold bg-[#386641] text-white rounded-lg">
+              {{ getStatusInfo(commande.status).label }}
+            </span>
+          </div>
+
+          <!-- Client Info -->
+          <div class="mb-4 p-3 bg-[#FED16A]/10 rounded-lg">
+            <h4 class="text-[#386641] font-bold text-md mb-2">Client</h4>
+            <div class="text-black text-sm space-y-1">
+              <p class="flex items-center gap-2">
+                <i class="fas fa-user"></i> {{ commande.client.nom }}
+              </p>
+              <p class="flex items-center gap-2">
+                <i class="fas fa-envelope"></i> {{ commande.client.email }}
+              </p>
+              <p class="flex items-center gap-2">
+                <i class="fas fa-phone"></i> {{ commande.client.telephone }}
+              </p>
+              <p class="flex items-center gap-2">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ commande.adresseLivraison.rue }}, {{ commande.adresseLivraison.ville }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Produits -->
+          <div class="mb-4">
+            <h4 class="text-[#386641] font-bold text-md mb-2">
+              Produits ({{ getTotalProduits(commande) }})
+            </h4>
+            <div class="space-y-2">
+              @for (produit of commande.produits; track produit.produitId || $index) {
+              <div class="flex justify-between text-sm text-black">
+                <span>{{ produit.nom }} ({{ produit.quantite }} × {{ produit.prixUnitaire }} DT)</span>
+                <span class="font-medium text-zinc-900">{{ produit.prixTotal }} DT</span>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Total & Actions -->
+          <div class="flex flex-wrap justify-between items-center pt-3 border-t border-[#FED16A]/50 gap-3">
+            <div>
+              <p class="text-[#386641]/60 text-sm">Total</p>
+              <p class="font-bold text-[#386641] text-lg">{{ commande.totalCommande }} DT</p>
+            </div>
+
+            @if (getNextStatus(commande.status)) {
+            <button (click)="updateStatus(commande.id)"
+              class="px-4 py-2 bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white text-sm font-medium rounded-lg transition-colors">
+              ✓ {{ getStatusInfo(getNextStatus(commande.status)!).label }}
+            </button>
+            }
+            @if (!getNextStatus(commande.status) && commande.status === 'READY') {
+            <span class="px-4 py-2 bg-[#386641] text-white text-sm font-medium rounded-lg">
+              ✓ Terminée
+            </span>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    }
+  </div>
+</div>

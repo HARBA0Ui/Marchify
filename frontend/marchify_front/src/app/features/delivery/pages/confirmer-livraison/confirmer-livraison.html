@@ -1,0 +1,121 @@
+<div class="min-h-screen bg-[#f5efc1] p-6 md:p-10">
+
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-[#386641] flex items-center gap-3">
+      <span class="bg-[#F97A00] text-white p-3 rounded-xl shadow-md flex items-center justify-center">
+        <i class="fa-solid fa-truck-fast text-xl"></i>
+      </span>
+      Confirmer les livraisons des produits
+    </h1>
+  </div>
+
+  @if (isLoading) {
+    <div class="flex justify-center items-center py-10">
+      <i class="fa-solid fa-spinner animate-spin text-[#386641] text-3xl"></i>
+      <span class="ml-3 text-[#386641] font-medium text-lg">
+        Chargement des missions...
+      </span>
+    </div>
+  }
+
+  @if (error) {
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6 shadow-sm">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+        <p class="text-red-700 font-medium">{{ error }}</p>
+      </div>
+    </div>
+  }
+
+  @if (livraisons.length === 0 && !isLoading) {
+    <div
+      class="bg-[#FED16A]/50 border border-[#FED16A] text-[#386641] p-4 rounded-lg mb-6 flex items-center gap-3 font-medium shadow-sm"
+    >
+      <i class="fa-solid fa-circle-info text-zinc-900"></i>
+      <span>Aucune livraison assignée pour ce livreur.</span>
+    </div>
+  }
+
+  @if (livraisons.length > 0) {
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#FED16A]/40">
+      <table class="min-w-full border-collapse">
+        <thead class="bg-[#386641] text-white">
+          <tr>
+            <th class="px-5 py-4 text-left text-sm font-semibold">
+              <i class="fa-solid fa-solid fa-truck-ramp-box mr-2"></i> Livraison
+            </th>
+            <th class="px-5 py-4 text-left text-sm font-semibold">
+              <i class="fa-solid fa-store mr-2"></i> Boutique
+            </th>
+            <th class="px-5 py-4 text-left text-sm font-semibold">
+              <i class="fa-solid fa-user mr-2"></i> Client
+            </th>
+            <th class="px-5 py-4 text-left text-sm font-semibold">
+              <i class="fa-solid fa-phone mr-2"></i> Téléphone
+            </th>
+            <th class="px-5 py-4 text-left text-sm font-semibold">
+              <i class="fa-solid fa-circle-info mr-2"></i> Statut
+            </th>
+            <th class="px-5 py-4 text-left text-sm font-semibold">
+              <i class="fa-solid fa-calendar-days mr-2"></i> Créé le
+            </th>
+            <th class="px-5 py-4 text-center text-sm font-semibold">
+              <i class="fa-solid fa-gear mr-2"></i> Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (bon of livraisons; track bon.id) {
+            <tr
+              class="hover:bg-[#faf6dc]/60 transition duration-200 border-b border-[#FED16A]/40"
+            >
+              <td class="px-5 py-4 font-mono text-gray-700 text-sm">
+                #{{ bon.commandeId.substring(0, 6) }}
+              </td>
+              <td class="px-5 py-4 font-semibold text-[#386641]">
+                {{ bon.commande.boutique.nom }}
+              </td>
+              <td class="px-5 py-4 text-gray-700 text-sm">
+                {{ bon.commande.client.prenom }} {{ bon.commande.client.nom }}
+              </td>
+              <td class="px-5 py-4 text-gray-600 text-sm">
+                {{ bon.commande.client.telephone || '-' }}
+              </td>
+              <td class="px-5 py-4">
+                <span
+                  [class]="getStatusClass(bon.status)"
+                  class="px-3 py-1 rounded-full text-xs font-semibold capitalize"
+                >
+                  {{ getLabel(bon.status) }}
+                </span>
+              </td>
+              <td class="px-5 py-4 text-gray-500 text-sm">
+                {{ bon.dateCreation | date: 'dd/MM HH:mm' }}
+              </td>
+              <td class="px-5 py-4 text-center">
+                @if (bon.status === 'PENDING_PICKUP') {
+                  <button
+                    class="px-4 py-2 bg-[#F97A00] hover:bg-[#e66a00] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition flex items-center gap-1 mx-auto"
+                    (click)="accepterMission(bon.id)"
+                  >
+                    <i class="fa-solid fa-circle-check"></i>
+                    Accepter
+                  </button>
+                }
+                @if (bon.status === 'IN_TRANSIT') {
+                  <button
+                    class="px-4 py-2 bg-[#386641] hover:bg-[#2d5434] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition flex items-center gap-1 mx-auto"
+                    (click)="confirmerLivraison(bon.id)"
+                  >
+                    <i class="fa-solid fa-truck-fast"></i>
+                    Livrer
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

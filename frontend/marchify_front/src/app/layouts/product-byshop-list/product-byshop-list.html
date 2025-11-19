@@ -1,0 +1,121 @@
+<div class="mb-4 bg-white/80 rounded p-3 border-t-4 border-[#386641]">
+  <div class="flex flex-wrap gap-2 text-xs">
+    
+ 
+<div class="relative flex-1 min-w-[120px]">
+  <input
+    type="text"
+    [(ngModel)]="searchQuery"
+    (input)="applyFilters()"
+    placeholder="Rechercher..."
+    class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all placeholder-gray-400"
+  />
+  
+  <div class="absolute inset-y-0 right-3 flex items-center text-gray-400 pointer-events-none">
+    <i class="fas fa-search"></i>
+  </div>
+</div>
+
+
+<div class="relative inline-block w-full sm:w-auto mb-2">
+  <select
+    [(ngModel)]="deliveryFilter"
+    (change)="applyFilters()"
+    class="w-full sm:w-auto appearance-none border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm hover:border-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all"
+  >
+    <option value="all">Tous</option>
+    <option value="livrable">Livrables</option>
+    <option value="non-livrable">Retrait</option>
+  </select>
+
+  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+</div>
+
+
+<div class="relative inline-block w-full sm:w-auto mb-2">
+  <select
+    [(ngModel)]="sortBy"
+    (change)="applySorting()"
+    class="w-full sm:w-auto appearance-none border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm hover:border-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all"
+  >
+    <option value="name">Nom</option>
+    <option value="price-asc">Prix ↑</option>
+    <option value="price-desc">Prix ↓</option>
+  </select>
+  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+</div>
+
+
+    <button (click)="clearFilters()" class="bg-[#F97A00] text-white rounded px-3 py-1.5 font-medium">
+      Réinitialiser
+    </button>
+  </div>
+</div>
+
+@if (isLoading) {
+  <div class="text-center py-10">
+    <div class="inline-block w-10 h-10 border-4 border-gray-300 border-t-[#F97A00] rounded-full animate-spin"></div>
+    <p class="mt-2 text-[#386641] text-xs">Chargement...</p>
+  </div>
+} @else if (filteredProducts.length === 0) {
+  <div class="text-center py-10 bg-white/80 rounded border-t-4 border-gray-300">
+    <p class="text-sm font-semibold text-[#386641] mb-1">Aucun produit</p>
+    <p class="text-xs text-gray-600">
+      @if (searchQuery || deliveryFilter !== 'all') {
+        Modifiez vos filtres
+      } @else {
+        Aucun produit disponible
+      }
+    </p>
+  </div>
+} @else {
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+    @for (product of filteredProducts; track product.id) {
+      <app-product-card
+        [product]="product"
+        (addToCartEvent)="onAddToCart($event)"
+        (viewDetailsEvent)="onViewDetails($event)"
+      ></app-product-card>
+    }
+  </div>
+}
+<!-- Floating Action Button (FAB) - AI Predict -->
+<div class="fixed bottom-6 left-6 z-50">
+  
+  <!-- Animated rings -->
+  <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+  <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+  
+  <!-- Main FAB Button -->
+  <button
+    routerLink="/ai-search/upload-predict"
+    class="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl cursor-pointer hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
+    title="Recherche par IA"
+  >
+    <!-- AI Brain Icon -->
+    <div class="relative">
+      <i class="fas fa-brain text-white text-2xl md:text-3xl"></i>
+      
+      <!-- Camera badge -->
+      <div class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+        <i class="fas fa-camera text-white text-[8px] md:text-[10px]"></i>
+      </div>
+    </div>
+    
+    <!-- Sparkle effect -->
+    <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
+      <i class="fas fa-sparkles text-xs"></i>
+    </div>
+  </button>
+  
+  <!-- Tooltip (optional) -->
+  <div class="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-[#386641] text-white px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg">
+    Recherche IA
+    <div class="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-[#386641]"></div>
+  </div>
+  
+</div>

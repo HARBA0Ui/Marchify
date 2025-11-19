@@ -1,0 +1,36 @@
+/* Smooth animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Disabled button state */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  border-color: #d1d5db !important;
+  color: #6b7280 !important;
+}
+
+/* Smooth transitions for quantity buttons */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Remove button hover effect */
+.hover\:bg-red-50:hover {
+  background-color: #fef2f2;
+}

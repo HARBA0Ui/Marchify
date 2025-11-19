@@ -1,0 +1,23 @@
+/* Smooth animations */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sticky sidebar */
+.sticky {
+  position: sticky;
+}
+
+/* Ensure smooth transitions */
+button, a {
+  transition: all 0.2s ease;
+}

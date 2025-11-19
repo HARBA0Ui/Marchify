@@ -1,0 +1,20 @@
+/* Minimal custom styles - most handled by Tailwind */
+
+/* Loading spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Smooth page transitions */
+.min-h-screen {
+  min-height: 100vh;
+}
