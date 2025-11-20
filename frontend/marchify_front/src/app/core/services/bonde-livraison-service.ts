@@ -20,8 +20,9 @@ export class BondeLivraisonService {
   }
 
   // ----------- GET BONS PAR LIVREUR -----------
-  getBondelisraisonsByLivreur(livreurId: string): Observable<BonDeLivraison[]> {
-    return this.http.get<BonDeLivraison[]>(
+  getBondelisraisonsByLivreur(livreurId: string): Observable<{bons: BonDeLivraison[]}> { // Retourne un observable de BonDeLivraison[]> {
+    return this.http.get<{bons: BonDeLivraison[]}> // Retourne un observable de BonDeLivraison[]>
+    (
       `${this.apiUrl}/livreur/${livreurId}`
     );
   }

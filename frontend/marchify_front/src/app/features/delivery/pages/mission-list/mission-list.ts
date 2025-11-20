@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CommandeService } from '../../../../core/services/commande-service';
-import { CmdStatus, Commande } from '../../../../core/models/commande';
 import { LivreurService } from '../../../../core/services/livreur-service';
+import { BonDeLivraison } from '../../../../core/models/bondelivraison';
+import { BondeLivraisonService } from '../../../../core/services/bonde-livraison-service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-mission-list',
@@ -12,39 +13,70 @@ import { LivreurService } from '../../../../core/services/livreur-service';
   styleUrl: './mission-list.css',
 })
 export class MissionList {
-  private livreurService = inject(LivreurService);
-
-  missions: Commande[] = [];
-  filteredMissions: Commande[] = [];
-  selectedStatus: string = 'READY';
-  loading = false;
-  error = '';
+  private authService = inject(AuthService)
+  private livreurService = inject(LivreurService)
+  private bondelivraison = inject(BondeLivraisonService)
+  missions: BonDeLivraison[] = []
+  selectedStatus: string = 'PENDING_PICKUP';
+  filteredMissions: BonDeLivraison[] = [];
+  livreurId: string | null = null;
+  error = signal<string | null>(null);
+  loading = signal<boolean>(false);
 
   statusList = [
-    { value: 'READY', label: 'Prêtes' },
-    { value: 'SHIPPED', label: 'En livraison' },
+    { value: 'PENDING_PICKUP', label: 'Prêtes' },
+    { value: 'IN_TRANSIT', label: 'En livraison' },
     { value: 'DELIVERED', label: 'Livrées' },
   ];
 
   ngOnInit(): void {
-    this.loadMissions();
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser || !currentUser.livreurId) {
+      console.error('No user logged in');
+      this.error.set('Vous devez être connecté pour voir vos commandes');
+      return;
+    }
+
+    this.livreurId = currentUser.livreurId;
+
+    this.loadMissionsDisponibles();
+    this.loadBonDesLivraisons();
   }
 
-  loadMissions(): void {
-    this.loading = true;
-    this.error = '';
-
+  loadMissionsDisponibles(): void {
     this.livreurService.getMissionsDisponibles().subscribe({
-      next: (data: any) => {
-        this.missions = Array.isArray(data) ? data : data.missions ?? [];
-        this.applyFilter();
-        this.loading = false;
+      next: (res: any) => {
+        const data = Array.isArray(res) ? res : res.missions ?? [];
+        console.log("data ready:", data)
+        this.missions = data.filter((cmd: any) => cmd.status === 'PENDING_PICKUP');
+        this.error.set(null);
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Erreur lors du chargement des missions';
-        this.loading = false;
+        this.error.set("Impossible de charger les missions disponibles.");
+        this.missions = [];
+      }
+    });
+  }
+
+  loadBonDesLivraisons(): void {
+    if (!this.livreurId) return;
+
+    this.bondelivraison.getBondelisraisonsByLivreur(this.livreurId).subscribe({
+      next: res => {
+        this.missions = Array.isArray(res?.bons) ? res.bons : [];
+        if (this.missions.length === 0) {
+          this.error.set("Aucune livraison trouvée pour ce livreur.");
+        } else {
+          this.error.set(null);
+        }
       },
+      error: err => {
+        console.error("Erreur lors du chargement des bons de livraison:", err);
+        this.error.set("Impossible de charger les bons de livraison. Veuillez réessayer plus tard.");
+        this.missions = [];
+      }
     });
   }
 
@@ -66,20 +98,16 @@ export class MissionList {
       : 0;
   }
 
-  getTotalProduits(mission: Commande) {
-    return (
-      mission.produits?.reduce((sum, p) => sum + (p.quantite ?? 0), 0) ?? 0
-    );
-  }
 
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      READY: 'Prête',
-      SHIPPED: 'En livraison',
+      PENDING_PICKUP: 'Prête',
+      IN_TRANSIT: 'En livraison',
       DELIVERED: 'Livrée'
     };
     return labels[status] || status;
   }
+
 
   formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleString('fr-FR', {
@@ -91,34 +119,40 @@ export class MissionList {
     });
   }
 
+
   acceptMission(missionId: string) {
-    const livreurId = '68f743532df2f750af13a58d';
-    this.livreurService.accepterMission(livreurId, missionId).subscribe({
+    if (!this.livreurId) return;
+
+    this.livreurService.accepterMission(this.livreurId, missionId).subscribe({
       next: (updatedMission) => {
-        const index = this.missions.findIndex((m) => m.id === missionId);
-        if (index !== -1) this.missions[index] = updatedMission;
+        const i = this.missions.findIndex(m => m.id === missionId);
+        if (i !== -1) {
+          this.missions[i] = updatedMission;
+        }
         this.applyFilter();
-        alert('✅ Mission acceptée avec succès!');
+        alert("Livraison confirmée !");
       },
-      error: (err) => {
-        console.error('Erreur accepter mission:', err);
-        alert('❌ Erreur lors de l\'acceptation de la mission.');
-      },
+
+    error: err => console.error(err)
     });
   }
 
   completeDelivery(missionId: string) {
-    this.livreurService.livrerCommande(missionId).subscribe({
+    if (!this.livreurId) return;
+
+    this.bondelivraison.livrerCommande(missionId).subscribe({
       next: (updatedMission) => {
-        const index = this.missions.findIndex((m) => m.id === missionId);
-        if (index !== -1) this.missions[index] = updatedMission;
+        const i = this.missions.findIndex(m => m.id === missionId);
+
+        if (i !== -1) {
+          this.missions[i]= updatedMission;
+        }
+
         this.applyFilter();
-        alert('✅ Livraison confirmée avec succès!');
+        alert("Livraison confirmée !");
       },
-      error: (err) => {
-        console.error('Erreur livrer mission:', err);
-        alert('❌ Erreur lors de la confirmation de livraison.');
-      },
+
+    error: err => console.error(err)
     });
   }
 }

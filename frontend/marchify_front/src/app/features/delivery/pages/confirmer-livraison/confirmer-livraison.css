@@ -1,4 +1,4 @@
-/* Smooth animations */
+Smooth animations
 .animate-spin {
   animation: spin 1s linear infinite;
 }

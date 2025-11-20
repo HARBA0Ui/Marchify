@@ -14,7 +14,7 @@ router.get("/missions", getMissionsDisponibles);
 
 router.get('/missions/:id', getMissionById);
 
-router.patch("/missions/accepter/:livreurId/:commandeId", accepterMission);
+router.patch("/missions/accepter/:livreurId/:bonId", accepterMission);
 
 
 router.patch("/missions/refuser/:commandeId", refuserMission);

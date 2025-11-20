@@ -27,7 +27,7 @@ export class MyOrders implements OnInit {
   commandes: Commande[] = [];
   produits: Product[] = [];
   shops: Shop[] = [];
-
+ 
   // 🔹 User ID from auth (not hardcoded)
   clientId: string | null = null;
 
