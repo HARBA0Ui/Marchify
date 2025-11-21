@@ -46,8 +46,13 @@ export const getBonsDeLivraisonByLivreur = async (req, res) => {
   try {
     const { livreurId } = req.params;
 
-    const bons = await db.bonDeLivraison.findMany({
-      where: { livreurId },
+   const bons = await db.bonDeLivraison.findMany({
+  where: {
+  
+  livreurId: String(livreurId)
+    
+  },
+
       include: {
         commande: {
           include: {
@@ -78,11 +83,13 @@ export const getBonsDeLivraisonByLivreur = async (req, res) => {
 
     return res.status(200).json({ bons });
   } catch (error) {
-    console.error("getBonsDeLivraisonByLivreur error:", error);
-    return res.status(500).json({
-      message: "Erreur serveur lors de la récupération des bons",
-    });
-  }
+  console.error("getBonsDeLivraisonByLivreur error:", error);
+  return res.status(500).json({
+    message: "Erreur serveur lors de la récupération des bons",
+    error: error.message || error.toString()
+  });
+}
+
 };
 
 // -----------------------------------------------------

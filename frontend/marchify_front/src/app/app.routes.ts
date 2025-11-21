@@ -7,7 +7,7 @@ import { PanierList } from './layouts/panier-list/panier-list';
 import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
-import { ConfirmerLivraison } from './features/delivery/pages/confirmer-livraison/confirmer-livraison';
+// import { ConfirmerLivraison } from './features/delivery/pages/confirmer-livraison/confirmer-livraison';
 import { UploadPredict } from './features/ai-search/upload-predict/upload-predict';
 import { PredictResults } from './features/ai-search/predict-results/predict-results';
 import { MapComponent } from './map/map';
@@ -87,11 +87,11 @@ export const routes: Routes = [
     title: 'Delivery Missions',
     component: MissionList,
   },
-  {
-    path: 'bondelivraison',
-    title: 'bondelivraison List',
-    component: ConfirmerLivraison,
-  },
+    // {
+    //   path: 'bondelivraison',
+    //   title: 'bondelivraison List',
+    //   component: ConfirmerLivraison,
+    // },
   {
     path: 'login',
     title: 'login',
