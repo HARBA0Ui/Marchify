@@ -72,10 +72,6 @@ export const routes: Routes = [
     title: 'Prediction Results',
     component: PredictResults,
   }, {
-    path: "commande-list-vendor",
-    title: "Commande List Vendor",
-    component: CommandeListVendor
-  }, {
     path: 'delivery/missions',
     title: 'Delivery Missions',
     component: MissionList,
@@ -100,6 +96,7 @@ export const routes: Routes = [
     path: 'notifications',
     title: 'Notifications',
     component: NotificationsList,
-  }
+  },
+  { path: '**', redirectTo: '/product-list' }
 ];
 
