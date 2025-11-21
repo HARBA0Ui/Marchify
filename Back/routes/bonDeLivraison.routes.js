@@ -9,6 +9,6 @@ import{
 const router = express.Router();
 
 router.get("/livreur/:livreurId", getBonsDeLivraisonByLivreur);
-router.get("/getAllBons", getAllBonsDeLivraison);
+router.get("/getAllBons",    getAllBonsDeLivraison);
 router.post("/livreur/:bonId", livrerCommande);
 export default router;

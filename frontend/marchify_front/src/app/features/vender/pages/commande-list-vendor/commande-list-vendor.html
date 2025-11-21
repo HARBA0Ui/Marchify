@@ -1,134 +1,285 @@
-<div class="min-h-screen bg-[#f5f0d4] px-4 py-8">
-  <div class="max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-[#386641] mb-2">Gestion des Commandes</h1>
-      <p class="text-[#386641]/70 text-lg">Gérez vos commandes et mettez à jour leur statut</p>
-    </div>
-
-    <!-- Status Tabs -->
-    <div class="mb-6 overflow-x-auto pb-2">
-      <div class="flex gap-2 min-w-max">
-        @for (status of statusList; track status.value) {
-        <button
-          (click)="filterByStatus(status.value)"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap
-                 {{ selectedStatus === status.value 
-                   ? 'bg-[#386641] text-white' 
-                   : 'bg-white text-[#386641] border border-[#FED16A]/40 hover:bg-[#FED16A]/10' }}">
-          {{ status.label }}
-          <span
-            class="ml-2 px-2 py-0.5 text-xs font-bold rounded-full
-                   {{ selectedStatus === status.value 
-                     ? 'bg-white/30 text-white' 
-                     : 'bg-[#F97A00] text-white' }}">
-            {{ getCommandeCount(status.value) }}
-          </span>
-        </button>
-        }
+<div class="page-wrapper">
+  <div class="container">
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <div class="page-header text-center">
+        <h1 class="!text-4xl font-bold text-[#386641] mb-2">Gestion des Commandes</h1>
+        <p class="text-gray-600">Gérez vos commandes et mettez à jour leur statut en temps réel</p>
       </div>
-    </div>
 
-    <!-- Loading -->
-    @if (loading) {
-      <div class="text-center py-16">
-        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-[#386641] border-t-transparent"></div>
-        <p class="mt-4 text-[#386641] text-lg font-medium">Chargement des commandes...</p>
+      <!-- Shop Selector -->
+      @if (userShops.length > 1) {
+      <div class="mb-6 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+        <label class="text-gray-700 font-medium text-sm mb-2 block">Boutique</label>
+        <select 
+          (change)="onShopChange($any($event.target).value)"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#386641] focus:border-transparent">
+          @for (shop of userShops; track shop.id) {
+          <option [value]="shop.id" [selected]="shop.id === selectedShopId">
+            {{ shop.nom }}
+          </option>
+          }
+        </select>
       </div>
-    }
+      }
 
-    <!-- Error -->
-    @if (error && !loading) {
-      <div class="bg-[#F97A00]/20 border-2 border-[#F97A00] text-[#386641] px-6 py-4 rounded-xl mb-6 font-medium">
-        {{ error }}
+      <!-- Status Tabs -->
+      <div class="status-tabs mb-8">
+        <div class="tabs-container">
+          @for (status of statusList; track status.value) {
+          <button
+            (click)="filterByStatus(status.value)"
+            [class.active]="selectedStatus === status.value"
+            class="status-tab">
+            <i class="fas {{ status.icon }}"></i>
+            <span class="tab-label">{{ status.label }}</span>
+            <span class="tab-count">{{ getCommandeCount(status.value) }}</span>
+          </button>
+          }
+        </div>
       </div>
-    }
 
-    <!-- Empty -->
-    @if (!loading && filteredCommandes.length === 0) {
-      <div class="text-center py-16 bg-white rounded-2xl shadow-lg text-[#386641] font-medium">
-        Aucune commande {{ getStatusInfo(selectedStatus).label.toLowerCase() }}
+      <!-- Error -->
+      @if (error() && !isLoading()) {
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+        <div class="flex items-center">
+          <i class="fa-solid fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+          <div>
+            <p class="text-red-800 font-semibold">Erreur</p>
+            <p class="text-red-700 text-sm">{{ error() }}</p>
+          </div>
+        </div>
       </div>
-    }
+      }
 
-    <!-- Commande List -->
-    @if (!loading && filteredCommandes.length > 0) {
-      <div class="space-y-4">
-        @for (commande of filteredCommandes; track commande.id) {
-        <div class="bg-white rounded-lg border border-[#FED16A]/30 shadow-sm hover:shadow-md transition-shadow duration-200 p-4">
+      <!-- Loading -->
+      @if (isLoading()) {
+      <div class="loading">
+        <div class="w-12 h-12 border-4 border-[#386641] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+        <p>Chargement des commandes...</p>
+      </div>
+      }
+
+      <!-- Empty -->
+      @else if (!isLoading() && filteredCommandes.length === 0) {
+      <div class="no-results">
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fa-solid fa-box text-3xl text-gray-400"></i>
+        </div>
+        <h3>Aucune commande</h3>
+        <p>Aucune commande {{ getStatusInfo(selectedStatus).label.toLowerCase() }}</p>
+      </div>
+      }
+
+      <!-- Commandes List -->
+      @else if (!isLoading() && filteredCommandes.length > 0) {
+      <div class="commandes-list">
+        @for (commande of filteredCommandes; track commande.id; let idx = $index) {
+        <div class="commande-card">
           
-          <!-- Header -->
-          <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
-            <div>
-              <h3 class="text-lg font-bold text-[#386641]">
-                Commande #{{ commande.id.substring(0, 8).toUpperCase() }}
+          <!-- Card Header -->
+          <div class="card-header">
+            <div class="header-left">
+              <h3 class="order-id">
+                <i class="fas fa-shopping-bag mr-2"></i>
+                #{{ commande.id.substring(0, 8).toUpperCase() }}
               </h3>
-              <p class="text-[#386641]/60 text-sm mt-1">
+              <p class="order-date">
+                <i class="far fa-calendar-alt mr-1"></i>
                 {{ formatDate(commande.dateCommande) }}
               </p>
             </div>
-            <span class="px-3 py-1.5 text-xs font-semibold bg-[#386641] text-white rounded-lg">
+            <span class="status-badge" [style.background-color]="getStatusInfo(commande.status).color">
+              <i class="fas {{ getStatusInfo(commande.status).icon }}"></i>
               {{ getStatusInfo(commande.status).label }}
             </span>
           </div>
 
-          <!-- Client Info -->
-          <div class="mb-4 p-3 bg-[#FED16A]/10 rounded-lg">
-            <h4 class="text-[#386641] font-bold text-md mb-2">Client</h4>
-            <div class="text-black text-sm space-y-1">
-              <p class="flex items-center gap-2">
-                <i class="fas fa-user"></i> {{ commande.client.nom }}
-              </p>
-              <p class="flex items-center gap-2">
-                <i class="fas fa-envelope"></i> {{ commande.client.email }}
-              </p>
-              <p class="flex items-center gap-2">
-                <i class="fas fa-phone"></i> {{ commande.client.telephone }}
-              </p>
-              <p class="flex items-center gap-2">
-                <i class="fas fa-map-marker-alt"></i>
-                {{ commande.adresseLivraison.rue }}, {{ commande.adresseLivraison.ville }}
-              </p>
+          <!-- Card Body -->
+          <div class="card-body">
+            
+            <!-- Client Info -->
+            <div class="info-section client-info">
+              <h4 class="section-title">
+                <i class="fas fa-user-circle"></i>
+                Client
+              </h4>
+              <div class="info-content">
+                <p><i class="fas fa-user"></i> {{ getClientFullName(commande) }}</p>
+                <p><i class="fas fa-envelope"></i> {{ commande.client.email }}</p>
+                <p><i class="fas fa-phone"></i> {{ commande.client.telephone }}</p>
+              </div>
+              
+              <div class="delivery-address">
+                <h5><i class="fas fa-map-marker-alt"></i> Livraison</h5>
+                <p>
+                  {{ commande.adresseLivraison.rue }}<br>
+                  {{ commande.adresseLivraison.ville }}, {{ commande.adresseLivraison.codePostal }}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <!-- Produits -->
-          <div class="mb-4">
-            <h4 class="text-[#386641] font-bold text-md mb-2">
-              Produits ({{ getTotalProduits(commande) }})
-            </h4>
-            <div class="space-y-2">
-              @for (produit of commande.produits; track produit.produitId || $index) {
-              <div class="flex justify-between text-sm text-black">
-                <span>{{ produit.nom }} ({{ produit.quantite }} × {{ produit.prixUnitaire }} DT)</span>
-                <span class="font-medium text-zinc-900">{{ produit.prixTotal }} DT</span>
+            <!-- Products Section -->
+            <div class="products-section">
+              <div class="section-header">
+                <h4 class="section-title">
+                  <i class="fas fa-box"></i>
+                  Produits
+                </h4>
+                <button
+                  (click)="toggleProductDetails(idx)"
+                  class="toggle-details-btn">
+                  <i class="fas" [class.fa-chevron-down]="!isProductDetailsExpanded(idx)" [class.fa-chevron-up]="isProductDetailsExpanded(idx)"></i>
+                  {{ isProductDetailsExpanded(idx) ? 'Masquer' : 'Voir détails' }}
+                </button>
+              </div>
+
+              <!-- Compact View -->
+              @if (!isProductDetailsExpanded(idx)) {
+              <div class="products-summary">
+                <span>{{ getTotalProductTypes(commande) }} article(s)</span>
+                <span>{{ getTotalProduits(commande) }} unité(s)</span>
+                <span class="font-bold">{{ commande.totalCommande }} DT</span>
+              </div>
+              }
+
+              <!-- Expanded View -->
+              @if (isProductDetailsExpanded(idx)) {
+              <div class="products-details">
+                @for (cmdProduit of commande.produits; track cmdProduit.id) {
+                <div class="product-item">
+                  
+                  @if (getProductImage(cmdProduit)) {
+                  <img 
+                    [src]="getProductImage(cmdProduit)!" 
+                    [alt]="getProductNom(cmdProduit)" 
+                    class="product-image">
+                  }
+
+                  <div class="product-info-grid">
+                    <div class="product-main-info">
+                      <h5 class="product-name">{{ getProductNom(cmdProduit) }}</h5>
+                      @if (getProductCategorie(cmdProduit)) {
+                      <span class="product-category">{{ getProductCategorie(cmdProduit) }}</span>
+                      }
+                    </div>
+                    
+                    <div class="product-price">
+                      <p class="price-amount">{{ cmdProduit.prixTotal }} DT</p>
+                      <p class="price-label">Total</p>
+                    </div>
+                  </div>
+
+                  <div class="product-details-grid">
+                    <div>
+                      <p class="detail-label">Quantité</p>
+                      <p class="detail-value">
+                        {{ cmdProduit.quantite }}
+                        @if (getProductUnite(cmdProduit)) {
+                          <span class="unit">{{ getUnitLabel(getProductUnite(cmdProduit)) }}</span>
+                        }
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <p class="detail-label">Prix Unit.</p>
+                      <p class="detail-value">{{ getPrixUnitaire(cmdProduit) | number:'1.2-2' }} DT</p>
+                    </div>
+                    
+                    <div>
+                      <p class="detail-label">Sous-total</p>
+                      <p class="detail-value">{{ cmdProduit.prixTotal }} DT</p>
+                    </div>
+                  </div>
+                </div>
+                }
+
+                <!-- Total -->
+                <div class="order-total">
+                  <div>
+                    <p class="total-label">Total de la commande</p>
+                    <p class="total-amount">{{ commande.totalCommande }} DT</p>
+                  </div>
+                  <div class="total-info">
+                    <p>{{ getTotalProductTypes(commande) }} produit(s)</p>
+                    <p>{{ getTotalProduits(commande) }} unité(s)</p>
+                  </div>
+                </div>
               </div>
               }
             </div>
           </div>
 
-          <!-- Total & Actions -->
-          <div class="flex flex-wrap justify-between items-center pt-3 border-t border-[#FED16A]/50 gap-3">
-            <div>
-              <p class="text-[#386641]/60 text-sm">Total</p>
-              <p class="font-bold text-[#386641] text-lg">{{ commande.totalCommande }} DT</p>
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <div class="footer-total">
+              <p class="total-label">Total</p>
+              <p class="total-amount">{{ commande.totalCommande }} DT</p>
             </div>
 
-            @if (getNextStatus(commande.status)) {
-            <button (click)="updateStatus(commande.id)"
-              class="px-4 py-2 bg-[#F97A00] hover:bg-[#FED16A] hover:text-[#386641] text-white text-sm font-medium rounded-lg transition-colors">
-              ✓ {{ getStatusInfo(getNextStatus(commande.status)!).label }}
-            </button>
-            }
-            @if (!getNextStatus(commande.status) && commande.status === 'READY') {
-            <span class="px-4 py-2 bg-[#386641] text-white text-sm font-medium rounded-lg">
-              ✓ Terminée
-            </span>
-            }
+            <div class="action-buttons">
+              <!-- Cancel Button -->
+              @if (canCancelCommande(commande.status)) {
+              <button 
+                (click)="annulerCommande(commande.id)"
+                class="btn-cancel">
+                <i class="fas fa-times"></i>
+                Annuler
+              </button>
+              }
+
+              <!-- Action Buttons -->
+              @if (getActionButton(commande.status); as actionBtn) {
+              <button 
+                (click)="handleStatusAction(commande)"
+                class="btn-primary">
+                <i class="fas {{ actionBtn.icon }}"></i>
+                {{ actionBtn.label }}
+              </button>
+              }
+              @else if (commande.status === CmdStatus.SHIPPED) {
+              <span class="btn-status status-shipped">
+                <i class="fas fa-truck"></i>
+                En cours de livraison
+              </span>
+              }
+              @else if (commande.status === CmdStatus.DELIVERED) {
+              <span class="btn-status status-delivered">
+                <i class="fas fa-check-double"></i>
+                Livrée
+              </span>
+              }
+              @else if (commande.status === CmdStatus.CANCELLED) {
+              <span class="btn-status status-cancelled">
+                <i class="fas fa-ban"></i>
+                Annulée
+              </span>
+              }
+            </div>
           </div>
         </div>
         }
       </div>
-    }
+      }
+    </main>
+  </div>
+
+  <!-- AI Search Button -->
+  <div class="fixed bottom-6 left-6 z-50">
+    <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
+    <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
+    <a
+      routerLink="/ai-search/upload-predict"
+      class="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#386641] to-[#6a994e] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group hover:shadow-[#F97A00]/50"
+      title="Recherche par IA">
+      <div class="relative">
+        <i class="fas fa-brain text-white text-2xl"></i>
+        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
+          <i class="fas fa-camera text-white text-[8px]"></i>
+        </div>
+      </div>
+    </a>
   </div>
 </div>

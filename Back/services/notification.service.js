@@ -9,6 +9,12 @@ const NOTIFICATION_TEMPLATES = {
       `Votre commande #${orderNumber} a été enregistrée avec succès.`,
     priority: "HIGH",
   },
+  NEW_ORDER_RECEIVED: {
+    title: "🛒 Nouvelle commande",
+    message: (orderNumber) =>
+      `Nouvelle commande #${orderNumber} reçue d'un client.`,
+    priority: "URGENT",
+  },
   ORDER_CONFIRMED: {
     title: "Commande acceptée",
     message: (orderNumber) =>

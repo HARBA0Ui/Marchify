@@ -3,8 +3,8 @@
     <!-- Logo -->
     <div class="navbar-brand">
       <a routerLink="/product-list" class="logo">
-   <img src="logo-marchify.png" alt="Marchify Logo" class="logo-img" />       
-    <span class="brand-name" >Marchify</span>
+        <img src="logo-marchify.png" alt="Marchify Logo" class="logo-img" />
+        <span class="brand-name">Marchify</span>
       </a>
     </div>
 
@@ -51,15 +51,13 @@
       </ul>
     </div>
 
-  <!-- Right side actions -->
+    <!-- Right side actions -->
     <div class="navbar-actions">
       <!-- Notification button -->
       <button class="icon-btn notification-btn" (click)="navigateToNotifications()">
         <i class="fas fa-bell"></i>
         @if (unreadCount > 0) {
-          <span class="badge">
-            {{ unreadCount }}
-          </span>
+          <span class="badge">{{ unreadCount }}</span>
         }
       </button>
 
@@ -71,27 +69,73 @@
         </span>
       </button>
 
-      <!-- Zone auth avec async pipe -->
+      <!-- 🔹 User Dropdown Menu -->
       <ng-container *ngIf="authState$ | async as auth">
         <ng-container *ngIf="auth.isLogged; else notLogged">
-          <!-- Utilisateur connecté -->
-          <div class="user-info">
-            <i class="fas fa-user-circle"></i>
-            <span class="username">
-              {{ auth.user?.prenom || auth.user?.nom || 'Utilisateur' }}
-            </span>
-            <span class="role-tag" *ngIf="auth.role">
-              ({{ auth.role }})
-            </span>
-          </div>
+          <!-- User Dropdown -->
+          <div class="user-dropdown-container">
+            <button 
+              class="user-dropdown-btn"
+              (click)="toggleUserDropdown()">
+              <i class="fas fa-user-circle"></i>
+              <span class="username">
+                {{ auth.user?.prenom || auth.user?.nom || 'Utilisateur' }}
+              </span>
+              <i class="fas fa-chevron-down chevron-icon" [class.rotate]="isUserDropdownOpen"></i>
+            </button>
 
-          <button class="btn-logout ripple-btn" (click)="logout()">
-            <i class="fas fa-sign-out-alt"></i>
-          </button>
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown-menu" [class.show]="isUserDropdownOpen">
+              <!-- User Info Header -->
+              <div class="dropdown-header">
+                <div class="user-avatar">
+                  <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                  <p class="user-name">{{ auth.user?.prenom || auth.user?.nom }}</p>
+                  <p class="user-email">{{ auth.user?.email }}</p>
+                  <span class="role-badge">{{ auth.role }}</span>
+                </div>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Role-specific Menu Items -->
+              <div class="dropdown-items">
+                <a 
+                  *ngFor="let item of getFilteredDropdownItems(auth.role)"
+                  [routerLink]="item.path"
+                  class="dropdown-item"
+                  (click)="closeUserDropdown(); closeMobileMenu()">
+                  <i [class]="item.icon"></i>
+                  <span>{{ item.label }}</span>
+                </a>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Common Actions -->
+              <div class="dropdown-items">
+                <a 
+                  routerLink="/notifications"
+                  class="dropdown-item"
+                  (click)="closeUserDropdown(); closeMobileMenu()">
+                  <i class="fas fa-bell"></i>
+                  <span>Notifications</span>
+                </a>
+                <button 
+                  class="dropdown-item logout-btn"
+                  (click)="logout()">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Déconnexion</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </ng-container>
 
         <ng-template #notLogged>
-          <!-- Non connecté -->
+          <!-- Not logged in -->
           <button class="btn-signin ripple-btn" (click)="navigateToLogin()">
             <i class="fas fa-sign-in-alt"></i>
           </button>

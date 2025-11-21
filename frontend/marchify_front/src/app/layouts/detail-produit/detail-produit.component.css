@@ -1,0 +1,30 @@
+/* Smooth transitions */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Star hover effect */
+svg.cursor-pointer:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Textarea focus enhancement */
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(56, 102, 65, 0.1);
+}
+
+/* Button hover effects */
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Review card animation */
+.bg-gray-50:hover {
+  transform: translateY(-2px);
+}
+

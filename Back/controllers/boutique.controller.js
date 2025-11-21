@@ -164,3 +164,59 @@ export const getBoutiqueReviews = async (req, res) => {
     });
   }
 };
+export const getBoutiquesByVendeurId = async (req, res) => {
+  try {
+    const { vendeurId } = req.params; // ✅ Changed from req.query to req.params
+
+    if (!vendeurId) {
+      return res.status(400).json({
+        message: "vendeurId est requis",
+      });
+    }
+
+    // Check if vendeur exists
+    const vendeur = await db.vendeur.findUnique({
+      where: { id: vendeurId },
+    });
+
+    if (!vendeur) {
+      return res.status(404).json({
+        message: "Vendeur non trouvé",
+      });
+    }
+
+    // Get all boutiques for this vendeur
+    const boutiques = await db.boutique.findMany({
+      where: {
+        vendeurId: vendeurId,
+      },
+      include: {
+        produits: true,
+        vendeur: {
+          include: {
+            user: {
+              select: {
+                nom: true,
+                prenom: true,
+                email: true,
+                telephone: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        nom: "asc",
+      },
+    });
+
+    res.json(boutiques);
+  } catch (error) {
+    console.error("getBoutiquesByVendeurId error:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération des boutiques",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+

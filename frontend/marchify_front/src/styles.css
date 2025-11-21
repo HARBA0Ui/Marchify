@@ -5,6 +5,10 @@
     cursor: url('./assets/cursor.png') 2 0, auto;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 button:hover, a:hover, input:hover, label:hover, .shop-card:hover, .shop-card a:hover, .shop-card div:hover, li a{
     cursor: url('./assets/cursor_hover.png') 2 0, auto !important;
 }

@@ -14,32 +14,28 @@ import { CommonModule } from '@angular/common';
 export class NotificationsList implements OnInit {
   private authService = inject(AuthService);
   notificationService = inject(NotificationService);
-  
-  userId: string | null = null; // 🔹 Initialize as null
+
+  userId: string | null = null;
   isLoading = signal(false);
   error = signal<string | null>(null);
   currentFilter = signal<'all' | 'unread'>('all');
 
   ngOnInit() {
-    // 🔹 Get the current user and extract the ID
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (!currentUser || !currentUser.id) {
       console.error('No user logged in');
       this.error.set('Vous devez être connecté pour voir les notifications');
       return;
     }
 
-    // 🔹 Assign the user ID
     this.userId = currentUser.id;
     console.log('User ID:', this.userId);
 
-    // 🔹 Load notifications
     this.loadNotifications();
   }
 
   loadNotifications(): void {
-    // 🔹 Check if userId exists before making the call
     if (!this.userId) {
       this.error.set('ID utilisateur non disponible');
       return;
@@ -118,14 +114,15 @@ export class NotificationsList implements OnInit {
 
   getTypeLabel(type: string): string {
     const typeLabels: Record<string, string> = {
-      ORDER_PLACED: 'Nouvelle commande',
+      ORDER_PLACED: 'Commande placée',
+      NEW_ORDER_RECEIVED: '🛒 Nouvelle commande', // ✅ Added
       ORDER_CONFIRMED: 'Commande confirmée',
-      ORDER_PROCESSING: 'Commande en traitement',
+      ORDER_PROCESSING: 'En traitement',
       ORDER_READY: 'Commande prête',
-      ORDER_SHIPPED: 'Commande expédiée',
-      ORDER_DELIVERED: 'Commande livrée',
-      ORDER_CANCELLED: 'Commande annulée',
-      ORDER_RETURNED: 'Commande retournée',
+      ORDER_SHIPPED: 'Expédiée',
+      ORDER_DELIVERED: 'Livrée',
+      ORDER_CANCELLED: 'Annulée',
+      ORDER_RETURNED: 'Retournée',
       REVIEW_RECEIVED: 'Avis reçu',
       PRODUCT_LOW_STOCK: 'Stock faible',
       PRODUCT_OUT_OF_STOCK: 'Stock épuisé',
@@ -147,5 +144,30 @@ export class NotificationsList implements OnInit {
       LOW: 'Basse',
     };
     return priorityLabels[priority] || priority;
+  }
+
+  // ✅ Get icon for notification type
+  getTypeIcon(type: string): string {
+    const typeIcons: Record<string, string> = {
+      ORDER_PLACED: 'fa-shopping-cart',
+      NEW_ORDER_RECEIVED: 'fa-cash-register', // ✅ Added
+      ORDER_CONFIRMED: 'fa-check-circle',
+      ORDER_PROCESSING: 'fa-spinner',
+      ORDER_READY: 'fa-box-check',
+      ORDER_SHIPPED: 'fa-truck',
+      ORDER_DELIVERED: 'fa-box-open',
+      ORDER_CANCELLED: 'fa-times-circle',
+      ORDER_RETURNED: 'fa-undo',
+      REVIEW_RECEIVED: 'fa-star',
+      PRODUCT_LOW_STOCK: 'fa-exclamation-triangle',
+      PRODUCT_OUT_OF_STOCK: 'fa-times-octagon',
+      NEW_PRODUCT_ADDED: 'fa-plus-circle',
+      DELIVERY_ASSIGNED: 'fa-truck-loading',
+      DELIVERY_PICKED_UP: 'fa-hands-helping',
+      DELIVERY_FAILED: 'fa-exclamation-circle',
+      PROMO_ALERT: 'fa-tag',
+      SYSTEM_ANNOUNCEMENT: 'fa-bullhorn',
+    };
+    return typeIcons[type] || 'fa-bell';
   }
 }

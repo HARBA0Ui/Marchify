@@ -7,14 +7,19 @@ import { PanierList } from './layouts/panier-list/panier-list';
 import { ProductList } from './layouts/product-list/product-list';
 import { CommandeListVendor } from './features/vender/pages/commande-list-vendor/commande-list-vendor';
 import { MissionList } from './features/delivery/pages/mission-list/mission-list';
-import { ConfirmerLivraison } from './features/delivery/pages/confirmer-livraison/confirmer-livraison';
 import { UploadPredict } from './features/ai-search/upload-predict/upload-predict';
 import { PredictResults } from './features/ai-search/predict-results/predict-results';
 import { MapComponent } from './map/map';
 import { AuthComponent } from './features/auth/auth.component';
 import { ProductEditSellerComponent } from './features/seller/pages/product-edit-seller/product-edit-seller.component';
+import { MyOrders } from './features/activities/buyer/my-orders/my-orders';
+import { Deliveries } from './features/activities/delivery/deliveries/deliveries';
+import { Commandes } from './features/activities/seller/commandes/commandes';
 import { RegisterComponent } from './features/register-component/register-component';
 import { NotificationsList } from './layouts/notifications-list/notifications-list';
+import { ShopsListSellerComponent } from './features/seller/pages/shops-list-seller/shops-list-seller.component';
+import { ShopProductsSellerComponent } from './features/seller/pages/shop-products-seller/shop-products-seller.component';
+import { DetailProduitComponent } from './layouts/detail-produit/detail-produit.component';
 
 export const routes: Routes = [
   {
@@ -71,17 +76,11 @@ export const routes: Routes = [
     path: 'predict-results',
     title: 'Prediction Results',
     component: PredictResults,
-  }, {
-    path: 'delivery/missions',
-    title: 'Delivery Missions',
-    component: MissionList,
   },
   {
-    path: 'bondelivraison',
-    title: 'bondelivraison List',
-    component: ConfirmerLivraison,
-  }, {
-    path: 'login', title: 'login', component: AuthComponent
+    path: 'login',
+    title: 'login',
+    component: AuthComponent,
   },
   {
     path: 'register',
@@ -92,11 +91,46 @@ export const routes: Routes = [
     path: 'delivery/map',
     title: 'Delivery Map',
     component: MapComponent,
-  }, {
+  },
+  {
+    path: 'client/ordersList',
+    title: 'Orders List',
+    component: MyOrders,
+  },
+  {
+    path: 'livreur/deliveries',
+    title: 'Deliveries List',
+    component: Deliveries,
+  },
+  {
+    path: 'vendeur/commandesList',
+    title: 'Commandes List',
+    component: Deliveries,
+  },
+  {
     path: 'notifications',
     title: 'Notifications',
     component: NotificationsList,
   },
+  {
+    path: 'seller/shop-list',
+    title: 'Shops List Seller',
+    component: ShopsListSellerComponent,
+  },
+  {
+    path: 'seller/shop-product-seller/:id',
+    title: 'Shop Products Seller',
+    component: ShopProductsSellerComponent,
+  },
+  {
+    path: 'seller/commande-satistics',
+    title: 'Commandes Statistics',
+    component: Commandes,
+  },
+  {
+    path: 'produit/:id',
+    title: " Detail produit ",
+    component: DetailProduitComponent
+  },
   { path: '**', redirectTo: '/product-list' }
 ];
-

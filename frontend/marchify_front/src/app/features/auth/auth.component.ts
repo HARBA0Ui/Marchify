@@ -42,7 +42,7 @@ export class AuthComponent {
         if (user.role === 'LIVREUR') {
           this.router.navigate(['/delivery/missions']);
         } else if (user.role === 'VENDEUR') {
-          this.router.navigate(['/seller/shop-creation']);
+          this.router.navigate(['/seller/shop-list']);
         } else if (user.role === 'CLIENT') {
           this.router.navigate(['/product-list']);
         } else {

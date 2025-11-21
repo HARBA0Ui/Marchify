@@ -53,6 +53,7 @@ enum ReviewType {
 // NEW: Notification Types
 enum NotificationType {
   ORDER_PLACED           // Client placed an order
+  NEW_ORDER_RECEIVED 
   ORDER_CONFIRMED        // Vendeur confirmed order
   ORDER_PROCESSING       // Order is being prepared
   ORDER_READY            // Order ready for pickup

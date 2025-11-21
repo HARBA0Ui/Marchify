@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../../core/models/product';
 import { CommonModule } from '@angular/common';
+import { RouterLink, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-product-card',
-  imports: [CommonModule],
+  imports: [CommonModule,RouterModule],
   templateUrl: './product-card.html',
   styleUrl: './product-card.css',
 })
@@ -17,11 +18,11 @@ export class ProductCard {
   showSuccess = false;
 
   addToCart(): void {
-    if (this.isAdding) return; // Prevent double clicks
+    if (this.isAdding) return;
+    console.log("product: ", this.product)
     
     this.isAdding = true;
     
-    // Reset after animation completes
     setTimeout(() => {
       this.showSuccess = true;
       

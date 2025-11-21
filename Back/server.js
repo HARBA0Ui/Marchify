@@ -11,6 +11,7 @@ import bonDelivraison from "./routes/bonDeLivraison.routes.js"
 import predictRoutes from "./routes/predict.routes.js"
 import userRoutes from "./routes/user.routes.js";
 import notifcationRoutes from "./routes/notifications.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 dotenv.config();
 const app = express();
@@ -34,7 +35,7 @@ app.use("/api/commandes", commandesRoutes);
 app.use("/api/livreur", livreurRoutes);
 app.use("/api/notifications", notifcationRoutes);
 app.use("/api/bonDeLivraison", bonDelivraison);
-
+app.use("/api/reviews", reviewRoutes);
 // Start server
 
 const PORT = process.env.PORT || 3000;

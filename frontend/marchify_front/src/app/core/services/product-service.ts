@@ -20,10 +20,15 @@ export class ProductService {
   getProductById(id: string): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
+  getProductsByShopId(shopId: string): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/shop/${shopId}`);
+  }
 
-  // 🔹 Create a new product
-  createProduct(product: ProductCreateRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, product); // no FormData
+  getProductsByIds(ids: string[]): Observable<Product[]> {
+    return this.http.post<Product[]>(`${this.apiUrl}/batch`, ids);
+  }
+  createProduct(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, formData);
   }
 
   // 🔹 Update product

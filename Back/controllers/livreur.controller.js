@@ -56,105 +56,105 @@ export const getMissionById = async (req, res) => {
   }
 };
 
-export const accepterMission = async (req, res) => {
-  try {
-    const { bonId, livreurId } = req.params;
+  export const accepterMission = async (req, res) => {
+    try {
+      const {  livreurId,bonId } = req.params;
 
-    const bon = await db.bonDeLivraison.findUnique({
-      where: { id: bonId },
-      include: {
-        commande: {
-          include: {
-            client: true,
-            boutique: { include: { vendeur: true } },
+      const bon = await db.bonDeLivraison.findUnique({
+        where: { id: bonId },
+        include: {
+          commande: {
+            include: {
+              client: true,
+              boutique: { include: { vendeur: true } },
+            },
           },
+          livreur: { include: { user: true } },
         },
-        livreur: { include: { user: true } },
-      },
-    });
+      });
 
-    if (!bon)
-      return res.status(404).json({ message: "Bon de livraison introuvable" });
-    if (bon.status !== "PENDING_PICKUP")
-      return res.status(400).json({ message: "Mission non disponible" });
-    if (bon.livreurId)
-      return res.status(400).json({ message: "Mission déjà prise" });
+      if (!bon)
+        return res.status(404).json({ message: "Bon de livraison introuvable" });
+      if (bon.status !== "PENDING_PICKUP")
+        return res.status(400).json({ message: "Mission non disponible" });
+      if (bon.livreurId)
+        return res.status(402).json({ message: "Mission déjà prise" });
 
-    // Get livreur info
-    const livreur = await db.livreur.findUnique({
-      where: { id: livreurId },
-      include: { user: true },
-    });
+      // Get livreur info
+      const livreur = await db.livreur.findUnique({
+        where: { id: livreurId },
+        include: { user: true },
+      });
 
-    if (!livreur) {
-      return res.status(404).json({ message: "Livreur introuvable" });
-    }
+      if (!livreur) {
+        return res.status(404).json({ message: "Livreur introuvable" });
+      }
 
-    const updatedBon = await db.bonDeLivraison.update({
-      where: { id: bonId },
-      data: {
-        livreurId,
-        status: "IN_TRANSIT",
-        commande: { update: { status: "SHIPPED" } },
-      },
-      include: {
-        commande: {
-          include: {
-            client: true,
-            boutique: { include: { vendeur: true } },
+      const updatedBon = await db.bonDeLivraison.update({
+        where: { id: bonId },
+        data: {
+          livreurId,
+          status: "IN_TRANSIT",
+          commande: { update: { status: "SHIPPED" } },
+        },
+        include: {
+          commande: {
+            include: {
+              client: true,
+              boutique: { include: { vendeur: true } },
+            },
           },
+          livreur: { include: { user: true } },
         },
-        livreur: { include: { user: true } },
-      },
-    });
+      });
 
-    // 🔔 Notify client that delivery has been assigned and is on the way
-    const orderNumber = updatedBon.commande.id.slice(-8).toUpperCase();
-    await createNotification({
-      userId: updatedBon.commande.clientId,
-      type: "ORDER_SHIPPED",
-      data: { orderNumber },
-      commandeId: updatedBon.commande.id,
-      actionUrl: `/orders/${updatedBon.commande.id}/track`,
-      metadata: {
-        deliveryId: updatedBon.id,
-        livreurName: `${livreur.user.prenom} ${livreur.user.nom}`,
-        livreurPhone: livreur.user.telephone,
-        status: "accepted_and_in_transit",
-      },
-    });
-
-    // 🔔 Notify vendeur that delivery has been accepted
-    if (updatedBon.commande.boutique?.vendeur?.userId) {
+      // 🔔 Notify client that delivery has been assigned and is on the way
+      const orderNumber = updatedBon.commande.id.slice(-8).toUpperCase();
       await createNotification({
-        userId: updatedBon.commande.boutique.vendeur.userId,
-        type: "DELIVERY_PICKED_UP",
+        userId: updatedBon.commande.clientId,
+        type: "ORDER_SHIPPED",
         data: { orderNumber },
         commandeId: updatedBon.commande.id,
-        actionUrl: `/vendor/orders/${updatedBon.commande.id}`,
+        actionUrl: `/orders/${updatedBon.commande.id}/track`,
         metadata: {
           deliveryId: updatedBon.id,
           livreurName: `${livreur.user.prenom} ${livreur.user.nom}`,
-          acceptedAt: new Date().toISOString(),
+          livreurPhone: livreur.user.telephone,
+          status: "accepted_and_in_transit",
         },
       });
+
+      // 🔔 Notify vendeur that delivery has been accepted
+      if (updatedBon.commande.boutique?.vendeur?.userId) {
+        await createNotification({
+          userId: updatedBon.commande.boutique.vendeur.userId,
+          type: "DELIVERY_PICKED_UP",
+          data: { orderNumber },
+          commandeId: updatedBon.commande.id,
+          actionUrl: `/vendor/orders/${updatedBon.commande.id}`,
+          metadata: {
+            deliveryId: updatedBon.id,
+            livreurName: `${livreur.user.prenom} ${livreur.user.nom}`,
+            acceptedAt: new Date().toISOString(),
+          },
+        });
+      }
+
+      // 🔔 Update order status notification
+      await notifyOrderStatusChange(updatedBon.commande, "SHIPPED");
+
+      res.json({
+        message: "Mission acceptée avec succès",
+        bonDeLivraison: updatedBon,
+      });
+    } catch (error) {
+      console.error("accepterMission error:", error);
+      res.status(500).json({
+        message: "Erreur lors de l'acceptation de la mission",
+        error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      });
     }
-
-    // 🔔 Update order status notification
-    await notifyOrderStatusChange(updatedBon.commande, "SHIPPED");
-
-    res.json({
-      message: "Mission acceptée avec succès",
-      bonDeLivraison: updatedBon,
-    });
-  } catch (error) {
-    console.error("accepterMission error:", error);
-    res.status(500).json({
-      message: "Erreur lors de l'acceptation de la mission",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
-    });
-  }
-};
+  };
 
 export const refuserMission = async (req, res) => {
   try {

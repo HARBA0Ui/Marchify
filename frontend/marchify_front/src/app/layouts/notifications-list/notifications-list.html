@@ -83,11 +83,7 @@
         </div>
         <h3 class="text-lg font-semibold text-gray-800 mb-1">Aucune notification</h3>
         <p class="text-gray-600 text-sm mb-3">
-          {{
-            currentFilter() === 'unread' 
-            ? "Vous avez tout lu !" 
-            : "Rien de nouveau pour le moment."
-          }}
+          {{ currentFilter() === 'unread' ? "Vous avez tout lu !" : "Rien de nouveau pour le moment." }}
         </p>
         @if (currentFilter() === 'unread') {
           <button
@@ -107,14 +103,17 @@
           <div 
             [style.--color-start]="notificationService.getColor(notification.priority) + '08'"
             [style.--color-end]="notificationService.getColor(notification.priority) + '03'"
-            [style.--color-hover-start]="notificationService.getColor(notification.priority) + '20'"
-            [style.--color-hover-end]="notificationService.getColor(notification.priority) + '10'"
             [style.background]="!notification.read ? 'linear-gradient(to right, var(--color-start), var(--color-end))' : '#ffffff'"
             (click)="!notification.read && markAsRead(notification.id)"
             [class.cursor-pointer]="!notification.read"
             class="notification-hover flex items-start gap-3 px-4 py-3 border-b border-gray-100 last:border-b-0 transition-all duration-200 group relative">
             
-          
+            <!-- ✅ Icon Circle -->
+            <div 
+              [style.background-color]="notificationService.getColor(notification.priority)"
+              class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+              <i class="fas {{ getTypeIcon(notification.type) }} text-white text-sm"></i>
+            </div>
 
             <!-- Content -->
             <div class="flex-1 min-w-0">
@@ -140,7 +139,23 @@
                 {{ notification.message }}
               </p>
 
-              <!-- User Name -->
+              <!-- ✅ Show client name for NEW_ORDER_RECEIVED -->
+              @if (notification.type === 'NEW_ORDER_RECEIVED' && notification.metadata?.clientName) {
+                <p class="text-xs text-gray-700 font-medium mb-1">
+                  <i class="fas fa-user text-[#386641] mr-1"></i>
+                  Client: {{ notification.metadata.clientName }}
+                </p>
+              }
+
+              <!-- ✅ Show order total -->
+              @if (notification.metadata?.orderTotal) {
+                <p class="text-xs text-gray-700 font-medium mb-1">
+                  <i class="fas fa-money-bill-wave text-green-600 mr-1"></i>
+                  Total: {{ notification.metadata.orderTotal }} DT
+                </p>
+              }
+
+              <!-- Priority -->
               <p class="text-xs font-semibold" [style.color]="notificationService.getColor(notification.priority)">
                 {{ getPriorityLabel(notification.priority) }}
               </p>
@@ -188,3 +203,4 @@
       </div>
     }
   </div>
+</div>
