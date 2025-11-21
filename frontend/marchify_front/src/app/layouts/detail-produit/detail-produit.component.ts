@@ -99,10 +99,6 @@ export class DetailProduitComponent implements OnInit {
       return;
     }
 
-    if (!this.newRating) {
-      return alert('Veuillez donner une note');
-    }
-
     if (!this.isCommentValid()) {
       return alert('Le commentaire doit contenir au moins 6 caractères.');
     }
@@ -110,7 +106,7 @@ export class DetailProduitComponent implements OnInit {
     const payload = {
       type: 'PRODUIT',
       produitId: this.produit.id,
-      rating: this.newRating,
+      rating: this.newRating ? this.newRating : 0,
       comment: this.newComment.trim(),
       authorName: this.userName,
       userId: currentUser.id

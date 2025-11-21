@@ -5,11 +5,11 @@ export const addReview = async (req, res) => {
   try {
     // ✅ Get userId from request body instead of req.user
     const { type, produitId, boutiqueId, rating, comment, userId } = req.body;
-    console.log("userId from body:", userId);
+    console.log(req.body)
 
     if (!userId)
       return res.status(401).json({ message: "Utilisateur non authentifié" });
-    if (!type || !rating)
+    if (rating == null)
       return res.status(400).json({ message: "Type et rating obligatoires" });
     if (!["PRODUIT", "BOUTIQUE"].includes(type))
       return res.status(400).json({ message: "Type invalide" });

@@ -190,7 +190,7 @@
           <!-- SUBMIT BUTTON -->
           <button 
             (click)="submitReview()" 
-            [disabled]="!isCommentValid() || !newRating"
+            [disabled]="!isCommentValid()"
             class="bg-[#386641] hover:bg-[#2d5234] text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
             <i class="fas fa-paper-plane mr-2"></i>
             Publier l'avis

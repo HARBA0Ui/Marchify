@@ -5,9 +5,8 @@ import {
   getProduitById,
   updateProduit,
   getProduitsByIds,
-  getProduitsByShopId
-
-
+  getProduitsByShopId,
+  deleteProduit
 } from "../controllers/produit.controller.js";
 import upload from "../utils/multer.js"; // import multer config
 
@@ -21,5 +20,6 @@ router.get("/:id", getProduitById);
 router.put("/:id", updateProduit);
 router.post('/batch', getProduitsByIds);
 router.get("/shop/:shopId", getProduitsByShopId);
+router.delete("/:id", deleteProduit);
 
 export default router;
