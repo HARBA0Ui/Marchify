@@ -163,7 +163,7 @@ export const deleteProduit = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get the top 6 pinned products with the best average rating
+// Get the top 3 pinned products with the best average rating
 export const getPinnedTopRatedProduits = async (req, res) => {
   try {
     // 1. Get all pinned products
@@ -189,7 +189,7 @@ export const getPinnedTopRatedProduits = async (req, res) => {
     const topPinned = productsWithAvgRating
       .filter(p => p.averageRating > 0)
       .sort((a, b) => b.averageRating - a.averageRating)
-      .slice(0, 6);
+      .slice(0, 3);
 
     res.json(topPinned);
   } catch (error) {

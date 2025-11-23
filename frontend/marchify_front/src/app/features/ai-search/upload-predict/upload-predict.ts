@@ -31,7 +31,7 @@ export class UploadPredict implements AfterViewInit, OnDestroy {
 
   // Game state
   gameScore = 0;
-  gameLives = 3;
+  gameLives = 5;
   gameOver = false;
   vegetables: Vegetable[] = [];
   gameInterval: any;
@@ -73,7 +73,7 @@ export class UploadPredict implements AfterViewInit, OnDestroy {
 
   startGame() {
     this.gameScore = 0;
-    this.gameLives = 3;
+    this.gameLives = 5;
     this.gameOver = false;
     this.vegetables = [];
 

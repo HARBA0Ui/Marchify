@@ -50,7 +50,7 @@ export class ProductList implements OnInit {
     this.productService.getPinnedTopRatedProduits().subscribe({
       next: (products) => {
         // Get only the first 6 products
-        this.topPinnedProducts = (products || []).slice(0, 6);
+        this.topPinnedProducts = (products || []).slice(0, 3);
       },
       error: (err) => {
         console.error('Erreur chargement des produits épinglés/top:', err);

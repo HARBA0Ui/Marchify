@@ -8,18 +8,13 @@ const FASTAPI_URL =
 const TOP_PREDICTIONS = parseInt(process.env.TOP_PREDICTIONS || "5", 10);
 const MAX_RESULTS = parseInt(process.env.MAX_RESULTS || "20", 10);
 
-// MASSIVE weight difference - name gets 10x priority over category [web:37][web:45]
+// Search weights for relevance calculation
 const SEARCH_WEIGHT_NAME = parseFloat(process.env.SEARCH_WEIGHT_NAME || "10.0");
 const SEARCH_WEIGHT_CATEGORY = parseFloat(
   process.env.SEARCH_WEIGHT_CATEGORY || "1.0"
 );
 const SEARCH_WEIGHT_DESC = parseFloat(process.env.SEARCH_WEIGHT_DESC || "0.3");
-const EXACT_MATCH_BONUS = parseFloat(process.env.EXACT_MATCH_BONUS || "5.0"); // Extra boost for exact name match [web:33][web:45]
-
-// Scoring weights
-const W_CONF = parseFloat(process.env.W_CONF || "0.6");
-const W_PRICE = parseFloat(process.env.W_PRICE || "0.2");
-const W_DIST = parseFloat(process.env.W_DIST || "0.2");
+const EXACT_MATCH_BONUS = parseFloat(process.env.EXACT_MATCH_BONUS || "5.0");
 
 async function callFastApi(imageBase64) {
   const payload = { image_base64: imageBase64 };
@@ -27,13 +22,8 @@ async function callFastApi(imageBase64) {
   return r.data?.predictions || [];
 }
 
-function normalize(value, min, max) {
-  if (max === min) return 0;
-  return (value - min) / (max - min);
-}
-
 /**
- * Multi-pass search: name FIRST, then add category/description [web:31]
+ * Multi-pass search: name FIRST, then add category/description
  */
 async function searchProductsMultiPass(predictions) {
   const searchTerms = [];
@@ -45,7 +35,7 @@ async function searchProductsMultiPass(predictions) {
 
   if (searchTerms.length === 0) return [];
 
-  // PASS 1: Search ONLY in NAME field (highest priority) [web:31][web:37]
+  // PASS 1: Search ONLY in NAME field (highest priority)
   const nameQuery = searchTerms.map((term) => ({
     nom: { contains: term, mode: "insensitive" },
   }));
@@ -56,7 +46,7 @@ async function searchProductsMultiPass(predictions) {
     take: MAX_RESULTS,
   });
 
-  // PASS 2: If we need more results, add category matches [web:31]
+  // PASS 2: If we need more results, add category matches
   let allResults = [...nameResults];
   const nameIds = new Set(nameResults.map((p) => p.id));
 
@@ -69,7 +59,7 @@ async function searchProductsMultiPass(predictions) {
       where: {
         AND: [
           { OR: categoryQuery },
-          { NOT: { id: { in: Array.from(nameIds) } } }, // Exclude already found
+          { NOT: { id: { in: Array.from(nameIds) } } },
         ],
       },
       include: { boutique: true },
@@ -79,7 +69,7 @@ async function searchProductsMultiPass(predictions) {
     allResults = [...allResults, ...categoryResults];
   }
 
-  // PASS 3: If still need more, add description matches [web:31]
+  // PASS 3: If still need more, add description matches
   if (allResults.length < MAX_RESULTS) {
     const allIds = new Set(allResults.map((p) => p.id));
     const descQuery = searchTerms.map((term) => ({
@@ -101,7 +91,7 @@ async function searchProductsMultiPass(predictions) {
 }
 
 /**
- * Calculate relevance with HEAVY name priority and exact match bonus [web:33][web:37][web:45]
+ * Calculate relevance with HEAVY name priority and exact match bonus
  */
 function calculateMatchRelevance(product, predictions) {
   let maxScore = 0;
@@ -118,7 +108,7 @@ function calculateMatchRelevance(product, predictions) {
       .map((t) => t.toLowerCase().trim());
 
     for (const term of searchTerms) {
-      // Check EXACT name match first (highest priority) [web:37][web:45]
+      // Check EXACT name match first (highest priority)
       if (productName === term) {
         const score = pred.value * SEARCH_WEIGHT_NAME * EXACT_MATCH_BONUS;
         if (score > maxScore) {
@@ -128,7 +118,7 @@ function calculateMatchRelevance(product, predictions) {
         }
       }
 
-      // Check partial name match (still very high priority) [web:37]
+      // Check partial name match (still very high priority)
       else if (productName.includes(term)) {
         const score = pred.value * SEARCH_WEIGHT_NAME;
         if (score > maxScore) {
@@ -138,7 +128,7 @@ function calculateMatchRelevance(product, predictions) {
         }
       }
 
-      // Check category match (much lower priority) [web:36]
+      // Check category match (much lower priority)
       else if (productCategory.includes(term)) {
         const score = pred.value * SEARCH_WEIGHT_CATEGORY;
         if (score > maxScore) {
@@ -177,7 +167,7 @@ async function getMatches(imageBase64, userLocation) {
     .sort((a, b) => b.value - a.value)
     .slice(0, TOP_PREDICTIONS);
 
-  // 3. Multi-pass search (name first!) [web:31]
+  // 3. Multi-pass search (name first!)
   const foundProducts = await searchProductsMultiPass(topPreds);
 
   if (foundProducts.length === 0) {
@@ -212,60 +202,36 @@ async function getMatches(imageBase64, userLocation) {
     }
   });
 
-  // 5. Get min/max for normalization
-  const prices = foundProducts.map((p) => p.prix || 0);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-
-  const finiteDistances = distances.filter((d) => Number.isFinite(d));
-  const minDist = finiteDistances.length ? Math.min(...finiteDistances) : 0;
-  const maxDist = finiteDistances.length
-    ? Math.max(...finiteDistances)
-    : minDist || 1;
-
-  // 6. Score each product with HEAVY name priority [web:37][web:45]
+  // 5. Build products with metadata
   const productsWithScores = foundProducts.map((prod, idx) => {
     const price = prod.prix || 0;
     const dist = distances[idx];
 
-    // Calculate relevance (with 10x name boost and exact match bonus) [web:33][web:45]
+    // Calculate relevance
     const { relevanceScore, matchedIn, isExactMatch } = calculateMatchRelevance(
       prod,
       topPreds
     );
 
-    // Normalize components
-    const normPrice = 1 - normalize(price, minPrice, maxPrice);
-    const normDist =
-      dist === Infinity ? 0 : 1 - normalize(dist, minDist, maxDist);
-    const normConf = relevanceScore;
-
-    // Final score
-    const score = W_CONF * normConf + W_PRICE * normPrice + W_DIST * normDist;
-
     return {
       produit: prod,
-      score,
       matchConfidence: relevanceScore,
       matchedIn,
       isExactMatch,
       computed: {
-        normConf,
-        normPrice,
-        normDist,
         price,
         distanceKm: dist,
       },
     };
   });
 
-  // 7. Sort with STRICT name priority [web:37][web:40]
+  // 6. Sort with STRICT hierarchical priority: Name → Price → Distance → Category → Description
   productsWithScores.sort((a, b) => {
-    // Priority 1: Exact name matches ALWAYS first [web:37]
+    // Priority 1: Exact name matches ALWAYS first
     if (a.isExactMatch && !b.isExactMatch) return -1;
     if (!a.isExactMatch && b.isExactMatch) return 1;
 
-    // Priority 2: Name matches before category/description [web:36]
+    // Priority 2: Name matches before category/description
     const matchPriority = {
       name_exact: 4,
       name: 3,
@@ -276,14 +242,36 @@ async function getMatches(imageBase64, userLocation) {
     const priorityB = matchPriority[b.matchedIn] || 0;
 
     if (priorityA !== priorityB) {
-      return priorityB - priorityA;
+      return priorityB - priorityA; // Higher priority first
     }
 
-    // Priority 3: Within same match type, sort by score
-    return b.score - a.score;
+    // Priority 3: Within same match type, sort by PRICE (lower is better)
+    const priceA = a.computed.price || 0;
+    const priceB = b.computed.price || 0;
+
+    if (Math.abs(priceA - priceB) > 0.01) {
+      return priceA - priceB; // Lower price first
+    }
+
+    // Priority 4: Within same price, sort by DISTANCE (closer is better)
+    const distA =
+      a.computed.distanceKm === Infinity
+        ? Number.MAX_VALUE
+        : a.computed.distanceKm;
+    const distB =
+      b.computed.distanceKm === Infinity
+        ? Number.MAX_VALUE
+        : b.computed.distanceKm;
+
+    if (Math.abs(distA - distB) > 0.01) {
+      return distA - distB; // Closer first
+    }
+
+    // Priority 5: Final tiebreaker - match confidence
+    return b.matchConfidence - a.matchConfidence;
   });
 
-  // 8. Format results
+  // 7. Format results
   const results = productsWithScores.map((p) => ({
     id: p.produit.id,
     nom: p.produit.nom,
@@ -295,7 +283,6 @@ async function getMatches(imageBase64, userLocation) {
       nom: p.produit.boutique?.nom,
       localisation: p.produit.boutique?.localisation,
     },
-    score: Number(p.score.toFixed(4)),
     matchConfidence: Number(p.matchConfidence.toFixed(4)),
     matchedIn: p.matchedIn,
     isExactMatch: p.isExactMatch,

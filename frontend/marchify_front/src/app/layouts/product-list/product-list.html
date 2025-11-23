@@ -70,26 +70,9 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 flex flex-col gap-8">
+  <main class="flex-1 flex flex-col">
 
-    <!-- Pinned/Top Note Products Section -->
-<section *ngIf="topPinnedProducts.length > 0  " class="highlighted-products bg-gray-50 rounded-2xl border border-[#386641] shadow p-6 mb-2">
-  <div class="products-header text-center mb-4">
-    <h2 class="text-3xl font-bold text-[#386641] flex items-center justify-center gap-3">
-      <i class="fas fa-fire text-yellow-500"></i>
-      <span class="font-bold">Top Note</span>
-    </h2>
-    <p class="text-gray-600">Les produits épinglés ayant la meilleure note</p>
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-    <app-product-mostrate-card
-      *ngFor="let product of topPinnedProducts"
-      [product]="product"
-      (addToCartEvent)="onAddToCart($event)"
-      (viewDetailsEvent)="onViewDetails($event)">
-    </app-product-mostrate-card>
-  </div>
-</section>
+    
 
 
 
@@ -99,6 +82,18 @@
       <p class="text-gray-600 mb-1">Découvrez nos boutiques partenaires et explorez leurs univers uniques.</p>
       <p><strong>{{ filteredProducts.length }} produits disponibles</strong></p>
     </div>
+    <!-- Pinned/Top Note Products Section -->
+<section *ngIf="topPinnedProducts.length > 0  " class="highlighted-products bg-gray-50 rounded-2xl border border-[#386641] shadow p-6 mb-2">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+    <app-product-mostrate-card
+      *ngFor="let product of topPinnedProducts"
+      [product]="product"
+      (addToCartEvent)="onAddToCart($event)"
+      (viewDetailsEvent)="onViewDetails($event)">
+    </app-product-mostrate-card>
+  </div>
+</section>
 
     <!-- Loading State -->
     <div *ngIf="isLoading" class="text-center py-10">
