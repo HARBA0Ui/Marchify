@@ -1,4 +1,9 @@
-<div class="p-card bg-white shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 max-w-sm border-zinc-200 border-[1px] min-h-[180px]">
+<div class="p-card bg-white shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 max-w-sm border-zinc-200 border-[1px] min-h-[180px] relative">
+ <div class="banner bg-yellow-400 text-yellow-900 font-bold px-3 py-1 absolute top-2 left-2 rounded flex items-center gap-1">
+       <i class="fas fa-thumbtack text-yellow-500"></i>
+    Pinned
+</div>
+
   <div class="p-4 flex gap-4 items-center">
     <!-- Left side - Product info -->
     <div class="flex-1 flex flex-col justify-between w-2/3">
@@ -7,7 +12,7 @@
         {{ product.nom }}
       </h3>
 
-      <!-- Boutique ID (temporary until you fetch boutique name) -->
+      <!-- Boutique ID -->
       <div class="flex items-center gap-1 mb-3 text-sm text-gray-600">
         <i class="fas fa-store text-xs"></i>
         <span>Boutique</span>
@@ -21,7 +26,6 @@
 
       <!-- Action buttons -->
       <div class="flex items-center gap-2 relative">
-        <!-- Add to cart button - icon only -->
         <button 
           class="add-to-cart flex items-center justify-center bg-[#386641] text-white rounded-sm w-10 h-10 hover:bg-[#2d5234] transition-all"
           [class.adding]="isAdding" 
@@ -30,17 +34,11 @@
           [disabled]="isAdding"
           title="Ajouter au panier">
 
-          <!-- Default state -->
           <i *ngIf="!isAdding && !showSuccess" class="fas fa-shopping-cart text-sm"></i>
-
-          <!-- Loading state -->
           <span *ngIf="isAdding && !showSuccess" class="loader"></span>
-
-          <!-- Success state -->
           <i *ngIf="showSuccess" class="fas fa-check text-sm"></i>
         </button>
 
-        <!-- Details button - icon only -->
         <a [routerLink]="['/produit', product.id]">
           <button 
             class="flex items-center justify-center border border-gray-300 rounded-sm w-10 h-10 hover:bg-gray-50 hover:border-gray-400 transition-all"
@@ -49,7 +47,6 @@
           </button>
         </a>
 
-        <!-- Flying cart icon animation -->
         <i *ngIf="isAdding" class="fas fa-shopping-cart flying-cart"></i>
       </div>
     </div>

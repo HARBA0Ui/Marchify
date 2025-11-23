@@ -184,6 +184,24 @@
             </label>
           </div>
         </div>
+        <!-- Pinned Toggle -->
+<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+  <div class="flex items-center justify-between">
+    <div class="flex-1">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">
+        <i class="fas fa-thumbtack text-[#F97A00] mr-2"></i>
+        Produit épinglé
+      </label>
+      <p class="text-xs text-gray-600">Activez pour mettre ce produit en avant</p>
+    </div>
+    <label class="relative inline-flex items-center cursor-pointer">
+      <input type="checkbox" formControlName="Ispinned" class="sr-only peer" />
+      <div class="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:bg-[#F97A00] transition-colors duration-300"></div>
+      <div class="absolute left-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 peer-checked:translate-x-7"></div>
+    </label>
+  </div>
+</div>
+
 
         <!-- Success Message -->
         @if (successMessage) {

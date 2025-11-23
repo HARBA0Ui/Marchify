@@ -43,6 +43,7 @@ export class ProductEditSellerComponent implements OnInit {
       quantite: [0, [Validators.required, Validators.min(0)]],
       unite: ['KILOGRAMME', Validators.required],
       livrable: [true],
+      Ispinned: [false],
     });
   }
 
@@ -92,9 +93,9 @@ export class ProductEditSellerComponent implements OnInit {
 
   onCancel(): void {
     if (this.product?.boutiqueId) {
-      this.router.navigate(['/seller/shop-products', this.product.boutiqueId]);
+      this.router.navigate(['/seller/shop-list', this.product.boutiqueId]);
     } else {
-      this.router.navigate(['/seller/shops']);
+      this.router.navigate(['/seller/shop-list']);
     }
   }
 

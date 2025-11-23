@@ -169,6 +169,7 @@ model Produit {
   unite              UniteMesure       @default(KILOGRAMME)
   unitePersonnalisee String?
   livrable           Boolean           @default(true)
+  Ispinned           Boolean           @default(false)
   boutique           Boutique?         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
   boutiqueId         String?           @db.ObjectId
   commandes          CommandeProduit[]

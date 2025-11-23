@@ -6,7 +6,8 @@ import {
   updateProduit,
   getProduitsByIds,
   getProduitsByShopId,
-  deleteProduit
+  deleteProduit,
+  getPinnedTopRatedProduits
 } from "../controllers/produit.controller.js";
 import upload from "../utils/multer.js"; // import multer config
 
@@ -19,6 +20,7 @@ router.get("/", getProduits);
 router.get("/:id", getProduitById);
 router.put("/:id", updateProduit);
 router.post('/batch', getProduitsByIds);
+router.get("/pinned/top-rated", getPinnedTopRatedProduits);
 router.get("/shop/:shopId", getProduitsByShopId);
 router.delete("/:id", deleteProduit);
 

@@ -8,6 +8,7 @@ export interface Product {
   description: string;
   image: string;
   quantite: number;
+  Ispinned: boolean;
   unite: UniteMesure;
   livrable: boolean;
   boutiqueId: string;

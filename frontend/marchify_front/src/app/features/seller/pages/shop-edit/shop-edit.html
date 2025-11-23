@@ -1,0 +1,142 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+  <div class="max-w-md w-full">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-gradient-to-br from-[#386641] to-[#6a994e] rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-store text-white text-2xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Modifier la boutique</h2>
+        <p class="text-gray-600 mt-2 text-sm">Modifiez les informations de votre boutique</p>
+      </div>
+
+      <form [formGroup]="shopForm" (ngSubmit)="onSubmit()" class="space-y-5">
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
+            <span class="text-red-700 text-sm">{{ errorMessage }}</span>
+          </div>
+        </div>
+        }
+
+        <!-- Shop Name -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-store text-[#386641] mr-2"></i>
+            Nom de la boutique *
+          </label>
+          <input 
+            type="text" 
+            formControlName="nom" 
+            placeholder="Nom de la boutique"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 text-gray-800 placeholder-gray-400" />
+          @if (isFieldInvalid('nom')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('nom') }}</span>
+          </div>
+          }
+        </div>
+        <!-- Address -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-map-marker-alt text-[#386641] mr-2"></i>
+            Adresse *
+          </label>
+          <input 
+            type="text" 
+            formControlName="adresse" 
+            placeholder="Adresse de la boutique"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 text-gray-800 placeholder-gray-400" />
+          @if (isFieldInvalid('adresse')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('adresse') }}</span>
+          </div>
+          }
+        </div>
+        <!-- Category -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-list-alt text-[#386641] mr-2"></i>
+            Catégorie *
+          </label>
+          <select 
+            formControlName="categorie"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 text-gray-800 bg-white cursor-pointer">
+            <option value="">Sélectionnez une catégorie</option>
+            @for (cat of categories; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+          @if (isFieldInvalid('categorie')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('categorie') }}</span>
+          </div>
+          }
+        </div>
+        <!-- Phone -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-phone text-[#386641] mr-2"></i>
+            Téléphone *
+          </label>
+          <input 
+            type="tel" 
+            formControlName="telephone" 
+            placeholder="98 123 456"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#386641] focus:ring-2 focus:ring-[#386641]/20 text-gray-800 placeholder-gray-400" />
+          @if (isFieldInvalid('telephone')) {
+          <div class="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldError('telephone') }}</span>
+          </div>
+          }
+        </div>
+    
+
+        <!-- Success Message -->
+        @if (successMessage) {
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle text-green-500"></i>
+            <span class="text-green-700 text-sm">{{ successMessage }}</span>
+          </div>
+        </div>
+        }
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 pt-4">
+          <button 
+            type="button" 
+            (click)="onCancel()"
+            class="flex-1 py-3 px-5 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm flex items-center justify-center gap-2">
+            <i class="fas fa-times-circle"></i>
+            <span>Annuler</span>
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="shopForm.invalid || isLoading"
+            class="flex-1 py-3 px-5 bg-gradient-to-r from-[#386641] to-[#6a994e] hover:from-[#2d5234] hover:to-[#386641] text-white font-semibold rounded-lg shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            @if (isLoading) {
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Modification…</span>
+            } @else {
+              <i class="fas fa-check-circle"></i>
+              <span>Enregistrer</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Decorative BG -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute top-0 right-0 w-96 h-96 bg-[#386641]/5 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#F97A00]/5 rounded-full blur-3xl"></div>
+</div>

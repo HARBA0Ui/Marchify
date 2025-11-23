@@ -23,6 +23,9 @@ export class ProductService {
   getProductsByShopId(shopId: string): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.apiUrl}/shop/${shopId}`);
   }
+  getPinnedTopRatedProduits(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/pinned/top-rated`);
+  }
 
   getProductsByIds(ids: string[]): Observable<Product[]> {
     return this.http.post<Product[]>(`${this.apiUrl}/batch`, ids);

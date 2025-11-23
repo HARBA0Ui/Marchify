@@ -7,10 +7,13 @@ import { CommonModule } from '@angular/common';
 import { PanierService } from '../../core/services/panier';
 import { AuthService } from '../../core/services/auth.service';
 import { RouterLink, Router } from '@angular/router';
+import { ProductMostrateCard } from "../product-mostrate-card/product-mostrate-card";
+import { ShopService } from '../../core/services/shop-service';
 
 @Component({
   selector: 'app-product-list',
-  imports: [ProductCard, FormsModule, CommonModule, RouterLink],
+  standalone: true,
+  imports: [ProductCard, FormsModule, CommonModule, RouterLink, ProductMostrateCard],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
 })
@@ -19,9 +22,11 @@ export class ProductList implements OnInit {
   private panierService = inject(PanierService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private boutisqueService = inject(ShopService);
 
   products: Product[] = [];
   filteredProducts: Product[] = [];
+  topPinnedProducts: Product[] = [];
 
   selectedCategory: string = '';
   deliveryFilter: string = 'all';
@@ -33,6 +38,18 @@ export class ProductList implements OnInit {
   ngOnInit() {
     this.loadProducts();
     this.loadCartCount(); // Load initial cart count
+    this.fetchPinnedTopRated();
+  }
+  fetchPinnedTopRated() {
+    this.productService.getPinnedTopRatedProduits().subscribe({
+      next: (products) => {
+        this.topPinnedProducts = products || [];
+      },
+      error: (err) => {
+        console.error('Erreur chargement des produits épinglés/top:', err);
+        this.topPinnedProducts = [];
+      },
+    });
   }
 
   loadProducts() {
@@ -71,7 +88,7 @@ export class ProductList implements OnInit {
       },
       error: () => {
         this.panierService.setCartCount(0);
-      }
+      },
     });
   }
 
@@ -121,7 +138,7 @@ export class ProductList implements OnInit {
   // ✅ Handle add to cart with dynamic clientId
   onAddToCart(product: Product) {
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (!currentUser) {
       alert('Vous devez être connecté pour ajouter au panier');
       this.router.navigate(['/login']);
@@ -131,28 +148,30 @@ export class ProductList implements OnInit {
     const clientId = currentUser.id;
     const quantite = 1;
 
-    this.panierService.ajouterProduit(clientId, product.id, quantite).subscribe({
-      next: (res) => {
-        console.log('Produit ajouté au panier:', res);
-        
-        // 🔹 Reload cart count from database to ensure accuracy
-        // The ProductCard already did optimistic update (+1)
-        // But let's sync with actual DB count to be safe
-        this.loadCartCount();
-      },
-      error: (err) => {
-        console.error('Erreur ajout produit:', err);
-        
-        if (err.status === 400 && err.error?.message) {
-          alert(err.error.message);
-        } else {
-          alert("Impossible d'ajouter le produit au panier.");
-        }
-        
-        // 🔹 Reload cart from DB on error to fix any mismatch
-        this.loadCartCount();
-      },
-    });
+    this.panierService
+      .ajouterProduit(clientId, product.id, quantite)
+      .subscribe({
+        next: (res) => {
+          console.log('Produit ajouté au panier:', res);
+
+          // 🔹 Reload cart count from database to ensure accuracy
+          // The ProductCard already did optimistic update (+1)
+          // But let's sync with actual DB count to be safe
+          this.loadCartCount();
+        },
+        error: (err) => {
+          console.error('Erreur ajout produit:', err);
+
+          if (err.status === 400 && err.error?.message) {
+            alert(err.error.message);
+          } else {
+            alert("Impossible d'ajouter le produit au panier.");
+          }
+
+          // 🔹 Reload cart from DB on error to fix any mismatch
+          this.loadCartCount();
+        },
+      });
   }
 
   onViewDetails(product: Product) {

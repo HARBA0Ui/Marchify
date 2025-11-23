@@ -20,6 +20,7 @@ import { NotificationsList } from './layouts/notifications-list/notifications-li
 import { ShopsListSellerComponent } from './features/seller/pages/shops-list-seller/shops-list-seller.component';
 import { ShopProductsSellerComponent } from './features/seller/pages/shop-products-seller/shop-products-seller.component';
 import { DetailProduitComponent } from './layouts/detail-produit/detail-produit.component';
+import { ShopEdit } from './features/seller/pages/shop-edit/shop-edit';
 
 export const routes: Routes = [
   {
@@ -122,6 +123,11 @@ export const routes: Routes = [
     title: 'Shop Products Seller',
     component: ShopProductsSellerComponent,
   },
+   {
+    path: 'seller/shop-edit/:id',
+    title: 'Shop Edit',
+    component: ShopEdit
+  },
   {
     path: 'seller/commande-satistics',
     title: 'Commandes Statistics',
@@ -132,5 +138,6 @@ export const routes: Routes = [
     title: " Detail produit ",
     component: DetailProduitComponent
   },
-  { path: '**', redirectTo: '/product-list' }
+  { path: '**', redirectTo: '/product-list' },
+ 
 ];

@@ -163,3 +163,48 @@ export const deleteProduit = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Get pinned products with the best average rating
+export const getPinnedTopRatedProduits = async (req, res) => {
+  try {
+    // 1. Get all pinned products
+    const pinnedProducts = await db.produit.findMany({
+      where: { Ispinned: true },
+      include: {
+        reviews: true, // assuming you have Produit.reviews[]
+      },
+    });
+
+    if (!pinnedProducts.length) {
+      return res.json([]);
+    }
+
+    // 2. Calculate average rating for each pinned product
+    const productsWithAvgRating = pinnedProducts.map((p) => {
+      const total = p.reviews.reduce((sum, r) => sum + r.rating, 0);
+      const avg = p.reviews.length ? total / p.reviews.length : 0;
+      return { ...p, averageRating: avg };
+    });
+
+    // 3. Find the highest average rating (can be several products with the same)
+    let bestAvg = 0;
+    productsWithAvgRating.forEach((p) => {
+      if (p.averageRating > bestAvg) bestAvg = p.averageRating;
+    });
+
+    // 4. Filter all pinned products that have this best average rating
+    const topPinned = productsWithAvgRating.filter(
+      (p) => p.averageRating === bestAvg && bestAvg > 0
+    );
+
+    // OR: Return all pinned, sorted by average rating descending
+    // const topPinned = productsWithAvgRating
+    //   .filter(p => p.averageRating > 0)
+    //   .sort((a, b) => b.averageRating - a.averageRating);
+
+    res.json(topPinned);
+  } catch (error) {
+    console.error("Error fetching best pinned products:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+

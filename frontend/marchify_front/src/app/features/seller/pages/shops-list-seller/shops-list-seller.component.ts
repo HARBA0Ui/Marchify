@@ -111,8 +111,9 @@ export class ShopsListSellerComponent implements OnInit {
       console.error('❌ Shop ID is undefined for edit');
       return;
     }
-    console.log('✏️ Editing shop:', shopId);
     this.router.navigate(['/seller/shop-edit', shopId]);
+     console.log('✏️ Editing shop:', shopId);
+
   }
 
   deleteShop(shopId: string): void {
