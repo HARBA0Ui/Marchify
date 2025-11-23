@@ -75,7 +75,7 @@
       class="highlighted-products bg-gray-50 rounded-md border border-[#386641]/50 shadow-xl p-6 mb-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
         <app-product-mostrate-card *ngFor="let product of topPinnedProducts" [product]="product"
-          (addToCartEvent)="onAddToCart($event)" (viewDetailsEvent)="onViewDetails($event)">
+          (addToCartEvent)="onAddToCart($event)" [shopName]="getShopName(product.boutiqueId)" (viewDetailsEvent)="onViewDetails($event)">
         </app-product-mostrate-card>
       </div>
     </section>
@@ -91,7 +91,7 @@
     <div *ngIf="!isLoading && paginatedProducts.length > 0"
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
       <app-product-card *ngFor="let product of paginatedProducts; trackBy: trackById" [product]="product"
-        (addToCartEvent)="onAddToCart($event)" (viewDetailsEvent)="onViewDetails($event)">
+        (addToCartEvent)="onAddToCart($event)" [shopName]="getShopName(product.boutiqueId)" (viewDetailsEvent)="onViewDetails($event)">
       </app-product-card>
     </div>
     <!-- ✅ ADD THIS PAGINATION after the products grid -->

@@ -13,7 +13,13 @@ import { ShopService } from '../../core/services/shop-service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [ProductCard, FormsModule, CommonModule, RouterLink, ProductMostrateCard],
+  imports: [
+    ProductCard,
+    FormsModule,
+    CommonModule,
+    RouterLink,
+    ProductMostrateCard,
+  ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
 })
@@ -22,11 +28,12 @@ export class ProductList implements OnInit {
   private panierService = inject(PanierService);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private boutisqueService = inject(ShopService);
+  private boutiqueService = inject(ShopService);
 
   products: Product[] = [];
   filteredProducts: Product[] = [];
   topPinnedProducts: Product[] = [];
+  shopNames: Map<string, string> = new Map(); // ✅ ADD THIS
 
   // ✅ PAGINATION - ADD THESE
   currentPage: number = 1;
@@ -58,6 +65,25 @@ export class ProductList implements OnInit {
       },
     });
   }
+  loadShopNames() {
+    const uniqueShopIds = [...new Set(this.products.map((p) => p.boutiqueId))];
+
+    uniqueShopIds.forEach((shopId) => {
+      if (shopId) {
+        this.boutiqueService.getShopById(shopId).subscribe({
+          next: (shop) => {
+            if (shop) {
+              this.shopNames.set(shopId, shop.nom);
+            }
+          },
+          error: (err) => {
+            console.error(`Erreur chargement boutique ${shopId}:`, err);
+            this.shopNames.set(shopId, 'Boutique');
+          },
+        });
+      }
+    });
+  }
 
   loadProducts() {
     this.isLoading = true;
@@ -68,6 +94,7 @@ export class ProductList implements OnInit {
         this.extractCategories();
         this.updatePagination(); // ✅ ADD PAGINATION
         this.isLoading = false;
+        this.loadShopNames(); // ✅ ADD THIS
       },
       error: (error) => {
         console.error('Erreur lors du chargement des produits:', error);
@@ -134,10 +161,15 @@ export class ProductList implements OnInit {
     }
     this.updatePagination(); // ✅ UPDATE PAGINATION
   }
+  getShopName(boutiqueId: string): string {
+    return this.shopNames.get(boutiqueId) || 'Boutique';
+  }
 
   // ✅ NEW PAGINATION METHODS
   updatePagination() {
-    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+    this.totalPages = Math.ceil(
+      this.filteredProducts.length / this.itemsPerPage
+    );
     if (this.currentPage > this.totalPages && this.totalPages > 0) {
       this.currentPage = this.totalPages;
     }
@@ -156,7 +188,7 @@ export class ProductList implements OnInit {
 
   triggerJumpAnimation() {
     this.isJumping = true;
-    setTimeout(() => this.isJumping = false, 600);
+    setTimeout(() => (this.isJumping = false), 600);
   }
 
   get pageNumbers(): number[] {
@@ -188,7 +220,7 @@ export class ProductList implements OnInit {
         break;
       }
     }
-    return padding + ((visualIndex + 1) * (buttonWidth + gap));
+    return padding + (visualIndex + 1) * (buttonWidth + gap);
   }
 
   clearFilters() {
@@ -210,21 +242,23 @@ export class ProductList implements OnInit {
     }
     const clientId = currentUser.id;
     const quantite = 1;
-    this.panierService.ajouterProduit(clientId, product.id, quantite).subscribe({
-      next: (res) => {
-        console.log('Produit ajouté au panier:', res);
-        this.loadCartCount();
-      },
-      error: (err) => {
-        console.error('Erreur ajout produit:', err);
-        if (err.status === 400 && err.error?.message) {
-          alert(err.error.message);
-        } else {
-          alert("Impossible d'ajouter le produit au panier.");
-        }
-        this.loadCartCount();
-      },
-    });
+    this.panierService
+      .ajouterProduit(clientId, product.id, quantite)
+      .subscribe({
+        next: (res) => {
+          console.log('Produit ajouté au panier:', res);
+          this.loadCartCount();
+        },
+        error: (err) => {
+          console.error('Erreur ajout produit:', err);
+          if (err.status === 400 && err.error?.message) {
+            alert(err.error.message);
+          } else {
+            alert("Impossible d'ajouter le produit au panier.");
+          }
+          this.loadCartCount();
+        },
+      });
   }
 
   onViewDetails(product: Product) {

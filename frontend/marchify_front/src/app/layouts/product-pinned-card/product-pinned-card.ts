@@ -13,6 +13,7 @@ export class ProductPinnedCard {
   @Input() product!: Product;
   @Output() addToCartEvent = new EventEmitter<Product>();
   @Output() viewDetailsEvent = new EventEmitter<Product>();
+  @Input() shopName: string = 'Boutique'; // ✅ ADD THIS
 
   isAdding = false;
   showSuccess = false;

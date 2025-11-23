@@ -8,10 +8,17 @@ import { PanierService } from '../../core/services/panier';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ProductPinnedCard } from '../product-pinned-card/product-pinned-card';
+import { ShopService } from '../../core/services/shop-service';
 
 @Component({
   selector: 'app-product-byshop-list',
-  imports: [ProductCard, FormsModule, CommonModule, RouterLink, ProductPinnedCard],
+  imports: [
+    ProductCard,
+    FormsModule,
+    CommonModule,
+    RouterLink,
+    ProductPinnedCard,
+  ],
   templateUrl: './product-byshop-list.html',
   styleUrl: './product-byshop-list.css',
 })
@@ -20,6 +27,7 @@ export class ProductByshopList implements OnInit, OnChanges {
   private panierService = inject(PanierService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private boutiqueService = inject(ShopService);
 
   @Input({ required: true }) boutiqueId!: string;
 
@@ -31,7 +39,7 @@ export class ProductByshopList implements OnInit, OnChanges {
   itemsPerPage: number = 9;
   totalPages: number = 0;
   paginatedUnpinnedProducts: Product[] = [];
-  
+
   // Animation state
   isJumping: boolean = false;
 
@@ -40,10 +48,11 @@ export class ProductByshopList implements OnInit, OnChanges {
   sortBy: string = 'name';
   searchQuery: string = '';
   isLoading: boolean = true;
+  shopNames: Map<string, string> = new Map();
 
   // Helper methods
   get hasPinnedProducts(): boolean {
-    return this.filteredProducts.some(p => p.Ispinned);
+    return this.filteredProducts.some((p) => p.Ispinned);
   }
 
   get hasUnpinnedProducts(): boolean {
@@ -51,11 +60,11 @@ export class ProductByshopList implements OnInit, OnChanges {
   }
 
   get pinnedProducts(): Product[] {
-    return this.filteredProducts.filter(p => p.Ispinned);
+    return this.filteredProducts.filter((p) => p.Ispinned);
   }
 
   get unpinnedProducts(): Product[] {
-    return this.filteredProducts.filter(p => !p.Ispinned);
+    return this.filteredProducts.filter((p) => !p.Ispinned);
   }
 
   ngOnInit() {
@@ -77,6 +86,7 @@ export class ProductByshopList implements OnInit, OnChanges {
         );
         this.filteredProducts = [...this.products];
         this.isLoading = false;
+        this.loadShopNames();
         this.applyFilters();
       },
       error: (err) => {
@@ -128,7 +138,7 @@ export class ProductByshopList implements OnInit, OnChanges {
           return a.nom.localeCompare(b.nom);
       }
     });
-    
+
     this.updatePagination();
   }
 
@@ -152,12 +162,34 @@ export class ProductByshopList implements OnInit, OnChanges {
       event.stopPropagation();
       event.stopImmediatePropagation();
     }
-    
+
     if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
       this.triggerJumpAnimation();
       this.currentPage = page;
       this.updatePagination();
     }
+  }
+  loadShopNames() {
+    const uniqueShopIds = [...new Set(this.products.map((p) => p.boutiqueId))];
+
+    uniqueShopIds.forEach((shopId) => {
+      if (shopId) {
+        this.boutiqueService.getShopById(shopId).subscribe({
+          next: (shop) => {
+            if (shop) {
+              this.shopNames.set(shopId, shop.nom);
+            }
+          },
+          error: (err) => {
+            console.error(`Erreur chargement boutique ${shopId}:`, err);
+            this.shopNames.set(shopId, 'Boutique');
+          },
+        });
+      }
+    });
+  }
+  getShopName(boutiqueId: string): string {
+    return this.shopNames.get(boutiqueId) || 'Boutique';
   }
 
   triggerJumpAnimation() {
@@ -201,7 +233,7 @@ export class ProductByshopList implements OnInit, OnChanges {
 
   getSliderPosition(): number {
     if (this.totalPages === 0) return 8;
-    
+
     const buttonWidth = 40;
     const gap = 8;
     const padding = 8;
@@ -214,8 +246,8 @@ export class ProductByshopList implements OnInit, OnChanges {
         break;
       }
     }
-    
-    return padding + ((visualIndex + 1) * (buttonWidth + gap));
+
+    return padding + (visualIndex + 1) * (buttonWidth + gap);
   }
 
   clearFilters() {
@@ -247,7 +279,7 @@ export class ProductByshopList implements OnInit, OnChanges {
         },
         error: (err) => {
           console.error('Erreur ajout produit:', err);
-          alert('Impossible d\'ajouter le produit au panier.');
+          alert("Impossible d'ajouter le produit au panier.");
         },
       });
   }

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-product-mostrate-card',
-  imports: [RouterModule,CommonModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './product-mostrate-card.html',
   styleUrl: './product-mostrate-card.css',
 })
@@ -13,6 +13,7 @@ export class ProductMostrateCard {
   @Input() product!: Product;
   @Output() addToCartEvent = new EventEmitter<Product>();
   @Output() viewDetailsEvent = new EventEmitter<Product>();
+  @Input() shopName: string = 'Boutique'; // ✅ ADD THIS
 
   isAdding = false;
   showSuccess = false;
