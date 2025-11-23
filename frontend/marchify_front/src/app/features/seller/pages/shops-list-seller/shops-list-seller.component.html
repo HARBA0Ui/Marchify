@@ -125,21 +125,33 @@
                 </div>
               </div>
 
-              <!-- Action Buttons (Seller Specific) -->
-              <div class="mt-6 pt-4 border-t border-gray-200 grid grid-cols-2 gap-3">
-                <a
-                  [routerLink]="['/seller/shop-product-seller', shop.id]"
-                  class="flex items-center justify-center gap-2 bg-gradient-to-r from-[#386641] to-[#6a994e] text-white py-2.5 px-4 rounded-lg hover:shadow-md transition-all duration-300 text-sm font-medium group-hover:from-[#2d5234] group-hover:to-[#567d3f]">
-                  <i class="fa-solid fa-box-open"></i>
-                  Produits
-                </a>
-                <button
-                  (click)="editShop(shop.id)"
-                  class="flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-50 hover:border-gray-300 hover:text-[#386641] transition-all duration-300 text-sm font-medium">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                  Modifier
-                </button>
-              </div>
+           <!-- Action Buttons (Seller Specific) -->
+<div class="mt-6 pt-4 border-t border-gray-200">
+  <!-- First row: Products and Edit -->
+  <div class="grid grid-cols-2 gap-3 mb-3">
+    <a
+      [routerLink]="['/seller/shop-product-seller', shop.id]"
+      class="flex items-center justify-center gap-2 bg-gradient-to-r from-[#386641] to-[#6a994e] text-white py-2.5 px-4 rounded-lg hover:shadow-md transition-all duration-300 text-sm font-medium hover:from-[#2d5234] hover:to-[#567d3f]">
+      <i class="fa-solid fa-box-open"></i>
+      Produits
+    </a>
+    <button
+      (click)="editShop(shop.id)"
+      class="flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-50 hover:border-gray-300 hover:text-[#386641] transition-all duration-300 text-sm font-medium">
+      <i class="fa-solid fa-pen-to-square"></i>
+      Modifier
+    </button>
+  </div>
+  
+  <!-- Second row: Delete (full width) -->
+  <button
+    (click)="deleteShop(shop.id)"
+    class="w-full flex items-center justify-center gap-2 bg-red-50 border border-red-200 text-red-600 py-2.5 px-4 rounded-lg hover:bg-red-100 hover:border-red-300 hover:text-red-700 transition-all duration-300 text-sm font-medium">
+    <i class="fa-solid fa-trash-can"></i>
+    Supprimer
+  </button>
+</div>
+
 
             </div>
           </div>

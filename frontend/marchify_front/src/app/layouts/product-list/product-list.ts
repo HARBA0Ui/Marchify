@@ -13,7 +13,13 @@ import { ShopService } from '../../core/services/shop-service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [ProductCard, FormsModule, CommonModule, RouterLink, ProductMostrateCard],
+  imports: [
+    ProductCard,
+    FormsModule,
+    CommonModule,
+    RouterLink,
+    ProductMostrateCard,
+  ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
 })
@@ -43,7 +49,8 @@ export class ProductList implements OnInit {
   fetchPinnedTopRated() {
     this.productService.getPinnedTopRatedProduits().subscribe({
       next: (products) => {
-        this.topPinnedProducts = products || [];
+        // Get only the first 6 products
+        this.topPinnedProducts = (products || []).slice(0, 6);
       },
       error: (err) => {
         console.error('Erreur chargement des produits épinglés/top:', err);

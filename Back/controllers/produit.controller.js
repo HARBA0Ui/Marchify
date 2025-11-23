@@ -163,7 +163,7 @@ export const deleteProduit = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get pinned products with the best average rating
+// Get the top 6 pinned products with the best average rating
 export const getPinnedTopRatedProduits = async (req, res) => {
   try {
     // 1. Get all pinned products
@@ -185,21 +185,11 @@ export const getPinnedTopRatedProduits = async (req, res) => {
       return { ...p, averageRating: avg };
     });
 
-    // 3. Find the highest average rating (can be several products with the same)
-    let bestAvg = 0;
-    productsWithAvgRating.forEach((p) => {
-      if (p.averageRating > bestAvg) bestAvg = p.averageRating;
-    });
-
-    // 4. Filter all pinned products that have this best average rating
-    const topPinned = productsWithAvgRating.filter(
-      (p) => p.averageRating === bestAvg && bestAvg > 0
-    );
-
-    // OR: Return all pinned, sorted by average rating descending
-    // const topPinned = productsWithAvgRating
-    //   .filter(p => p.averageRating > 0)
-    //   .sort((a, b) => b.averageRating - a.averageRating);
+    // 3. Sort by average rating descending and get top 6
+    const topPinned = productsWithAvgRating
+      .filter(p => p.averageRating > 0)
+      .sort((a, b) => b.averageRating - a.averageRating)
+      .slice(0, 6);
 
     res.json(topPinned);
   } catch (error) {
@@ -207,4 +197,5 @@ export const getPinnedTopRatedProduits = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
