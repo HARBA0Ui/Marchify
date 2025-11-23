@@ -18,7 +18,7 @@ router.post("/", upload.array("imageFile", 5), createProduit);
 
 router.get("/", getProduits);
 router.get("/:id", getProduitById);
-router.put("/:id", updateProduit);
+router.put("/:id", upload.array("imageFile", 5), updateProduit);
 router.post('/batch', getProduitsByIds);
 router.get("/pinned/top-rated", getPinnedTopRatedProduits);
 router.get("/shop/:shopId", getProduitsByShopId);

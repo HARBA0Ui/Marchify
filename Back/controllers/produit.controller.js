@@ -103,21 +103,93 @@ export const getProduitsByShopId = async (req, res) => {
 };
 
 // Mettre à jour un produit
+// Mettre à jour un produit
 export const updateProduit = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = req.body;
+    const files = req.files || [];
+    
+    // Extract and parse form fields
+    const {
+      nom,
+      prix,
+      categorie,
+      description,
+      quantite,
+      unite,
+      livrable,
+      Ispinned,
+      existingImage
+    } = req.body;
 
+    // Validate required fields
+    if (!nom || !prix || !categorie || !unite || quantite === undefined) {
+      return res.status(400).json({
+        message: 'Missing required fields'
+      });
+    }
+
+    // Prepare base update data
+    const updateData = {
+      nom,
+      prix: parseFloat(prix),
+      categorie,
+      description: description || '',
+      quantite: parseInt(quantite),
+      unite,
+      livrable: livrable === 'true' || livrable === true,
+      Ispinned: Ispinned === 'true' || Ispinned === true,
+    };
+
+    // Handle image uploads
+    if (files && files.length > 0) {
+      console.log(`📤 Uploading ${files.length} new image(s) to Cloudinary`);
+      
+      const imageUrls = [];
+      
+      for (const file of files) {
+        const url = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "products" },
+            (err, result) => {
+              if (err) {
+                console.error('❌ Cloudinary upload error:', err);
+                reject(err);
+              } else {
+                resolve(result.secure_url);
+              }
+            }
+          );
+          stream.end(file.buffer);
+        });
+        imageUrls.push(url);
+      }
+      
+      // Use first uploaded image
+      updateData.image = imageUrls[0];
+      console.log('✅ Images uploaded successfully');
+      
+    } else if (existingImage) {
+      // Keep existing image if no new images uploaded
+      updateData.image = existingImage;
+      console.log('ℹ️ Keeping existing image');
+    }
+
+    // Update product in database
     const produit = await db.produit.update({
       where: { id },
-      data,
+      data: updateData,
     });
 
+    console.log('✅ Product updated:', produit.id);
     res.json(produit);
+
   } catch (error) {
+    console.error('❌ Error updating product:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Récupérer plusieurs produits par leurs IDs (batch)
 export const getProduitsByIds = async (req, res) => {

@@ -35,11 +35,8 @@ export class ProductService {
   }
 
   // 🔹 Update product
-  updateProduct(
-    id: string,
-    productData: Partial<Product>
-  ): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
+  updateProduct(id: string, formData: FormData): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, formData);
   }
 
   // 🔹 Delete product (if you add backend support later)
