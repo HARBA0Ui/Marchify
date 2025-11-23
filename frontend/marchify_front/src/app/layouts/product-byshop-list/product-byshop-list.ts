@@ -11,7 +11,7 @@ import { ProductPinnedCard } from '../product-pinned-card/product-pinned-card';
 
 @Component({
   selector: 'app-product-byshop-list',
-  imports: [ProductCard, FormsModule, CommonModule, RouterLink,ProductPinnedCard],
+  imports: [ProductCard, FormsModule, CommonModule, RouterLink, ProductPinnedCard],
   templateUrl: './product-byshop-list.html',
   styleUrl: './product-byshop-list.css',
 })
@@ -26,19 +26,28 @@ export class ProductByshopList implements OnInit, OnChanges {
   products: Product[] = [];
   filteredProducts: Product[] = [];
 
+  // Pagination properties
+  currentPage: number = 1;
+  itemsPerPage: number = 9;
+  totalPages: number = 0;
+  paginatedUnpinnedProducts: Product[] = [];
+  
+  // Animation state
+  isJumping: boolean = false;
+
   // Filters
   deliveryFilter: string = 'all';
   sortBy: string = 'name';
   searchQuery: string = '';
   isLoading: boolean = true;
 
-  // Add these helper methods
+  // Helper methods
   get hasPinnedProducts(): boolean {
     return this.filteredProducts.some(p => p.Ispinned);
   }
 
   get hasUnpinnedProducts(): boolean {
-    return this.filteredProducts.some(p => !p.Ispinned);
+    return this.unpinnedProducts.length > 0;
   }
 
   get pinnedProducts(): Product[] {
@@ -98,6 +107,7 @@ export class ProductByshopList implements OnInit, OnChanges {
     }
 
     this.filteredProducts = filtered;
+    this.currentPage = 1;
     this.applySorting();
   }
 
@@ -118,12 +128,101 @@ export class ProductByshopList implements OnInit, OnChanges {
           return a.nom.localeCompare(b.nom);
       }
     });
+    
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    const unpinned = this.unpinnedProducts;
+    this.totalPages = Math.ceil(unpinned.length / this.itemsPerPage);
+
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = this.totalPages;
+    }
+
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedUnpinnedProducts = unpinned.slice(startIndex, endIndex);
+  }
+
+  // FIXED: No scroll manipulation - just clean pagination
+  goToPage(page: number, event?: MouseEvent) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.triggerJumpAnimation();
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  triggerJumpAnimation() {
+    this.isJumping = true;
+    setTimeout(() => {
+      this.isJumping = false;
+    }, 600);
+  }
+
+  get pageNumbers(): number[] {
+    const maxPages = 7;
+    const pages: number[] = [];
+
+    if (this.totalPages <= maxPages) {
+      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    }
+
+    pages.push(1);
+
+    if (this.currentPage > 3) {
+      pages.push(-1);
+    }
+
+    const start = Math.max(2, this.currentPage - 1);
+    const end = Math.min(this.totalPages - 1, this.currentPage + 1);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (this.currentPage < this.totalPages - 2) {
+      pages.push(-1);
+    }
+
+    if (this.totalPages > 1) {
+      pages.push(this.totalPages);
+    }
+
+    return pages;
+  }
+
+  getSliderPosition(): number {
+    if (this.totalPages === 0) return 8;
+    
+    const buttonWidth = 40;
+    const gap = 8;
+    const padding = 8;
+
+    const allPages = this.pageNumbers;
+    let visualIndex = 0;
+    for (let i = 0; i < allPages.length; i++) {
+      if (allPages[i] === this.currentPage) {
+        visualIndex = i;
+        break;
+      }
+    }
+    
+    return padding + ((visualIndex + 1) * (buttonWidth + gap));
   }
 
   clearFilters() {
     this.searchQuery = '';
     this.deliveryFilter = 'all';
     this.sortBy = 'name';
+    this.currentPage = 1;
     this.filteredProducts = [...this.products];
     this.applySorting();
   }
@@ -148,7 +247,7 @@ export class ProductByshopList implements OnInit, OnChanges {
         },
         error: (err) => {
           console.error('Erreur ajout produit:', err);
-          alert('Impossible d ajouter le produit au panier.');
+          alert('Impossible d\'ajouter le produit au panier.');
         },
       });
   }
@@ -157,4 +256,3 @@ export class ProductByshopList implements OnInit, OnChanges {
     console.log('View product details:', product);
   }
 }
-

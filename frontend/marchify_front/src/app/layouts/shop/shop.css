@@ -1,3 +1,21 @@
+/* Prevent scroll restoration and anchoring */
+:host {
+  display: block;
+  scroll-behavior: auto !important;
+}
+
+/* Lock scroll position during content updates */
+.max-w-7xl {
+  scroll-behavior: auto !important;
+  overflow-anchor: none;
+}
+
+/* Prevent sticky elements from causing scroll jumps */
+.sticky {
+  position: sticky;
+  overflow-anchor: none;
+}
+
 /* Smooth animations */
 .animate-spin {
   animation: spin 1s linear infinite;
@@ -12,12 +30,13 @@
   }
 }
 
-/* Sticky sidebar */
-.sticky {
-  position: sticky;
-}
-
 /* Ensure smooth transitions */
 button, a {
   transition: all 0.2s ease;
+}
+
+/* Prevent layout shifts from sticky sidebar */
+.lg\:col-span-1,
+.lg\:col-span-3 {
+  scroll-behavior: auto !important;
 }

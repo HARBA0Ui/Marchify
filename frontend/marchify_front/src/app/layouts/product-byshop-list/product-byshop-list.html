@@ -7,7 +7,7 @@
         [(ngModel)]="searchQuery"
         (input)="applyFilters()"
         placeholder="Rechercher..."
-        class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all placeholder-gray-400"
+        class="w-full border h-10 border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all placeholder-gray-400"
       />
       <div class="absolute inset-y-0 right-3 flex items-center text-gray-400 pointer-events-none">
         <i class="fas fa-search"></i>
@@ -18,7 +18,7 @@
       <select
         [(ngModel)]="deliveryFilter"
         (change)="applyFilters()"
-        class="w-full sm:w-auto appearance-none border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm hover:border-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all"
+        class="w-full h-10 sm:w-auto appearance-none border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm hover:border-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all"
       >
         <option value="all">Tous</option>
         <option value="livrable">Livrables</option>
@@ -33,7 +33,7 @@
       <select
         [(ngModel)]="sortBy"
         (change)="applySorting()"
-        class="w-full sm:w-auto appearance-none border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm text-gray-700 shadow-sm hover:border-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all"
+        class="w-full sm:w-auto appearance-none border border-gray-300 rounded-lg px-6 mr-1 h-10 bg-white text-sm text-gray-700 shadow-sm hover:border-[#386641] focus:outline-none focus:ring-2 focus:ring-[#F97A00] transition-all"
       >
         <option value="name">Nom</option>
         <option value="price-asc">Prix ↑</option>
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <button (click)="clearFilters()" class="bg-[#F97A00] text-white rounded px-3 py-1.5 font-medium">
+    <button (click)="clearFilters()" class="bg-[#F97A00] text-white rounded h-10 px-6 font-medium">
       Réinitialiser
     </button>
     

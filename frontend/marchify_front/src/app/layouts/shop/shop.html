@@ -6,9 +6,8 @@
   </div>
 </div>
 }
-
 @else if (shop) {
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50" id="shop-container">
   <!-- Header -->
   <div class="bg-white border-b border-gray-200 py-6">
     <div class="max-w-7xl mx-auto px-4">
@@ -88,14 +87,16 @@
 
           <!-- Action Buttons -->
           <div class="space-y-3 pt-4 border-t border-gray-200">
-            <button (click)="callShop()"
-              class="w-full bg-[#F97A00] hover:bg-[#e86900] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <button type="button"
+                    (click)="callShop()"
+                    class="w-full bg-[#F97A00] hover:bg-[#e86900] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
               <i class="fas fa-phone-alt"></i>
               <span>Appeler</span>
             </button>
 
-            <button (click)="openMap()"
-              class="w-full bg-[#386641] hover:bg-[#2d5234] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <button type="button"
+                    (click)="openMap()"
+                    class="w-full bg-[#386641] hover:bg-[#2d5234] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
               <i class="fas fa-map-marked-alt"></i>
               <span>Localiser</span>
             </button>
@@ -122,7 +123,7 @@
       </div>
 
       <!-- Main Content - Products -->
-      <div class="lg:col-span-3">
+      <div class="lg:col-span-3" id="products-section">
         <div class="mb-6">
           <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <i class="fas fa-boxes text-[#386641]"></i>
@@ -141,23 +142,6 @@
       </div>
 
     </div>
-  </div>
-</div>
-}
-
-@else {
-<div class="min-h-screen bg-gray-50 flex items-center justify-center">
-  <div class="text-center px-4">
-    <div class="mx-auto bg-red-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-      <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
-    </div>
-    <h2 class="text-2xl font-bold text-gray-800 mb-2">Boutique introuvable</h2>
-    <p class="text-gray-600 mb-6">Cette boutique n'existe pas ou a été supprimée.</p>
-    <a routerLink="/shop-list"
-      class="inline-flex items-center gap-2 bg-[#386641] text-white font-medium px-6 py-3 rounded-lg hover:bg-[#2d5234] transition-colors shadow-md">
-      <i class="fas fa-arrow-left"></i>
-      <span>Retour aux boutiques</span>
-    </a>
   </div>
 </div>
 }

@@ -13,13 +13,7 @@ import { ShopService } from '../../core/services/shop-service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [
-    ProductCard,
-    FormsModule,
-    CommonModule,
-    RouterLink,
-    ProductMostrateCard,
-  ],
+  imports: [ProductCard, FormsModule, CommonModule, RouterLink, ProductMostrateCard],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
 })
@@ -34,22 +28,28 @@ export class ProductList implements OnInit {
   filteredProducts: Product[] = [];
   topPinnedProducts: Product[] = [];
 
+  // ✅ PAGINATION - ADD THESE
+  currentPage: number = 1;
+  itemsPerPage: number = 9;
+  totalPages: number = 0;
+  paginatedProducts: Product[] = [];
+  isJumping: boolean = false;
+
   selectedCategory: string = '';
   deliveryFilter: string = 'all';
   sortBy: string = 'name';
-
   isLoading: boolean = true;
   categories: string[] = [];
 
   ngOnInit() {
     this.loadProducts();
-    this.loadCartCount(); // Load initial cart count
+    this.loadCartCount();
     this.fetchPinnedTopRated();
   }
+
   fetchPinnedTopRated() {
     this.productService.getPinnedTopRatedProduits().subscribe({
       next: (products) => {
-        // Get only the first 6 products
         this.topPinnedProducts = (products || []).slice(0, 3);
       },
       error: (err) => {
@@ -61,12 +61,12 @@ export class ProductList implements OnInit {
 
   loadProducts() {
     this.isLoading = true;
-
     this.productService.getProducts().subscribe({
       next: (products) => {
         this.products = products;
         this.filteredProducts = [...this.products];
         this.extractCategories();
+        this.updatePagination(); // ✅ ADD PAGINATION
         this.isLoading = false;
       },
       error: (error) => {
@@ -76,7 +76,6 @@ export class ProductList implements OnInit {
     });
   }
 
-  // 🔹 Load cart count from database on init
   loadCartCount() {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
@@ -117,7 +116,8 @@ export class ProductList implements OnInit {
     }
 
     this.filteredProducts = filtered;
-    this.applySorting();
+    this.currentPage = 1; // Reset to page 1
+    this.updatePagination(); // ✅ UPDATE PAGINATION
   }
 
   applySorting() {
@@ -132,6 +132,63 @@ export class ProductList implements OnInit {
       default:
         this.filteredProducts.sort((a, b) => a.nom.localeCompare(b.nom));
     }
+    this.updatePagination(); // ✅ UPDATE PAGINATION
+  }
+
+  // ✅ NEW PAGINATION METHODS
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = this.totalPages;
+    }
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedProducts = this.filteredProducts.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.triggerJumpAnimation();
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  triggerJumpAnimation() {
+    this.isJumping = true;
+    setTimeout(() => this.isJumping = false, 600);
+  }
+
+  get pageNumbers(): number[] {
+    const maxPages = 7;
+    const pages: number[] = [];
+    if (this.totalPages <= maxPages) {
+      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    }
+    pages.push(1);
+    if (this.currentPage > 3) pages.push(-1);
+    const start = Math.max(2, this.currentPage - 1);
+    const end = Math.min(this.totalPages - 1, this.currentPage + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (this.currentPage < this.totalPages - 2) pages.push(-1);
+    if (this.totalPages > 1) pages.push(this.totalPages);
+    return pages;
+  }
+
+  getSliderPosition(): number {
+    if (this.totalPages === 0) return 8;
+    const buttonWidth = 40;
+    const gap = 8;
+    const padding = 8;
+    const allPages = this.pageNumbers;
+    let visualIndex = 0;
+    for (let i = 0; i < allPages.length; i++) {
+      if (allPages[i] === this.currentPage) {
+        visualIndex = i;
+        break;
+      }
+    }
+    return padding + ((visualIndex + 1) * (buttonWidth + gap));
   }
 
   clearFilters() {
@@ -139,46 +196,35 @@ export class ProductList implements OnInit {
     this.deliveryFilter = 'all';
     this.sortBy = 'name';
     this.filteredProducts = [...this.products];
+    this.currentPage = 1;
     this.applySorting();
   }
 
-  // ✅ Handle add to cart with dynamic clientId
+  // ✅ YOUR WORKING CART METHODS (KEEP THESE)
   onAddToCart(product: Product) {
     const currentUser = this.authService.getCurrentUser();
-
     if (!currentUser) {
       alert('Vous devez être connecté pour ajouter au panier');
       this.router.navigate(['/login']);
       return;
     }
-
     const clientId = currentUser.id;
     const quantite = 1;
-
-    this.panierService
-      .ajouterProduit(clientId, product.id, quantite)
-      .subscribe({
-        next: (res) => {
-          console.log('Produit ajouté au panier:', res);
-
-          // 🔹 Reload cart count from database to ensure accuracy
-          // The ProductCard already did optimistic update (+1)
-          // But let's sync with actual DB count to be safe
-          this.loadCartCount();
-        },
-        error: (err) => {
-          console.error('Erreur ajout produit:', err);
-
-          if (err.status === 400 && err.error?.message) {
-            alert(err.error.message);
-          } else {
-            alert("Impossible d'ajouter le produit au panier.");
-          }
-
-          // 🔹 Reload cart from DB on error to fix any mismatch
-          this.loadCartCount();
-        },
-      });
+    this.panierService.ajouterProduit(clientId, product.id, quantite).subscribe({
+      next: (res) => {
+        console.log('Produit ajouté au panier:', res);
+        this.loadCartCount();
+      },
+      error: (err) => {
+        console.error('Erreur ajout produit:', err);
+        if (err.status === 400 && err.error?.message) {
+          alert(err.error.message);
+        } else {
+          alert("Impossible d'ajouter le produit au panier.");
+        }
+        this.loadCartCount();
+      },
+    });
   }
 
   onViewDetails(product: Product) {

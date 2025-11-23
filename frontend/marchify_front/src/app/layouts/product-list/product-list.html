@@ -1,128 +1,146 @@
 <div class="flex flex-col lg:flex-row gap-10 px-4 lg:px-12 py-8 bg-gray-50 min-h-screen">
 
   <!-- Filters Sidebar -->
-  <aside class="filters bg-white border border-gray-200 rounded-2xl p-6 w-full lg:max-w-xs mb-8 lg:sticky lg:top-8 shadow-md">
-    <div class="filters-content space-y-6">
-      <h2 class="text-lg font-bold text-[#386641] mb-4 flex items-center gap-2">
-        <i class="fas fa-sliders-h"></i> Filtrer les produits
-      </h2>
+  <aside class="filters">
+    <div class="filters-content">
+      <h2>Filtrer les produits</h2>
 
       <!-- Category Filter -->
       <div class="filter-group">
-        <h3 class="text-md font-semibold mb-2">Catégorie</h3>
-        <div class="space-y-1">
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="selectedCategory === ''">
-            <input type="radio" name="category" [(ngModel)]="selectedCategory" value="" (change)="applyFilters()">
-            <span>Toutes les catégories</span>
-          </label>
-          <label *ngFor="let cat of categories" class="flex items-center gap-2 cursor-pointer" [class.font-bold]="selectedCategory === cat">
-            <input type="radio" name="category" [(ngModel)]="selectedCategory" [value]="cat" (change)="applyFilters()">
-            <span>{{ cat }}</span>
-          </label>
-        </div>
+        <h3>Catégorie</h3>
+        <label [class.active]="selectedCategory === ''">
+          <input type="radio" name="category" [(ngModel)]="selectedCategory" value="" (change)="applyFilters()">
+          <span>Toutes les catégories</span>
+        </label>
+        <label *ngFor="let cat of categories" [class.active]="selectedCategory === cat">
+          <input type="radio" name="category" [(ngModel)]="selectedCategory" [value]="cat" (change)="applyFilters()">
+          <span>{{ cat }}</span>
+        </label>
       </div>
 
       <!-- Delivery Filter -->
       <div class="filter-group">
-        <h3 class="text-md font-semibold mb-2">Livraison</h3>
-        <div class="space-y-1">
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="deliveryFilter === 'all'">
-            <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="all" (change)="applyFilters()">
-            <span>Tous les produits</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="deliveryFilter === 'livrable'">
-            <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="livrable" (change)="applyFilters()">
-            <span>Livrable</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="deliveryFilter === 'non-livrable'">
-            <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="non-livrable" (change)="applyFilters()">
-            <span>Non livrable</span>
-          </label>
-        </div>
+        <h3>Livraison</h3>
+        <label [class.active]="deliveryFilter === 'all'">
+          <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="all" (change)="applyFilters()">
+          <span>Tous les produits</span>
+        </label>
+        <label [class.active]="deliveryFilter === 'livrable'">
+          <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="livrable" (change)="applyFilters()">
+          <span>Livrable</span>
+        </label>
+        <label [class.active]="deliveryFilter === 'non-livrable'">
+          <input type="radio" name="delivery" [(ngModel)]="deliveryFilter" value="non-livrable"
+            (change)="applyFilters()">
+          <span>Non livrable</span>
+        </label>
       </div>
 
       <!-- Sort Filter -->
       <div class="filter-group">
-        <h3 class="text-md font-semibold mb-2">Trier par</h3>
-        <div class="space-y-1">
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="sortBy === 'name'">
-            <input type="radio" name="sort" [(ngModel)]="sortBy" value="name" (change)="applySorting()">
-            <span>Nom (A-Z)</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="sortBy === 'price-asc'">
-            <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-asc" (change)="applySorting()">
-            <span>Prix croissant</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer" [class.font-bold]="sortBy === 'price-desc'">
-            <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-desc" (change)="applySorting()">
-            <span>Prix décroissant</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Clear Filters Button -->
-      <div class="pt-3">
-        <button class="w-full px-4 py-2 rounded-lg bg-[#F97A00] text-white font-bold transition hover:bg-[#386641]" (click)="clearFilters()">
-          Réinitialiser les filtres
-        </button>
+        <h3>Trier par</h3>
+        <label [class.active]="sortBy === 'name'">
+          <input type="radio" name="sort" [(ngModel)]="sortBy" value="name" (change)="applySorting()">
+          <span>Nom (A-Z)</span>
+        </label>
+        <label [class.active]="sortBy === 'price-asc'">
+          <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-asc" (change)="applySorting()">
+          <span>Prix croissant</span>
+        </label>
+        <label [class.active]="sortBy === 'price-desc'">
+          <input type="radio" name="sort" [(ngModel)]="sortBy" value="price-desc" (change)="applySorting()">
+          <span>Prix décroissant</span>
+        </label>
       </div>
     </div>
+
+    <!-- Clear Filters Button - Sticky at bottom -->
+    <button class="clear-filters-btn" (click)="clearFilters()">
+      Réinitialiser les filtres
+    </button>
   </aside>
 
   <!-- Main Content -->
   <main class="flex-1 flex flex-col">
 
-    
-
-
-
     <!-- Header -->
     <div class="products-header text-center">
-      <h1 class="text-4xl font-extrabold text-[#386641] mb-2">NosProduits</h1>
+      <h1 class="text-4xl font-extrabold text-[#386641] mb-2">Nos Produits</h1>
       <p class="text-gray-600 mb-1">Découvrez nos boutiques partenaires et explorez leurs univers uniques.</p>
       <p><strong>{{ filteredProducts.length }} produits disponibles</strong></p>
     </div>
-    <!-- Pinned/Top Note Products Section -->
-<section *ngIf="topPinnedProducts.length > 0  " class="highlighted-products bg-gray-50 rounded-2xl border border-[#386641] shadow p-6 mb-2">
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-    <app-product-mostrate-card
-      *ngFor="let product of topPinnedProducts"
-      [product]="product"
-      (addToCartEvent)="onAddToCart($event)"
-      (viewDetailsEvent)="onViewDetails($event)">
-    </app-product-mostrate-card>
-  </div>
-</section>
+    <!-- Pinned/Top Note Products Section -->
+    <section *ngIf="topPinnedProducts.length > 0"
+      class="highlighted-products bg-gray-50 rounded-md border border-[#386641]/50 shadow-xl p-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+        <app-product-mostrate-card *ngFor="let product of topPinnedProducts" [product]="product"
+          (addToCartEvent)="onAddToCart($event)" (viewDetailsEvent)="onViewDetails($event)">
+        </app-product-mostrate-card>
+      </div>
+    </section>
 
     <!-- Loading State -->
     <div *ngIf="isLoading" class="text-center py-10">
-      <div class="w-16 h-16 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mx-auto mb-6"></div>
+      <div class="w-16 h-16 border-4 border-[#386641]/20 border-t-[#F97A00] rounded-full animate-spin mx-auto mb-6">
+      </div>
       <p class="text-[#386641] text-lg font-semibold">Chargement des produits...</p>
     </div>
 
     <!-- Products Grid -->
-     <div *ngIf="!isLoading && filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-
-      <app-product-card
-        *ngFor="let product of filteredProducts; trackBy: trackById"
-        [product]="product"
-        (addToCartEvent)="onAddToCart($event)"
-        (viewDetailsEvent)="onViewDetails($event)">
+    <div *ngIf="!isLoading && paginatedProducts.length > 0"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+      <app-product-card *ngFor="let product of paginatedProducts; trackBy: trackById" [product]="product"
+        (addToCartEvent)="onAddToCart($event)" (viewDetailsEvent)="onViewDetails($event)">
       </app-product-card>
     </div>
+    <!-- ✅ ADD THIS PAGINATION after the products grid -->
+    <div *ngIf="!isLoading && totalPages > 1" class="pagination-container mt-12">
+      <div class="pagination-wrapper">
+        <ul class="pagination">
+          <!-- Previous -->
+          <li [class.disabled]="currentPage === 1">
+            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+          </li>
+
+          <!-- Pages -->
+          <li *ngFor="let page of pageNumbers" [class.active]="page === currentPage" [class.ellipsis]="page === -1">
+            <button *ngIf="page !== -1" (click)="goToPage(page)">
+              {{ page }}
+            </button>
+            <span *ngIf="page === -1" class="ellipsis-dots">...</span>
+          </li>
+
+          <!-- Next -->
+          <li [class.disabled]="currentPage === totalPages">
+            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </li>
+        </ul>
+
+        <span class="pagination-slider" [style.left.px]="getSliderPosition()"></span>
+        <span class="pagination-icon-jumper" [style.left.px]="getSliderPosition()" [class.jumping]="isJumping">🍊</span>
+      </div>
+      <p class="pagination-info">Page {{ currentPage }} de {{ totalPages }} ({{ filteredProducts.length }} produits)</p>
+    </div>
+
 
     <!-- No Results -->
-    <div *ngIf="!isLoading && filteredProducts.length === 0" class="bg-white rounded-2xl shadow border p-10 text-center mt-10">
+    <div *ngIf="!isLoading && filteredProducts.length === 0"
+      class="bg-white rounded-2xl shadow border p-10 text-center mt-10">
       <h3 class="text-xl font-bold text-[#386641] mb-2">Aucun produit trouvé</h3>
       <p class="text-gray-600 mb-3">Essayez d'ajuster vos filtres</p>
-      <button class="mt-2 px-6 py-2 bg-[#386641] text-white rounded-lg font-semibold transition hover:bg-[#F97A00]" (click)="clearFilters()">
+      <button class="mt-2 px-6 py-2 bg-[#386641] text-white rounded-lg font-semibold transition hover:bg-[#F97A00]"
+        (click)="clearFilters()">
         Voir tous les produits
       </button>
     </div>
   </main>
 
-  <!-- AI Floating Button (unchanged) -->
+  <!-- AI Floating Button -->
   <div class="fixed bottom-6 left-6 z-50">
     <div class="absolute inset-0 rounded-full bg-[#386641] opacity-20 animate-ping"></div>
     <div class="absolute inset-0 rounded-full bg-[#F97A00] opacity-10 animate-pulse"></div>
@@ -135,7 +153,7 @@
           class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-[#F97A00] rounded-full flex items-center justify-center border-2 border-white">
           <i class="fas fa-camera text-white text-[8px]"></i>
         </div>
-      </div>  
+      </div>
       <div class="absolute -top-1 -right-1 text-yellow-300 animate-pulse">
         <i class="fas fa-sparkles text-xs"></i>
       </div>
