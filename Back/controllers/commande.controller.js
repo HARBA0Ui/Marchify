@@ -159,6 +159,7 @@ export const accepterCommande = async (req, res) => {
 };
 
 // ✅ UPDATED: Prepare order (PROCESSING → READY)
+// ✅ PERFECT: Calls createBonDeLivraison correctly
 export const preparerCommande = async (req, res) => {
   try {
     const { commandeId } = req.params;
@@ -181,7 +182,7 @@ export const preparerCommande = async (req, res) => {
       });
     }
 
-    // Check stock one more time
+    // ✅ Check stock
     const indisponibles = commande.produits.filter(
       (p) => p.produit.quantite < p.quantite
     );
@@ -196,6 +197,7 @@ export const preparerCommande = async (req, res) => {
       });
     }
 
+    // ✅ DÉDUCT STOCK
     for (const p of commande.produits) {
       const updatedProduit = await db.produit.update({
         where: { id: p.produitId },
@@ -204,10 +206,15 @@ export const preparerCommande = async (req, res) => {
 
       const STOCK_THRESHOLD = 10;
       if (updatedProduit.quantite <= STOCK_THRESHOLD) {
-        await notifyLowStock(updatedProduit);
+        try {
+          await notifyLowStock(updatedProduit);
+        } catch (notifError) {
+          console.error("Low stock notification failed:", notifError);
+        }
       }
     }
 
+    // ✅ UPDATE STATUS TO READY
     const commandePrep = await db.commande.update({
       where: { id: commandeId },
       data: { status: "READY" },
@@ -220,15 +227,67 @@ export const preparerCommande = async (req, res) => {
 
     await notifyOrderStatusChange(commandePrep, "READY");
 
+    const bonDeLivraison = await createBonDeLivraison(commandeId);
+
+    console.log("✅ Commande préparée + Bon créé:", commandePrep.id);
+
     res.json({
-      message: "Commande prête pour livraison",
+      message: "Commande prête pour livraison + Bon de livraison créé",
       commande: commandePrep,
+      bonDeLivraison: bonDeLivraison || null,
     });
   } catch (error) {
     console.error("preparerCommande error:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const createBonDeLivraison = async (commandeId, livreurId = null) => {
+  try {
+    const commande = await db.commande.findUnique({
+      where: { id: commandeId },
+      include: { boutique: true, client: true },
+    });
+
+    if (!commande || commande.status !== "READY") {
+      console.error("❌ Commande invalid:", commande?.status);
+      return null;
+    }
+
+    // ✅ DELETE existing bon first
+    await db.bonDeLivraison.deleteMany({
+      where: { commandeId }
+    });
+
+    // ✅ NO livreurId field = automatically null!
+    const bon = await db.bonDeLivraison.create({
+      data: {
+        commande: { connect: { id: commandeId } },
+        status: "PENDING_PICKUP",
+        // ✅ NO livreurId = Prisma sets null automatically
+      },
+      include: {
+        commande: { include: { client: true, boutique: true } },
+      },
+    });
+
+    console.log("✅ Bon créé (livreurId=NULL):", bon.id);
+
+    // Notify it's ready for pickup
+    try {
+      await notifyDeliveryAssigned(bon, commande);
+    } catch (notifError) {
+      console.error("Notification failed:", notifError);
+    }
+
+    return bon;
+  } catch (error) {
+    console.error("❌ createBonDeLivraison:", error);
+    return null;
+  }
+};
+
 
 export const expedierCommande = async (req, res) => {
   try {

@@ -97,7 +97,7 @@ export const getBonsDeLivraisonByLivreur = async (req, res) => {
 // -----------------------------------------------------
 export const createBonDeLivraison = async (req, res) => {
   try {
-    const { commandeId, livreurId } = req.body;
+    const { commandeId, livreurId=null } = req.body;
 
     const commande = await db.commande.findUnique({
       where: { id: commandeId },
@@ -287,3 +287,5 @@ export const failDelivery = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+
