@@ -128,10 +128,11 @@ model BonDeLivraison {
   commande     Commande       @relation(fields: [commandeId], references: [id], onDelete: Cascade)
   commandeId   String         @unique @db.ObjectId
   status       DeliveryStatus @default(PENDING_PICKUP)
-  livreur      Livreur        @relation(fields: [livreurId], references: [id], onDelete: Cascade)
-  livreurId    String         @db.ObjectId
+  livreur      Livreur?       @relation(fields: [livreurId], references: [id], onDelete: SetNull)
+  livreurId    String?        @db.ObjectId  
   @@map("bon_de_livraison")
 }
+
 
 model Commande {
   id               String            @id @default(auto()) @map("_id") @db.ObjectId

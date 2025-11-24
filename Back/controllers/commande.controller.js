@@ -196,6 +196,7 @@ export const preparerCommande = async (req, res) => {
       });
     }
 
+    // Deduct stock
     for (const p of commande.produits) {
       const updatedProduit = await db.produit.update({
         where: { id: p.produitId },
@@ -208,21 +209,50 @@ export const preparerCommande = async (req, res) => {
       }
     }
 
-    const commandePrep = await db.commande.update({
-      where: { id: commandeId },
-      data: { status: "READY" },
-      include: {
-        client: true,
-        boutique: true,
-        produits: { include: { produit: true } },
-      },
+    // ✅ UPDATE COMMANDE AND CREATE BON DE LIVRAISON IN ONE TRANSACTION
+    const result = await db.$transaction(async (prisma) => {
+      // Update commande status to READY
+      const commandePrep = await prisma.commande.update({
+        where: { id: commandeId },
+        data: { status: "READY" },
+        include: {
+          client: true,
+          boutique: true,
+          produits: { include: { produit: true } },
+        },
+      });
+
+      // ✅ AUTO-CREATE BON DE LIVRAISON WITH NULL LIVREUR
+      const bonDeLivraison = await prisma.bonDeLivraison.create({
+        data: {
+          commandeId: commandeId,
+          status: "PENDING_PICKUP",
+          // livreurId is not provided, so it will be null
+        },
+        include: {
+          commande: { include: { client: true, boutique: true } },
+        },
+      });
+
+      return { commande: commandePrep, bon: bonDeLivraison };
     });
 
-    await notifyOrderStatusChange(commandePrep, "READY");
+    await notifyOrderStatusChange(result.commande, "READY");
+
+    // ✅ NOTIFY THAT ORDER IS READY FOR PICKUP (no livreur assigned yet)
+    const orderNumber = result.commande.id.slice(-8).toUpperCase();
+    await createNotification({
+      userId: result.commande.clientId,
+      type: "ORDER_READY",
+      data: { orderNumber },
+      commandeId: result.commande.id,
+      actionUrl: `/orders/${result.commande.id}/track`,
+    });
 
     res.json({
-      message: "Commande prête pour livraison",
-      commande: commandePrep,
+      message: "Commande prête et bon de livraison créé",
+      commande: result.commande,
+      bonDeLivraison: result.bon,
     });
   } catch (error) {
     console.error("preparerCommande error:", error);

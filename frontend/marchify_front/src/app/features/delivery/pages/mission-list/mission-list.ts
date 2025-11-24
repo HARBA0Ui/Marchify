@@ -1,13 +1,10 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { interval, Subscription } from 'rxjs';
-import { LivreurService } from '../../../../core/services/livreur-service';
+import { interval, Subscription, forkJoin } from 'rxjs';
 import { BonDeLivraison } from '../../../../core/models/bondelivraison';
 import { BondeLivraisonService } from '../../../../core/services/bonde-livraison-service';
 import { AuthService } from '../../../../core/services/auth.service';
-
-interface MissionsResponse { missions: BonDeLivraison[] }
 
 @Component({
   selector: 'app-mission-list',
@@ -18,18 +15,17 @@ interface MissionsResponse { missions: BonDeLivraison[] }
 })
 export class MissionList implements OnInit, OnDestroy {
   private authService = inject(AuthService);
-  private livreurService = inject(LivreurService);
-  private bondelivraison = inject(BondeLivraisonService);
-  
-  missions: BonDeLivraison[] = [];
+  private bonService = inject(BondeLivraisonService);
+
+  missions = signal<BonDeLivraison[]>([]);
   selectedStatus = signal<string>('PENDING_PICKUP');
-  filteredMissions: BonDeLivraison[] = [];
+  filteredMissions = signal<BonDeLivraison[]>([]);
   livreurId: string | null = null;
   error = signal<string | null>(null);
   loading = signal<boolean>(false);
-  refreshing = signal<boolean>(false); // ✅ Manual refresh indicator
-  
-  private refreshSubscription?: Subscription; // ✅ Auto-refresh
+  refreshing = signal<boolean>(false);
+
+  private refreshSubscription?: Subscription;
 
   statusList = [
     { value: 'PENDING_PICKUP', label: 'Prêtes' },
@@ -45,18 +41,18 @@ export class MissionList implements OnInit, OnDestroy {
     }
     this.livreurId = currentUser.livreurId;
     this.loadAllMissions();
-    this.startAutoRefresh(); // ✅ Start polling
+    this.startAutoRefresh();
   }
 
   ngOnDestroy(): void {
-    this.stopAutoRefresh(); // ✅ Clean up
+    this.stopAutoRefresh();
   }
 
   // ✅ AUTO-REFRESH every 30 seconds
   startAutoRefresh(): void {
     this.refreshSubscription = interval(30000).subscribe(() => {
       console.log('🔄 Auto-refreshing missions...');
-      this.loadAllMissions(true); // Silent refresh
+      this.loadAllMissions(true);
     });
   }
 
@@ -71,107 +67,220 @@ export class MissionList implements OnInit, OnDestroy {
     this.loadAllMissions(false, () => this.refreshing.set(false));
   }
 
-  // ✅ ENHANCED loadAllMissions with silent mode
+  // ✅ LOAD ALL MISSIONS using forkJoin
   loadAllMissions(silent = false, callback?: () => void): void {
     if (!this.livreurId) return;
-    
+
     if (!silent) this.loading.set(true);
     this.error.set(null);
 
-    this.livreurService.getMissionsDisponibles().subscribe({
-      next: (res: any) => {
-        const available = Array.isArray(res) ? res : res.missions ?? [];
-        console.log('✅ Available:', available.length);
+    forkJoin({
+      unassigned: this.bonService.getUnassignedBons(),
+      assigned: this.bonService.getBonsByLivreur(this.livreurId),
+    }).subscribe({
+      next: (result) => {
+        const unassignedBons = result.unassigned?.bons || [];
+        const assignedBons = result.assigned?.bons || [];
 
-        this.bondelivraison.getBondelisraisonsByLivreur(this.livreurId!).subscribe({
-          next: (assignedRes: any) => {
-            const assigned = Array.isArray(assignedRes?.bons) ? assignedRes.bons : [];
-            console.log('✅ Assigned:', assigned.length);
-            
-            const previousCount = this.missions.length;
-            this.missions = [...available, ...assigned];
-            console.log('✅ TOTAL:', this.missions.length);
-            
-            // ✅ Notify if new missions
-            if (this.missions.length > previousCount && silent) {
-              console.log('🔔 New missions available!');
-            }
-            
-            this.filterByStatus(this.selectedStatus());
-            this.error.set(this.missions.length === 0 ? "Aucune mission" : null);
-            if (!silent) this.loading.set(false);
-            callback?.();
-          },
-          error: (err) => {
-            console.error('Assigned error:', err);
-            this.missions = available;
-            this.filterByStatus(this.selectedStatus());
-            if (!silent) this.loading.set(false);
-            callback?.();
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Available error:', err);
-        this.error.set('Erreur chargement');
+        const previousCount = this.missions().length;
+        const allMissions = [...unassignedBons, ...assignedBons];
+
+        console.log('✅ Unassigned:', unassignedBons.length);
+        console.log('✅ Assigned:', assignedBons.length);
+        console.log('✅ TOTAL:', allMissions.length);
+
+        // ✅ Update signal with new array reference
+        this.missions.set(allMissions);
+
+        // ✅ Notify if new missions (only during silent refresh)
+        if (allMissions.length > previousCount && silent) {
+          console.log('🔔 New missions available!');
+          this.showNotification(
+            `${allMissions.length - previousCount} nouvelle(s) mission(s)`
+          );
+        }
+
+        this.filterByStatus(this.selectedStatus());
+
+        if (allMissions.length === 0) {
+          this.error.set('Aucune mission disponible');
+        }
+
         if (!silent) this.loading.set(false);
         callback?.();
-      }
+      },
+      error: (err) => {
+        console.error('❌ Load missions error:', err);
+        this.error.set('Erreur lors du chargement des missions');
+        if (!silent) this.loading.set(false);
+        callback?.();
+      },
     });
   }
 
-  filterByStatus(status: string) {
+  // ✅ FILTER BY STATUS
+  filterByStatus(status: string): void {
     this.selectedStatus.set(status);
-    this.filteredMissions = this.missions.filter(m => m.status === status);
+    const filtered = this.missions().filter((m) => m.status === status);
+    this.filteredMissions.set(filtered);
   }
 
+  // ✅ GET MISSION COUNT
   getMissionCount(status: string): number {
-    return this.missions.filter(m => m.status === status).length;
+    return this.missions().filter((m) => m.status === status).length;
   }
 
-  getStatusLabel(status: string): string {
-    const labels = { PENDING_PICKUP: 'Prête', IN_TRANSIT: 'En livraison', DELIVERED: 'Livrée' };
-    return labels[status as keyof typeof labels] || status;
-  }
-
-  formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleString('fr-FR', {
-      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-  }
-
-  acceptMission(missionId: string) {
+  // ✅ ACCEPT MISSION (Assign livreur to unassigned bon)
+  acceptMission(missionId: string): void {
     if (!this.livreurId || !confirm('Accepter cette mission ?')) return;
-    
-    this.livreurService.accepterMission(this.livreurId, missionId).subscribe({
-      next: (res: any) => {
-        const mission = res.bonDeLivraison || res;
-        const i = this.missions.findIndex(m => m.id === missionId);
-        if (i > -1) this.missions[i] = mission;
+
+    this.bonService.assignLivreur(missionId, this.livreurId).subscribe({
+      next: (response) => {
+        console.log('✅ Mission accepted:', response);
+
+        // ✅ Update the specific mission in the array
+        this.missions.update((missions) =>
+          missions.map((m) =>
+            m.id === missionId ? response.bonDeLivraison : m
+          )
+        );
+
         this.filterByStatus(this.selectedStatus());
-        alert('✅ Mission acceptée!');
-        this.loadAllMissions(true); // ✅ Refresh after action
+        alert('✅ Mission acceptée! Vous pouvez maintenant la récupérer.');
+
+        // ✅ Optionally auto-pickup after accept
+        this.pickupMission(missionId);
       },
-      error: () => alert('❌ Erreur acceptation')
+      error: (err) => {
+        console.error('❌ Accept error:', err);
+        alert(err.error?.message || "❌ Erreur lors de l'acceptation");
+      },
     });
   }
 
-  completeDelivery(missionId: string) {
-    if (!confirm('Confirmer livraison ?')) return;
-    
-    this.bondelivraison.livrerCommande(missionId).subscribe({
-      next: (mission: BonDeLivraison) => {
-        const i = this.missions.findIndex(m => m.id === missionId);
-        if (i > -1) this.missions[i] = mission;
+  // ✅ PICKUP MISSION (PENDING_PICKUP → IN_TRANSIT)
+  pickupMission(missionId: string): void {
+    if (!confirm('Confirmer la récupération de la commande ?')) return;
+
+    this.bonService.pickupCommande(missionId).subscribe({
+      next: (response) => {
+        console.log('✅ Pickup confirmed:', response);
+
+        // ✅ Update signal immutably
+        this.missions.update((missions) =>
+          missions.map((m) =>
+            m.id === missionId ? response.bonDeLivraison : m
+          )
+        );
+
         this.filterByStatus(this.selectedStatus());
-        alert('✅ Livraison confirmée!');
-        this.loadAllMissions(true); // ✅ Refresh after action
+        alert('✅ Commande récupérée! En route pour la livraison.');
       },
-      error: () => alert('❌ Erreur livraison')
+      error: (err) => {
+        console.error('❌ Pickup error:', err);
+        alert(err.error?.message || '❌ Erreur lors de la récupération');
+      },
     });
   }
 
+  // ✅ COMPLETE DELIVERY (IN_TRANSIT → DELIVERED)
+  completeDelivery(missionId: string): void {
+    if (!confirm('Confirmer la livraison de cette commande ?')) return;
+
+    this.bonService.livrerCommande(missionId).subscribe({
+      next: (response) => {
+        console.log('✅ Delivery completed:', response);
+
+        // ✅ Update signal immutably
+        this.missions.update((missions) =>
+          missions.map((m) =>
+            m.id === missionId ? response.bonDeLivraison : m
+          )
+        );
+
+        this.filterByStatus(this.selectedStatus());
+        alert('✅ Livraison confirmée avec succès!');
+      },
+      error: (err) => {
+        console.error('❌ Delivery error:', err);
+        alert(err.error?.message || '❌ Erreur lors de la livraison');
+      },
+    });
+  }
+
+  // ✅ FAIL DELIVERY
+  failDelivery(missionId: string): void {
+    const reason = prompt("Raison de l'échec de livraison:");
+    if (!reason) return;
+
+    this.bonService.failDelivery(missionId, reason).subscribe({
+      next: (response) => {
+        console.log('⚠️ Delivery failed:', response);
+
+        this.missions.update((missions) =>
+          missions.map((m) =>
+            m.id === missionId ? response.bonDeLivraison : m
+          )
+        );
+
+        this.filterByStatus(this.selectedStatus());
+        alert('⚠️ Échec de livraison enregistré.');
+      },
+      error: (err) => {
+        console.error('❌ Fail delivery error:', err);
+        alert(err.error?.message || '❌ Erreur');
+      },
+    });
+  }
+
+  // ✅ HELPER: Show browser notification
+  showNotification(message: string): void {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Marchify - Nouvelles missions', {
+        body: message,
+        icon: '/assets/logo.png',
+      });
+    }
+  }
+
+  // ✅ HELPER: Get total products
   getTotalProduits(mission: BonDeLivraison): number {
-    return mission.commande?.produits?.reduce((sum, p) => sum + p.quantite, 0) || 0;
+    return (
+      mission.commande?.produits?.reduce((sum, p) => sum + p.quantite, 0) || 0
+    );
+  }
+
+  // ✅ HELPER: Format date
+  formatDate(dateStr: string | Date): string {
+    return new Date(dateStr).toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  // ✅ HELPER: Get status label
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      PENDING_PICKUP: 'Prête à récupérer',
+      IN_TRANSIT: 'En livraison',
+      DELIVERED: 'Livrée',
+      FAILED: 'Échec',
+    };
+    return labels[status] || status;
+  }
+
+  // ✅ HELPER: Get client address
+  getClientAddress(mission: BonDeLivraison): string {
+    const adresse = mission.commande?.adresseLivraison;
+    if (typeof adresse === 'string') return adresse;
+    if (typeof adresse === 'object') {
+      return `${adresse.rue || ''}, ${adresse.ville || ''} ${
+        adresse.codePostal || ''
+      }`.trim();
+    }
+    return 'Adresse non disponible';
   }
 }
